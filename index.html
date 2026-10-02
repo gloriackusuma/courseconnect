@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CourseConnect — Learn from mentors nearby</title>
+<meta name="description" content="CourseConnect is a location-aware learning network prototype: browse nearby mentors by skill, message them, and book sessions.">
+<meta name="theme-color" content="#3547E0">
+<meta property="og:type" content="website">
+<meta property="og:title" content="CourseConnect">
+<meta property="og:description" content="Find someone to learn from nearby — browse mentors, chat, and book sessions.">
+<meta property="og:image" content="assets/logo.png">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: light;
+    --ink:#161829;
+    --ink-soft:#5B5F7C;
+    --ink-faint:#7B7F9E;
+    --paper:#F3F1EC;
+    --surface:#FFFFFF;
+    --surface-alt:#EDEBFA;
+    --brand:#3547E0;
+    --brand-deep:#1F2C99;
+    --brand-soft:#E4E7FC;
+    --accent:#FF6B45;
+    --gold:#F0A020;
+    --border:#E6E3DB;
+    --danger:#E14B4B;
+    --good:#1F8A3B;
+    --shadow: 0 1px 2px rgba(22,24,41,.05), 0 10px 24px -12px rgba(22,24,41,.18);
+    --radius-lg: 22px;
+    --radius-md: 16px;
+    --radius-sm: 11px;
+
+    --cat-coding:#3547E0;
+    --cat-languages:#0E8272;
+    --cat-music:#D9481C;
+    --cat-design:#7A2FC0;
+    --cat-business:#B9760A;
+    --cat-fitness:#1F8A3B;
+    --cat-academics:#0E7FA8;
+    --cat-photography:#C22A6D;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --ink:#F1F0EC;
+      --ink-soft:#B4B6D2;
+      --ink-faint:#71749A;
+      --paper:#0E0F1B;
+      --surface:#181A2C;
+      --surface-alt:#22253D;
+      --brand:#6C79FF;
+      --brand-deep:#AEB6FF;
+      --brand-soft:#262A50;
+      --accent:#FF8B66;
+      --gold:#F3B34A;
+      --border:#2C2E48;
+      --danger:#FF7373;
+      --good:#4FC26B;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 14px 30px -14px rgba(0,0,0,.6);
+
+      --cat-coding:#7C87FF;
+      --cat-languages:#3FBFA8;
+      --cat-music:#FF8560;
+      --cat-design:#C08BF0;
+      --cat-business:#F0B24E;
+      --cat-fitness:#5FCE7C;
+      --cat-academics:#4FC0EA;
+      --cat-photography:#F16FA4;
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --ink:#F1F0EC; --ink-soft:#B4B6D2; --ink-faint:#71749A;
+    --paper:#0E0F1B; --surface:#181A2C; --surface-alt:#22253D;
+    --brand:#6C79FF; --brand-deep:#AEB6FF; --brand-soft:#262A50;
+    --accent:#FF8B66; --gold:#F3B34A; --border:#2C2E48;
+    --danger:#FF7373; --good:#4FC26B;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 14px 30px -14px rgba(0,0,0,.6);
+    --cat-coding:#7C87FF; --cat-languages:#3FBFA8; --cat-music:#FF8560;
+    --cat-design:#C08BF0; --cat-business:#F0B24E; --cat-fitness:#5FCE7C;
+    --cat-academics:#4FC0EA; --cat-photography:#F16FA4;
+  }
+
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html{scroll-padding-top: env(safe-area-inset-top, 0px);}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Plus Jakarta Sans', system-ui, sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit; cursor:pointer;}
+  ::selection{ background:var(--brand-soft); }
+
+  /* ============================================================
+     SECTION 1 — APP SHELL
+     Phone frame, status bar, generic header chrome, tab bar,
+     overlay scaffolding. Shared by every tab.
+     ============================================================ */
+  /* ---------- Page shell / scene ---------- */
+  .stage{
+    min-height:100%;
+    display:flex; flex-direction:column; align-items:center;
+    gap:28px;
+    padding: 40px 20px 56px;
+  }
+  .scene-header{
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    text-align:center; max-width:440px;
+  }
+  .wordmark{ display:flex; align-items:center; gap:10px; }
+  .wordmark img{ width:40px; height:40px; flex:none; object-fit:contain; }
+  .wordmark span{ font-size:20px; font-weight:800; letter-spacing:-0.01em; }
+  .scene-header p{ margin:0; color:var(--ink-soft); font-size:14.5px; line-height:1.55; }
+
+  .device{
+    position:relative;
+    width:376px;
+    height:clamp(680px, calc(100dvh - 48px), 790px);
+    border-radius:52px;
+    background:linear-gradient(180deg,#22243A,#0F1020);
+    padding:14px;
+    box-shadow: 0 30px 60px -20px rgba(15,16,32,.35), 0 2px 0 rgba(255,255,255,.04) inset;
+    flex:none;
+  }
+  .notch{
+    position:absolute; top:14px; left:50%; transform:translateX(-50%);
+    width:120px; height:28px; background:#0F1020; border-radius:0 0 18px 18px; z-index:40;
+  }
+  .screen{
+    position:relative;
+    width:100%; height:100%;
+    background:var(--surface);
+    border-radius:38px;
+    overflow:hidden;
+    display:flex; flex-direction:column;
+  }
+
+  /* ---------- App header ---------- */
+  .app-header{
+    flex:none;
+    padding: calc(42px + env(safe-area-inset-top, 0px)) 18px 12px;
+    background:var(--surface);
+    border-bottom:1px solid transparent;
+  }
+  .status-row{
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:12px; font-weight:600; color:var(--ink); margin-bottom:10px;
+  }
+  .header-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .place-pill{
+    display:flex; align-items:center; gap:6px; color:var(--ink-soft); font-size:12.5px; font-weight:600;
+  }
+  .place-pill svg{ width:14px; height:14px; color:var(--brand); }
+  .icon-btn{
+    width:36px; height:36px; border-radius:50%; border:1px solid var(--border);
+    background:var(--surface); display:flex; align-items:center; justify-content:center;
+    color:var(--ink); position:relative; flex:none;
+  }
+  .icon-btn svg{ width:17px; height:17px; }
+  .dot-flag{ position:absolute; top:7px; right:7px; width:7px; height:7px; border-radius:50%; background:var(--accent); border:1.5px solid var(--surface); }
+  .h1{ font-size:24px; font-weight:800; letter-spacing:-0.015em; margin:12px 0 2px; }
+  .h1-sub{ font-size:13px; color:var(--ink-soft); margin:0; }
+
+  /* ============================================================
+     SECTION 2 — DISCOVER
+     Search bar, category chips, mentor cards + mentor detail
+     overlay (profile-hero .. btn-ghost further below), favoriting.
+     ============================================================ */
+  .search-bar{
+    margin-top:14px;
+    border:1px solid transparent;
+    transition:border-color .15s ease;
+  }
+  .search-bar:focus-within{ border-color:var(--brand); }
+  .search-bar input{
+    flex:1; border:none; background:none; outline:none; font-family:inherit;
+    font-size:13.5px; color:var(--ink); padding:0;
+  }
+  .search-bar input::placeholder{ color:var(--ink-faint); }
+  .search-bar button{ display:flex; background:none; border:none; padding:0; color:var(--ink-faint); flex:none; }
+  .search-bar button svg{ width:15px; height:15px; }
+  .search-bar{
+    display:flex; align-items:center; gap:8px;
+    background:var(--surface-alt); border-radius:14px; padding:11px 13px;
+    color:var(--ink-faint);
+  }
+  .search-bar > svg{ width:16px; height:16px; flex:none; }
+
+  .chip-row{
+    display:flex; gap:8px; overflow-x:auto; padding:14px 18px 4px; margin: 0 -18px;
+    scrollbar-width:none;
+  }
+  .chip-row::-webkit-scrollbar{ display:none; }
+  .chip{
+    flex:none; display:flex; align-items:center; gap:6px;
+    padding:8px 13px; border-radius:100px; font-size:12.5px; font-weight:700;
+    border:1px solid var(--border); background:var(--surface); color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .chip svg{ width:13px; height:13px; }
+  .chip.active{ background:var(--ink); border-color:var(--ink); color:var(--surface); }
+
+  /* ---------- Body / scroll area ---------- */
+  .app-body{
+    flex:1; overflow-y:auto; padding: 4px 18px 100px;
+    scrollbar-width:none;
+  }
+  .app-body::-webkit-scrollbar{ display:none; }
+  .section-label{
+    font-size:12.5px; font-weight:700; color:var(--ink-faint); margin:16px 2px 10px;
+  }
+  .section-label b{ color:var(--ink); font-weight:800; }
+
+  /* ---------- Mentor card ---------- */
+  .mentor-card{
+    display:flex; gap:12px; align-items:flex-start;
+    padding:13px; border-radius:var(--radius-md);
+    background:var(--surface); border:1px solid var(--border);
+    margin-bottom:10px; text-align:left; width:100%;
+  }
+  .avatar{
+    flex:none; display:flex; align-items:center; justify-content:center;
+    border-radius:50%; font-weight:800; color:#fff; font-size:15px; letter-spacing:-0.02em;
+  }
+  .avatar.md{ width:52px; height:52px; }
+  .avatar.lg{ width:78px; height:78px; font-size:24px; border-radius:26px; }
+  .avatar.sm{ width:40px; height:40px; font-size:13px; }
+
+  .mentor-main{ flex:1; min-width:0; }
+  .mentor-name-row{ display:flex; align-items:center; gap:5px; }
+  .mentor-name-row strong{ font-size:14.5px; font-weight:800; letter-spacing:-0.01em; }
+  .badge-check{ width:14px; height:14px; color:var(--brand); flex:none; }
+  .cat-badge{
+    display:inline-flex; align-items:center; gap:4px;
+    font-size:11px; font-weight:700; padding:3px 8px; border-radius:100px;
+    margin-top:5px;
+  }
+  .mentor-bio{
+    font-size:12.5px; color:var(--ink-soft); margin:7px 0 0; line-height:1.5;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  }
+  .mentor-meta{ display:flex; align-items:center; gap:10px; margin-top:9px; font-size:12px; color:var(--ink-soft); font-weight:600; }
+  .mentor-meta .stars{ display:flex; align-items:center; gap:3px; color:var(--ink); }
+  .mentor-meta svg{ width:13px; height:13px; }
+  .mentor-rate{ text-align:right; flex:none; }
+  .mentor-rate strong{ display:block; font-size:14px; font-weight:800; color:var(--ink); }
+  .mentor-rate span{ font-size:10.5px; color:var(--ink-faint); font-weight:600; }
+
+  .fav-btn{
+    position:absolute; bottom:10px; right:10px; width:30px; height:30px; border-radius:50%;
+    border:1px solid var(--border); background:var(--surface); display:flex; align-items:center;
+    justify-content:center; flex:none; z-index:2; box-shadow:var(--shadow);
+  }
+  .fav-btn svg{ width:15px; height:15px; color:var(--ink-faint); transition:color .15s ease, transform .15s ease; }
+  .fav-btn.on svg{ color:var(--accent); transform:scale(1.08); }
+  .mentor-card{ position:relative; cursor:pointer; }
+
+  /* Notification dropdown */
+  .notif-panel{
+    position:absolute; top:0; right:16px; width:250px; z-index:35;
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md);
+    box-shadow:var(--shadow); overflow:hidden;
+    opacity:0; transform:translateY(-6px); pointer-events:none; visibility:hidden;
+    transition:opacity .16s ease, transform .16s ease, visibility 0s linear .16s;
+  }
+  .notif-panel.open{ opacity:1; transform:translateY(0); pointer-events:auto; visibility:visible; transition-delay:0s; }
+  .notif-head{ display:flex; align-items:center; justify-content:space-between; padding-right:10px; border-bottom:1px solid var(--border); }
+  .notif-head h5{ margin:0; padding:12px 14px; font-size:12px; font-weight:800; color:var(--ink-faint); }
+  .notif-clear{ border:none; background:none; color:var(--brand); font-size:11.5px; font-weight:800; padding:4px 6px; }
+  .notif-item{ padding:11px 14px; border-bottom:1px solid var(--border); font-size:12px; line-height:1.5; }
+  .notif-item:last-child{ border-bottom:none; }
+  .notif-item strong{ display:block; font-size:12.5px; margin-bottom:2px; }
+  .notif-item span{ color:var(--ink-faint); font-size:10.5px; font-weight:600; }
+  .notif-empty{ padding:22px 14px; text-align:center; color:var(--ink-faint); font-size:12px; font-weight:600; }
+
+  /* ---------- Tab bar ---------- */
+  .tabbar{
+    flex:none; display:flex; border-top:1px solid var(--border);
+    background:var(--surface); padding:10px 6px calc(10px + env(safe-area-inset-bottom,0px));
+  }
+  .tab-btn{
+    flex:1; background:none; border:none; display:flex; flex-direction:column; align-items:center; gap:4px;
+    color:var(--ink-faint); padding:4px 0; font-size:10.5px; font-weight:700; position:relative;
+  }
+  .tab-btn svg{ width:21px; height:21px; }
+  .tab-btn.active{ color:var(--brand); }
+  .tab-dot{ position:absolute; top:0; right:calc(50% - 16px); width:7px; height:7px; border-radius:50%; background:var(--accent); border:1.5px solid var(--surface); }
+
+  /* ---------- Overlay (profile / chat) ---------- */
+  .overlay{
+    position:absolute; inset:0; background:var(--surface); z-index:30;
+    display:flex; flex-direction:column;
+    transform:translateX(100%); visibility:hidden;
+    transition:transform .32s cubic-bezier(.22,.9,.35,1), visibility 0s linear .32s;
+  }
+  .overlay.open{ transform:translateX(0); visibility:visible; transition-delay:0s; }
+  .overlay-header{
+    flex:none; display:flex; align-items:center; gap:10px; padding:16px 16px 10px;
+    border-bottom:1px solid var(--border);
+  }
+  .back-btn{ width:34px; height:34px; border-radius:50%; border:1px solid var(--border); background:var(--surface); display:flex; align-items:center; justify-content:center; flex:none; }
+  .back-btn svg{ width:16px; height:16px; }
+  .overlay-title{ font-size:15px; font-weight:800; }
+  .overlay-body{ flex:1; overflow-y:auto; scrollbar-width:none; }
+  .overlay-body::-webkit-scrollbar{ display:none; }
+
+  /* Mentor detail overlay (opened from Discover) */
+  .profile-hero{ padding:22px 20px 18px; text-align:center; }
+  .profile-hero .rate-tag{
+    display:inline-flex; align-items:baseline; gap:3px; background:var(--brand); color:#fff;
+    padding:6px 12px; border-radius:100px; font-size:13px; font-weight:800; margin-top:12px;
+  }
+  .profile-hero .rate-tag span{ font-size:10.5px; font-weight:600; opacity:.85; }
+  .stat-row{ display:flex; justify-content:center; gap:26px; padding:16px 20px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .stat{ text-align:center; }
+  .stat strong{ display:block; font-size:16px; font-weight:800; }
+  .stat span{ font-size:11px; color:var(--ink-faint); font-weight:600; }
+  .block{ padding:18px 20px; border-bottom:1px solid var(--border); }
+  .block h4{ margin:0 0 8px; font-size:12.5px; font-weight:800; color:var(--ink-faint); }
+  .block p{ margin:0; font-size:13.5px; line-height:1.6; color:var(--ink); }
+  .tag-row{ display:flex; flex-wrap:wrap; gap:7px; }
+  .tag{ padding:6px 11px; border-radius:100px; background:var(--surface-alt); font-size:12px; font-weight:700; color:var(--ink); }
+  .cta-row{ display:flex; gap:10px; padding:16px 20px 20px; }
+  .btn{
+    flex:1; border:none; border-radius:14px; padding:13px; font-size:13.5px; font-weight:800;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+  }
+  .btn svg{ width:15px; height:15px; }
+  .btn-primary{ background:var(--accent); color:#fff; }
+  .btn-ghost{ background:var(--surface-alt); color:var(--ink); }
+
+  /* ============================================================
+     SECTION 3 — CHAT
+     Chat list + per-mentor conversation thread, each mentor keeps
+     their own independent message history.
+     ============================================================ */
+  .chat-row{ display:flex; gap:12px; align-items:center; padding:11px 0; width:100%; background:none; border:none; text-align:left; border-bottom:1px solid var(--border); }
+  .chat-row:last-child{ border-bottom:none; }
+  .chat-text{ flex:1; min-width:0; }
+  .chat-top{ display:flex; justify-content:space-between; gap:8px; }
+  .chat-top strong{ font-size:13.5px; font-weight:800; }
+  .chat-top time{ font-size:11px; color:var(--ink-faint); font-weight:600; }
+  .chat-preview{ font-size:12.5px; color:var(--ink-soft); margin:2px 0 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .unread{ width:8px; height:8px; border-radius:50%; background:var(--accent); flex:none; margin-top:6px; }
+
+  /* Chat thread */
+  .thread{ padding:16px; display:flex; flex-direction:column; gap:10px; }
+  .msg{ max-width:76%; padding:10px 13px; border-radius:16px; font-size:13px; line-height:1.5; }
+  .msg.them{ background:var(--surface-alt); color:var(--ink); border-bottom-left-radius:5px; align-self:flex-start; }
+  .msg.me{ background:var(--brand); color:#fff; border-bottom-right-radius:5px; align-self:flex-end; }
+  .msg-time{ font-size:10px; color:var(--ink-faint); text-align:center; margin:6px 0; }
+  .session-card{
+    align-self:center; width:100%; background:var(--surface); border:1px solid var(--border);
+    border-radius:14px; padding:13px; text-align:center; margin:6px 0;
+  }
+  .session-card p{ margin:0 0 8px; font-size:12px; color:var(--ink-soft); font-weight:600; }
+  .session-card strong{ font-size:13.5px; }
+  .composer{
+    flex:none; display:flex; align-items:center; gap:8px; padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));
+    border-top:1px solid var(--border);
+  }
+  .composer input{
+    flex:1; border:1px solid var(--border); background:var(--surface-alt); border-radius:100px;
+    padding:11px 15px; font-size:13px; color:var(--ink); font-family:inherit; outline:none;
+  }
+  .send-btn{ width:38px; height:38px; border-radius:50%; background:var(--brand); border:none; display:flex; align-items:center; justify-content:center; flex:none; }
+  .send-btn svg{ width:16px; height:16px; color:#fff; }
+
+  /* ============================================================
+     SECTION 4 — BOOKING
+     Month calendar (tap a date to see/plan sessions) + agenda
+     lists, plus the "new booking" flow opened from a mentor's page.
+     ============================================================ */
+  .cal-card{
+    border:1px solid var(--border); border-radius:var(--radius-md); background:var(--surface);
+    padding:14px 14px 8px; margin-bottom:18px;
+  }
+  .cal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .cal-head strong{ font-size:13.5px; font-weight:800; }
+  .cal-nav{ display:flex; gap:6px; }
+  .cal-nav-btn{ width:26px; height:26px; border-radius:50%; border:1px solid var(--border); background:var(--surface); display:flex; align-items:center; justify-content:center; }
+  .cal-nav-btn svg{ width:12px; height:12px; }
+  .cal-dow{ display:grid; grid-template-columns:repeat(7,1fr); text-align:center; font-size:10px; font-weight:700; color:var(--ink-faint); margin-bottom:4px; }
+  .cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); row-gap:4px; }
+  .cal-day{
+    position:relative; aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:700; border-radius:10px; border:none; background:none; color:var(--ink);
+  }
+  .cal-day.pad{ visibility:hidden; }
+  .cal-day.today{ box-shadow:inset 0 0 0 1.5px var(--brand); }
+  .cal-day.selected{ background:var(--ink); color:var(--surface); }
+  .cal-day .cal-dot{ position:absolute; bottom:4px; left:50%; transform:translateX(-50%); width:4px; height:4px; border-radius:50%; background:var(--accent); }
+  .cal-day.selected .cal-dot{ background:var(--surface); }
+  .cal-day.past-dot .cal-dot{ background:var(--ink-faint); }
+  .cal-agenda{ border-top:1px solid var(--border); margin-top:10px; padding:12px 0 6px; }
+  .cal-agenda h5{ margin:0 0 8px; font-size:11.5px; font-weight:800; color:var(--ink-faint); }
+
+  /* Bookings */
+  .booking-card{
+    border:1px solid var(--border); border-radius:var(--radius-md); padding:14px; margin-bottom:10px;
+    display:flex; gap:12px; align-items:center;
+  }
+  .booking-date{
+    flex:none; width:48px; text-align:center; background:var(--brand-soft); border-radius:12px; padding:8px 0; color:var(--brand);
+  }
+  .booking-date strong{ display:block; font-size:16px; font-weight:800; line-height:1; }
+  .booking-date span{ font-size:9.5px; font-weight:700; text-transform:uppercase; }
+  .booking-info{ flex:1; min-width:0; }
+  .booking-info strong{ font-size:13.5px; font-weight:800; display:block; }
+  .booking-info p{ margin:3px 0 0; font-size:12px; color:var(--ink-soft); font-weight:600; }
+  .booking-actions{ display:flex; gap:6px; margin-top:8px; }
+  .mini-btn{ font-size:11px; font-weight:700; padding:6px 10px; border-radius:8px; border:1px solid var(--border); background:var(--surface); }
+  .mini-btn.primary{ background:var(--ink); color:var(--surface); border-color:var(--ink); }
+
+  /* New-booking flow (date + time picker over a mentor) */
+  .slot-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .slot-btn{ padding:9px 12px; border-radius:10px; border:1px solid var(--border); background:var(--surface); font-size:12px; font-weight:700; color:var(--ink); }
+  .slot-btn.active{ background:var(--brand); border-color:var(--brand); color:#fff; }
+  .dur-row{ display:flex; gap:8px; }
+  .dur-btn{ flex:1; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--surface); font-size:12px; font-weight:700; }
+  .dur-btn.active{ background:var(--ink); border-color:var(--ink); color:var(--surface); }
+
+  /* ============================================================
+     SECTION 5 — PROFILE
+     User data (learning/teaching mode, saved mentors, skill tags)
+     and the settings sheet (theme, notifications).
+     ============================================================ */
+  .profile-top{ display:flex; flex-direction:column; align-items:center; text-align:center; padding:14px 0 6px; }
+  .profile-top h3{ margin:12px 0 2px; font-size:17px; font-weight:800; }
+  .profile-top p{ margin:0; font-size:12.5px; color:var(--ink-soft); font-weight:600; }
+  .mode-switch{
+    display:flex; background:var(--surface-alt); border-radius:100px; padding:4px; margin:16px 0 4px;
+  }
+  .mode-btn{ flex:1; border:none; background:none; padding:9px 0; border-radius:100px; font-size:12.5px; font-weight:800; color:var(--ink-soft); }
+  .mode-btn.active{ background:var(--surface); color:var(--ink); box-shadow:var(--shadow); }
+  .field-label{ font-size:11.5px; font-weight:800; color:var(--ink-faint); margin:16px 2px 8px; }
+  .field-box{
+    border:1px solid var(--border); border-radius:14px; padding:13px; font-size:13px; color:var(--ink-soft);
+    background:var(--surface);
+  }
+  .toggle-row{ display:flex; align-items:center; justify-content:space-between; padding:13px; border:1px solid var(--border); border-radius:14px; }
+  .toggle-row strong{ font-size:13px; font-weight:700; display:block; }
+  .toggle-row span{ font-size:11.5px; color:var(--ink-faint); }
+  .switch{ width:40px; height:24px; border-radius:100px; background:var(--good); position:relative; flex:none; border:none; padding:0; }
+  .switch::after{ content:''; position:absolute; width:19px; height:19px; border-radius:50%; background:#fff; top:2.5px; right:2.5px; box-shadow:0 1px 3px rgba(0,0,0,.25); transition:right .15s ease, left .15s ease; }
+  .switch.off{ background:var(--border); }
+  .switch.off::after{ right:auto; left:2.5px; }
+
+  .tag.add-tag{ background:var(--surface); border:1px dashed var(--border); color:var(--ink-faint); cursor:pointer; }
+  .settings-row{ display:flex; align-items:center; gap:12px; padding:13px 4px; border-bottom:1px solid var(--border); }
+  .settings-row:last-child{ border-bottom:none; }
+  .settings-row svg{ width:18px; height:18px; color:var(--ink-soft); flex:none; }
+  .settings-row .settings-label{ flex:1; }
+  .settings-row .settings-label strong{ display:block; font-size:13px; font-weight:700; }
+  .settings-row .settings-label span{ font-size:11.5px; color:var(--ink-faint); }
+  .theme-row{ display:flex; gap:6px; background:var(--surface-alt); border-radius:100px; padding:3px; }
+  .theme-opt{ padding:6px 11px; border-radius:100px; border:none; background:none; font-size:11px; font-weight:700; color:var(--ink-soft); }
+  .theme-opt.active{ background:var(--surface); color:var(--ink); box-shadow:var(--shadow); }
+  .theme-opt svg{ width:14px; height:14px; display:block; }
+
+  .empty-note{ text-align:center; padding:30px 10px; color:var(--ink-faint); font-size:12.5px; font-weight:600; line-height:1.6; }
+
+  /* Shared toast (feedback for save / send / book actions) */
+  .toast{
+    position:absolute; left:50%; bottom:96px; transform:translateX(-50%) translateY(10px);
+    background:var(--ink); color:var(--surface); font-size:12.5px; font-weight:700;
+    padding:10px 16px; border-radius:100px; z-index:60; white-space:nowrap;
+    opacity:0; pointer-events:none; transition:opacity .18s ease, transform .18s ease;
+    box-shadow:var(--shadow);
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+
+  /* ============================================================
+     ADDITIONS — a11y, sorting, dialogs, forms, typing indicator
+     ============================================================ */
+  :focus-visible{ outline:2px solid var(--brand); outline-offset:2px; }
+  .search-bar input:focus-visible, .composer input:focus-visible,
+  .field-input:focus-visible, .rate-box input:focus-visible, .field-area:focus-visible{ outline:none; }
+  .search-bar button[hidden]{ display:none; }
+  .search-bar button{ cursor:pointer; }
+  .search-bar button svg{ width:15px; height:15px; }
+  .composer input:focus{ border-color:var(--brand); }
+  button:disabled{ cursor:not-allowed; }
+
+  .section-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin:16px 0 10px; }
+  .section-row .section-label{ margin:0 2px; }
+  .sort-select{
+    font-family:inherit; font-size:12px; font-weight:700; color:var(--ink);
+    background:var(--surface-alt); border:none; border-radius:100px; padding:7px 12px; cursor:pointer;
+  }
+
+  .tab-dot[hidden]{ display:none; }
+  .tab-dot{ top:2px; right:calc(50% - 18px); }
+
+  .typing{ display:flex; gap:4px; align-items:center; padding:13px 14px; width:fit-content; }
+  .typing i{ width:6px; height:6px; border-radius:50%; background:var(--ink-faint); animation:blink 1s infinite ease-in-out; }
+  .typing i:nth-child(2){ animation-delay:.15s; }
+  .typing i:nth-child(3){ animation-delay:.3s; }
+  @keyframes blink{ 0%,80%,100%{ opacity:.25; transform:translateY(0);} 40%{ opacity:1; transform:translateY(-2px);} }
+
+  .cal-day:disabled{ opacity:.3; }
+  .cal-day:not(:disabled):not(.pad):not(.selected):hover{ background:var(--surface-alt); }
+  .cal-nav-btn:disabled{ opacity:.35; }
+  .cal-nav{ align-items:center; }
+  .slot-btn:disabled{ opacity:.38; text-decoration:line-through; }
+  .hint{ margin:10px 0 0; font-size:11.5px; color:var(--ink-faint); font-weight:600; line-height:1.5; }
+  .hint a{ color:var(--brand); }
+  .mini-btn{ cursor:pointer; color:var(--ink); }
+  .mini-btn.primary{ color:var(--surface); }
+  .mini-btn.danger{ color:var(--danger); }
+  .booking-actions{ flex-wrap:wrap; }
+
+  .tag{ display:inline-flex; align-items:center; gap:4px; }
+  button.tag{ font-family:inherit; }
+  .tag-x{ display:flex; border:none; background:none; padding:0; margin:0 -3px 0 1px; color:var(--ink-faint); }
+  .tag-x svg{ width:12px; height:12px; }
+  .tag-x:hover{ color:var(--danger); }
+  .tag-input{
+    border:1px dashed var(--brand); border-radius:100px; padding:6px 11px; font-family:inherit; font-size:12px; font-weight:700;
+    color:var(--ink); background:var(--surface); outline:none; width:120px;
+  }
+  .rate-box{ display:flex; align-items:center; gap:8px; color:var(--ink-faint); font-weight:700; }
+  .rate-box input{ flex:1; min-width:0; border:none; background:none; font:inherit; font-weight:800; color:var(--ink); }
+  .rate-box:focus-within, .field-area:focus, .field-input:focus{ border-color:var(--brand); }
+  .field-area{ display:block; width:100%; min-height:92px; resize:vertical; font-family:inherit; line-height:1.5; color:var(--ink); }
+  .field-area::placeholder{ color:var(--ink-faint); }
+  .field-input{ display:block; width:100%; font-family:inherit; font-size:13px; color:var(--ink); }
+  .char-count{ text-align:right; font-size:11px; color:var(--ink-faint); font-weight:600; margin:4px 4px 0; }
+
+  .btn-danger{ background:var(--danger); color:#fff; }
+  .btn:disabled{ opacity:.45; }
+  .danger-text{ color:var(--danger); }
+
+  .dialog-backdrop{
+    position:absolute; inset:0; z-index:70; background:rgba(15,16,32,.5);
+    display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .dialog-backdrop[hidden]{ display:none; }
+  .dialog-card{ width:100%; background:var(--surface); border-radius:var(--radius-md); padding:20px; box-shadow:var(--shadow); }
+  .dialog-card h4{ margin:0 0 6px; font-size:15px; font-weight:800; }
+  .dialog-card p{ margin:0 0 16px; font-size:13px; line-height:1.55; color:var(--ink-soft); }
+  .dialog-actions{ display:flex; gap:10px; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition-duration:.01ms !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; }
+  }
+
+  /* ---------- Responsive: real mobile viewers see the screen edge-to-edge ---------- */
+  @media (max-width: 460px){
+    .scene-header{ display:none; }
+    .stage{ padding:0; gap:0; }
+    .device{
+      width:100vw; height:100dvh; border-radius:0; padding:0; box-shadow:none;
+      background:var(--surface);
+    }
+    .notch{ display:none; }
+    .screen{ border-radius:0; height:100dvh; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+<div class="scene-header">
+  <div class="wordmark">
+    <img src="data:image/png;base64,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" alt="CourseConnect logo" width="40" height="40">
+    <span>CourseConnect</span>
+  </div>
+
+  <p>
+    A location-aware learning network — browse nearby mentors by skill,
+    message them directly, and book time to learn. This is an interactive
+    prototype: tap through it below.
+  </p>
+</div>
+
+  <div class="device">
+    <div class="notch"></div>
+    <div class="screen" id="screen">
+
+      <!-- ============ APP HEADER (per tab) ============ -->
+      <div class="app-header" id="appHeader"></div>
+
+      <!-- ============ MAIN SCROLL BODY ============ -->
+      <div class="app-body" id="appBody"></div>
+
+      <!-- ============ TAB BAR ============ -->
+      <nav class="tabbar" id="tabbar" aria-label="Main">
+        <button class="tab-btn" data-tab="discover" onclick="setTab('discover')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5 5-2z"/></svg>
+          Discover
+        </button>
+        <button class="tab-btn" data-tab="chats" onclick="setTab('chats')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-8.9 8.4 9 9 0 01-3.2-.6L4 20l1-4.5A8.3 8.3 0 013 11.5 8.4 8.4 0 0112 3a8.4 8.4 0 019 8.5z"/></svg>
+          Chats
+          <span class="tab-dot" id="chatDot" hidden></span>
+        </button>
+        <button class="tab-btn" data-tab="bookings" onclick="setTab('bookings')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>
+          Bookings
+        </button>
+        <button class="tab-btn" data-tab="profile" onclick="setTab('profile')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.2" r="3.6"/><path d="M4.5 20c1.4-4 4.2-6 7.5-6s6.1 2 7.5 6"/></svg>
+          Profile
+        </button>
+      </nav>
+
+      <!-- ============ OVERLAYS ============ -->
+      <div class="overlay" id="profileOverlay"></div>
+      <div class="overlay" id="chatOverlay"></div>
+      <div class="overlay" id="bookingOverlay"></div>
+      <div class="overlay" id="settingsOverlay"></div>
+
+      <!-- ============ FLOATING UI (notif panel, toast) ============ -->
+      <div class="notif-panel" id="notifPanel"></div>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+      <!-- Confirm dialog (cancel booking, reset data) -->
+      <div class="dialog-backdrop" id="dialog" hidden>
+        <div class="dialog-card" role="alertdialog" aria-modal="true" aria-labelledby="dialogTitle" aria-describedby="dialogBody">
+          <h4 id="dialogTitle"></h4>
+          <p id="dialogBody"></p>
+          <div class="dialog-actions">
+            <button class="btn btn-ghost" id="dialogCancel" onclick="closeDialog(false)">Keep</button>
+            <button class="btn btn-primary" id="dialogOk" onclick="closeDialog(true)">Confirm</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   ICONS
+   Every icon used anywhere in the app lives here so a new one
+   only ever needs to be added in one place.
+   ============================================================ */
+const ic = {
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 1112 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 19.5a2 2 0 004 0"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.4"/></svg>',
+  star:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6.3 6.9.7-5.2 4.6 1.6 6.8L12 17.6l-6.2 3.3 1.6-6.8-5.2-4.6 6.9-.7z"/></svg>',
+  starOutline:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2.5l2.9 6.3 6.9.7-5.2 4.6 1.6 6.8L12 17.6l-6.2 3.3 1.6-6.8-5.2-4.6 6.9-.7z"/></svg>',
+  chevronLeft:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  chevronRight:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
+  badge:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5l2.3 2 3-.6 1 2.9 2.9 1-.6 3 2 2.3-2 2.3.6 3-2.9 1-1 2.9-3-.6-2.3 2-2.3-2-3 .6-1-2.9-2.9-1 .6-3-2-2.3 2-2.3-.6-3 2.9-1 1-2.9 3 .6z"/><path d="M9 12.2l2 2 4-4.4" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  msg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-8.9 8.4 9 9 0 01-3.2-.6L4 20l1-4.5A8.3 8.3 0 013 11.5 8.4 8.4 0 0112 3a8.4 8.4 0 019 8.5z"/></svg>',
+  calendar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>',
+  send:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 11.5L21 3l-7 18-3-7-8-2.5z"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+  sliders:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h9M17 6h3M4 12h3M9 12h11M4 18h13M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="7" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>',
+  heartOutline:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9A5.5 5.5 0 0112 6.5 5.5 5.5 0 0121.8 11.5c-2.3 4.4-9.8 9-9.8 9z"/></svg>',
+  heartFill:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20.5s-7.5-4.6-9.8-9A5.5 5.5 0 0112 6.5 5.5 5.5 0 0121.8 11.5c-2.3 4.4-9.8 9-9.8 9z"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19 12a7 7 0 00-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 00-2-1.2L14 3h-4l-.4 2.6a7 7 0 00-2 1.2l-2.3-.9-2 3.4 2 1.5a7 7 0 000 2.4l-2 1.5 2 3.4 2.3-.9a7 7 0 002 1.2L10 21h4l.4-2.6a7 7 0 002-1.2l2.3.9 2-3.4-2-1.5c.07-.4.1-.8.1-1.2z"/></svg>',
+  sun:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.5M12 19v2.5M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2.5 12H5M19 12h2.5M4.2 19.8L6 18M18 6l1.8-1.8"/></svg>',
+  moon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1110.5 4a6.8 6.8 0 009.5 10.5z"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+};
+
+/* ============================================================
+   DATA
+   Seed data for the prototype. MENTORS / CATS stay fixed;
+   CHATS, THREADS, BOOKINGS and NOTIFS are mutated as the person
+   interacts and are saved to this browser (see persist()).
+   ============================================================ */
+const APP_VERSION = '1.1.0';
+const STORE_KEY = 'cc_state_v2';
+const DAY_MS = 86400000;
+// Real "today" (midnight) so the calendar and sample bookings are always current.
+const TODAY = (()=>{ const d = new Date(); d.setHours(0,0,0,0); return d; })();
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+const CATS = [
+  {id:'all', label:'All'},
+  {id:'coding', label:'Coding'},
+  {id:'languages', label:'Languages'},
+  {id:'music', label:'Music'},
+  {id:'design', label:'Design'},
+  {id:'business', label:'Business'},
+  {id:'academics', label:'Academics'},
+  {id:'fitness', label:'Fitness'},
+  {id:'photography', label:'Photo'},
+];
+
+const MENTORS = [
+  {id:1, name:'Raka Pratama', cat:'coding', label:'Python · Web Dev', rating:4.9, reviews:128, rate:85, dist:'0.6 km', verified:true, color:'#3547E0',
+    bio:"Backend engineer teaching Python fundamentals up through intro data structures. I focus on debugging skills, not just syntax — bring me your broken code.",
+    tags:['Python','Web Dev','Git'], avail:['Tue evenings','Thu evenings','Sat afternoon']},
+  {id:2, name:'Alya Nugraha', cat:'languages', label:'Mandarin · IELTS', rating:4.8, reviews:94, rate:60, dist:'1.2 km', verified:true, color:'#0E8272',
+    bio:"Native Mandarin speaker with three years tutoring HSK 1–4. Also happy to do casual conversation practice if you just want to get comfortable speaking.",
+    tags:['Mandarin','IELTS','Conversation'], avail:['Mon mornings','Wed evenings']},
+  {id:3, name:'Bimo Santoso', cat:'music', label:'Guitar · Theory', rating:5.0, reviews:61, rate:70, dist:'2.4 km', verified:false, color:'#D9481C',
+    bio:"Self-taught guitarist turned instructor. I teach chords, basic theory, and — more importantly — how to actually enjoy practicing so it sticks.",
+    tags:['Guitar','Music Theory'], avail:['Fri evenings','Sun afternoon']},
+  {id:4, name:'Cinta Wijaya', cat:'design', label:'Figma · UI Basics', rating:4.7, reviews:73, rate:90, dist:'0.9 km', verified:true, color:'#7A2FC0',
+    bio:"Product design intern sharing everything I wish someone had taught me before my first internship — Figma workflow, components, and portfolio feedback.",
+    tags:['Figma','UI Design','Portfolio Review'], avail:['Tue afternoon','Sat morning']},
+  {id:5, name:'Dimas Aditya', cat:'business', label:'Finance · Excel', rating:4.9, reviews:110, rate:100, dist:'1.7 km', verified:true, color:'#B9760A',
+    bio:"Finance senior and case-competition regular. I break down DCF models and financial modeling in Excel without burying you in jargon.",
+    tags:['Financial Modeling','Excel','Case Prep'], avail:['Mon evenings','Thu afternoon']},
+  {id:6, name:'Farhan Putra', cat:'academics', label:'Calculus · Stats', rating:4.8, reviews:156, rate:55, dist:'0.4 km', verified:true, color:'#0E7FA8',
+    bio:"Math tutor for first- and second-year students. I explain the 'why' behind a method first, then we drill problems until it's automatic.",
+    tags:['Calculus','Statistics','Exam Prep'], avail:['Wed afternoon','Sat evening']},
+  {id:7, name:'Erika Halim', cat:'fitness', label:'Yoga · Mobility', rating:4.6, reviews:48, rate:65, dist:'3.1 km', verified:false, color:'#1F8A3B',
+    bio:"Certified instructor focused on beginner-friendly flows and injury-safe stretching routines for people who sit at a desk all day.",
+    tags:['Yoga','Mobility','Beginners'], avail:['Tue morning','Sun morning']},
+  {id:8, name:'Grace Lim', cat:'photography', label:'Portrait · Editing', rating:4.9, reviews:67, rate:80, dist:'2.0 km', verified:true, color:'#C22A6D',
+    bio:"Campus photographer teaching composition, natural lighting, and a practical Lightroom editing workflow you can actually keep up with.",
+    tags:['Portraits','Lightroom','Composition'], avail:['Fri afternoon','Sat morning']},
+];
+
+const SORTS = [
+  {id:'best',   label:'Best match'},
+  {id:'rating', label:'Top rated'},
+  {id:'price',  label:'Lowest price'},
+  {id:'near',   label:'Nearest'},
+];
+
+// One independent message history per mentor — switching mentors switches threads.
+const SEED_THREADS = {
+  5: [
+    {who:'them', text:"Hey! Saw you're prepping for a case comp — happy to help with the modeling side."},
+    {who:'me', text:"That'd be great. Mainly stuck on building a 3-statement model from scratch."},
+    {who:'them', text:"No worries, that trips up almost everyone at first. I can walk through the linkages with you."},
+    {who:'session', text:''},
+    {who:'them', text:"Sounds good — let's do Thursday 4pm at the library?"},
+  ],
+  1: [
+    {who:'me', text:"Hey, quick one — my recursion function keeps hitting max call stack, any idea why?"},
+    {who:'them', text:"Usually a missing or unreachable base case. Mind pasting the function?"},
+    {who:'me', text:"Just dropped it above, thanks for taking a look."},
+    {who:'them', text:"Sent you the practice repo, take a look before we meet"},
+  ],
+  6: [
+    {who:'them', text:"How did the derivative problem set go in the end?"},
+    {who:'me', text:"Rough at first, but that chain-rule trick you showed really clicked once I slowed down."},
+    {who:'me', text:"Thanks for the session! That derivative trick really helped"},
+  ],
+  4: [
+    {who:'them', text:"Happy to look over your portfolio whenever — just send the Figma link."},
+    {who:'them', text:"Also wanted to check — is Saturday morning still open on your side?"},
+    {who:'me', text:"Is Saturday morning still open?"},
+  ],
+};
+
+const REPLIES = [
+  "Sounds good!",
+  "Got it, thanks for the update.",
+  "I'll take a look and get back to you.",
+  "Works for me 👍",
+  "Let's confirm the details closer to the day.",
+  "Makes sense — see you then.",
+];
+
+function addDays(n){ const d = new Date(TODAY); d.setDate(d.getDate()+n); return ymd(d); }
+function seedBookings(){ return [
+  {id:'b1', mentorId:5, date:addDays(2),  start:'4:00 PM', dur:60, place:'Online'},
+  {id:'b2', mentorId:1, date:addDays(4),  start:'6:30 PM', dur:45, place:'Library, L3'},
+  {id:'b3', mentorId:6, date:addDays(-4), start:'2:00 PM', dur:60, place:'Online'},
+]; }
+function seedChats(){ const n = Date.now(); return [
+  {mentorId:5, ts:n-2*60000,            unread:true},
+  {mentorId:1, ts:n-3600000,            unread:true},
+  {mentorId:6, ts:n-DAY_MS-3600000,     unread:false},
+  {mentorId:4, ts:n-3*DAY_MS,           unread:false},
+]; }
+function seedNotifs(){ const n = Date.now(); return [
+  {title:'Booking confirmed', body:`Your session with Dimas Aditya is set for ${friendlyDate(addDays(2))}.`, ts:n-2*3600000},
+  {title:'New message', body:'Raka Pratama sent you the practice repo.', ts:n-5*3600000},
+  {title:'Session complete', body:'How did your session with Farhan Putra go?', ts:n-4*DAY_MS},
+]; }
+
+let CHATS = seedChats();
+let THREADS = JSON.parse(JSON.stringify(SEED_THREADS));
+let BOOKINGS = seedBookings();
+let NOTIFS = seedNotifs();
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let state = {
+  tab:'discover', activeCat:'all', sort:'best', query:'', profileMode:'learning',
+  savedIds: new Set([1]),
+  openChatMentor: null, pending:{}, addingTag:null,
+  calYear: TODAY.getFullYear(), calMonth: TODAY.getMonth(), selectedDate: null,
+  theme:'system', hasNotif:true,
+  teachingVisible:true, notifReminders:true, notifMessages:true,
+  profile:{ name:'Glo Christophera', school:'BINUS University · Finance', rate:100000, about:'' },
+  learningTags:['Financial Modeling','Public Speaking','Python'],
+  teachingTags:['Financial Modeling','Case Prep','Excel'],
+  reminded:new Set(),
+};
+let bookingFlow = { mentorId:null, year:0, month:0, date:null, time:null, dur:60, mode:'Online', place:'Online', rescheduleId:null };
+let toastTimer = null;
+let dialogCb = null;
+
+/* ============================================================
+   SHARED HELPERS
+   ============================================================ */
+function mentorById(id){ return MENTORS.find(m=>m.id===id); }
+function catInfo(id){ return CATS.find(c=>c.id===id) || CATS[0]; }
+function initials(name){ const s = (name||'').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); return s || '?'; }
+function starsCompact(){ return `<span class="stars">${ic.star.replace('currentColor','var(--gold)')}</span>`; }
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function ymd(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function friendlyDate(dateStr){
+  const d = new Date(dateStr+'T00:00:00');
+  return d.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'});
+}
+function toMin(str){
+  const m = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(str);
+  if(!m) return 0;
+  let h = parseInt(m[1],10) % 12;
+  if(m[3].toUpperCase()==='PM') h += 12;
+  return h*60 + parseInt(m[2],10);
+}
+function relTime(ts, long){
+  const diff = Date.now()-ts, m = Math.floor(diff/60000), h = Math.floor(diff/3600000);
+  if(m<1) return long ? 'Just now' : 'now';
+  if(m<60) return long ? `${m}m ago` : `${m}m`;
+  if(h<24) return long ? `${h}h ago` : `${h}h`;
+  const day0 = new Date(ts); day0.setHours(0,0,0,0);
+  const days = Math.round((TODAY - day0)/DAY_MS);
+  if(days<=1) return 'Yesterday';
+  if(days<7) return long ? `${days}d ago` : new Date(ts).toLocaleDateString('en-US',{weekday:'short'});
+  return new Date(ts).toLocaleDateString('en-US',{month:'short', day:'numeric'});
+}
+function isUpcoming(x){ return x.date >= ymd(TODAY); }
+function bookingTimeLabel(x){ return `${x.start} · ${x.dur} min · ${x.place}`; }
+function formatRp(n){ return 'Rp ' + Number(n||0).toLocaleString('en-US'); }
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ---------- Persistence (localStorage, safe if blocked) ---------- */
+function persist(){
+  try{
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      v:2,
+      savedIds:[...state.savedIds], theme:state.theme, hasNotif:state.hasNotif,
+      teachingVisible:state.teachingVisible, notifReminders:state.notifReminders, notifMessages:state.notifMessages,
+      profile:state.profile, learningTags:state.learningTags, teachingTags:state.teachingTags,
+      reminded:[...state.reminded],
+      bookings:BOOKINGS, chats:CHATS, threads:THREADS, notifs:NOTIFS,
+    }));
+  }catch(e){}
+}
+function loadPersisted(){
+  let d = null;
+  try{ d = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); }catch(e){}
+  if(d && typeof d === 'object'){
+    if(Array.isArray(d.savedIds)) state.savedIds = new Set(d.savedIds.filter(id=>mentorById(id)));
+    if(['light','dark','system'].includes(d.theme)) state.theme = d.theme;
+    ['hasNotif','teachingVisible','notifReminders','notifMessages'].forEach(k=>{ if(typeof d[k]==='boolean') state[k] = d[k]; });
+    if(d.profile && typeof d.profile==='object'){
+      state.profile = {
+        name: typeof d.profile.name==='string' ? d.profile.name : state.profile.name,
+        school: typeof d.profile.school==='string' ? d.profile.school : state.profile.school,
+        rate: Number.isFinite(d.profile.rate) ? d.profile.rate : state.profile.rate,
+        about: typeof d.profile.about==='string' ? d.profile.about : '',
+      };
+    }
+    if(Array.isArray(d.learningTags)) state.learningTags = d.learningTags.filter(t=>typeof t==='string');
+    if(Array.isArray(d.teachingTags)) state.teachingTags = d.teachingTags.filter(t=>typeof t==='string');
+    if(Array.isArray(d.reminded)) state.reminded = new Set(d.reminded);
+    if(Array.isArray(d.bookings)) BOOKINGS = d.bookings.filter(b=>b && mentorById(b.mentorId) && b.date && b.start && b.dur);
+    if(Array.isArray(d.chats)) CHATS = d.chats.filter(c=>c && mentorById(c.mentorId));
+    if(d.threads && typeof d.threads==='object'){
+      THREADS = {};
+      Object.keys(d.threads).forEach(k=>{ if(Array.isArray(d.threads[k])) THREADS[k] = d.threads[k]; });
+    }
+    if(Array.isArray(d.notifs)) NOTIFS = d.notifs;
+  } else {
+    // Migrate the two keys used by the original prototype
+    try{
+      const raw = localStorage.getItem('cc_saved');
+      if(raw){ state.savedIds = new Set(JSON.parse(raw)); }
+      const theme = localStorage.getItem('cc_theme');
+      if(theme) state.theme = theme;
+    }catch(e){}
+  }
+  applyTheme();
+}
+function applyTheme(){
+  const root = document.documentElement;
+  if(state.theme==='system') root.removeAttribute('data-theme');
+  else root.setAttribute('data-theme', state.theme);
+}
+
+/* ---------- In-app confirm dialog (replaces confirm()/prompt()) ---------- */
+function openDialog(opts, cb){
+  dialogCb = cb;
+  document.getElementById('dialogTitle').textContent = opts.title;
+  document.getElementById('dialogBody').textContent = opts.body;
+  const ok = document.getElementById('dialogOk');
+  ok.textContent = opts.confirmLabel || 'Confirm';
+  ok.className = 'btn ' + (opts.danger ? 'btn-danger' : 'btn-primary');
+  document.getElementById('dialog').hidden = false;
+  document.getElementById('dialogCancel').focus();
+}
+function closeDialog(runCb){
+  const cb = dialogCb; dialogCb = null;
+  document.getElementById('dialog').hidden = true;
+  if(runCb && cb) cb();
+}
+
+/* ---------- Notifications ---------- */
+function pushNotif(title, body){
+  NOTIFS.unshift({title, body, ts:Date.now()});
+  if(NOTIFS.length>20) NOTIFS.length = 20;
+  state.hasNotif = true;
+  persist();
+  updateBell();
+}
+function updateBell(){
+  const bell = document.getElementById('bellBtn');
+  if(!bell) return;
+  const dot = bell.querySelector('.dot-flag');
+  if(state.hasNotif && !dot){ bell.insertAdjacentHTML('beforeend','<span class="dot-flag"></span>'); }
+  if(!state.hasNotif && dot){ dot.remove(); }
+}
+function updateBadges(){
+  const dot = document.getElementById('chatDot');
+  if(dot) dot.hidden = !CHATS.some(c=>c.unread);
+}
+function checkReminders(){
+  if(!state.notifReminders) return;
+  const today = ymd(TODAY), tomorrow = addDays(1);
+  BOOKINGS.forEach(b=>{
+    const key = b.id + '@' + b.date;
+    if((b.date===today || b.date===tomorrow) && !state.reminded.has(key)){
+      state.reminded.add(key);
+      pushNotif('Reminder', `Session with ${mentorById(b.mentorId).name} ${b.date===today?'today':'tomorrow'} at ${b.start}.`);
+    }
+  });
+}
+
+/* ============================================================
+   SECTION 1 — APP SHELL
+   Tab switching + the overlay open/close plumbing shared by
+   every section below.
+   ============================================================ */
+function setTab(tab){
+  state.tab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    const on = b.dataset.tab===tab;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-current', on ? 'page' : 'false');
+  });
+  document.getElementById('appBody').scrollTop = 0;
+  document.getElementById('notifPanel').classList.remove('open');
+  renderHeader();
+  renderBody();
+}
+function renderBody(){
+  const b = document.getElementById('appBody');
+  if(state.tab==='discover') renderDiscover(b);
+  else if(state.tab==='chats') renderChats(b);
+  else if(state.tab==='bookings') renderBookings(b);
+  else if(state.tab==='profile') renderProfile(b);
+  updateBadges();
+}
+function closeOverlay(id){ document.getElementById(id).classList.remove('open'); }
+
+/* ============================================================
+   SECTION 2 — DISCOVER
+   Search + category filtering + sorting, mentor cards,
+   favoriting, the mentor detail overlay, and notifications.
+   ============================================================ */
+function setQuery(v){
+  state.query = v;
+  syncClear();
+  renderDiscover(document.getElementById('appBody')); // only the list re-renders, so the search input keeps focus
+}
+function syncClear(){ const b = document.getElementById('clearSearch'); if(b) b.hidden = !state.query; }
+function clearSearch(){
+  state.query = '';
+  const i = document.getElementById('searchInput');
+  if(i){ i.value = ''; i.focus(); }
+  syncClear();
+  renderDiscover(document.getElementById('appBody'));
+}
+function setCat(cat){ state.activeCat = cat; renderChips(); renderBody(); }
+function setSort(v){ state.sort = v; renderBody(); }
+
+function renderChips(){
+  const row = document.getElementById('chipRow');
+  if(!row) return;
+  row.innerHTML = CATS.map(c=>`
+    <button class="chip ${state.activeCat===c.id?'active':''}" aria-pressed="${state.activeCat===c.id}" onclick="setCat('${c.id}')">${c.label}</button>
+  `).join('');
+}
+
+function sortedMentors(list){
+  const arr = [...list];
+  if(state.sort==='rating') arr.sort((a,b)=> b.rating-a.rating || b.reviews-a.reviews);
+  else if(state.sort==='price') arr.sort((a,b)=> a.rate-b.rate);
+  else if(state.sort==='near') arr.sort((a,b)=> parseFloat(a.dist)-parseFloat(b.dist));
+  return arr;
+}
+
+function renderDiscover(b){
+  const q = (state.query||'').trim().toLowerCase();
+  let list = state.activeCat==='all' ? MENTORS : MENTORS.filter(m=>m.cat===state.activeCat);
+  if(q){
+    list = list.filter(m =>
+      m.name.toLowerCase().includes(q) ||
+      m.label.toLowerCase().includes(q) ||
+      m.tags.some(t=>t.toLowerCase().includes(q))
+    );
+  }
+  list = sortedMentors(list);
+  b.innerHTML = `
+    <div class="section-row">
+      <div class="section-label">${list.length} mentor${list.length===1?'':'s'} <b>${q ? `matching "${escapeHTML(state.query)}"` : 'near you'}</b></div>
+      <select class="sort-select" aria-label="Sort mentors" onchange="setSort(this.value)">
+        ${SORTS.map(s=>`<option value="${s.id}" ${state.sort===s.id?'selected':''}>${s.label}</option>`).join('')}
+      </select>
+    </div>
+    ${list.length ? list.map(mentorCardHTML).join('') : `<div class="empty-note">No mentors match${q?' your search':' this category'}.<br>Try a different search or category.</div>`}
+  `;
+}
+
+function cardKey(e, id){
+  if(e.target !== e.currentTarget) return; // ignore Enter/Space pressed on the heart button inside the card
+  if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openProfile(id); }
+}
+
+function mentorCardHTML(m){
+  const saved = state.savedIds.has(m.id);
+  return `
+    <div class="mentor-card" role="button" tabindex="0" onclick="openProfile(${m.id})" onkeydown="cardKey(event,${m.id})">
+      <button class="fav-btn ${saved?'on':''}" onclick="toggleFav(${m.id}, event)" aria-label="${saved?'Remove saved mentor':'Save mentor'}" aria-pressed="${saved}">${saved?ic.heartFill:ic.heartOutline}</button>
+      <div class="avatar md" style="background:${m.color}">${initials(m.name)}</div>
+      <div class="mentor-main">
+        <div class="mentor-name-row"><strong>${m.name}</strong>${m.verified?`<span class="badge-check" style="color:var(--brand)" title="Verified">${ic.badge.replace('currentColor', m.color)}</span>`:''}</div>
+        <span class="cat-badge" style="background:color-mix(in srgb, var(--cat-${m.cat}) 16%, var(--surface)); color:var(--cat-${m.cat})">${m.label}</span>
+        <p class="mentor-bio">${m.bio}</p>
+        <div class="mentor-meta">
+          ${starsCompact()}
+          <span>${m.rating} (${m.reviews})</span>
+          <span>· ${m.dist}</span>
+        </div>
+      </div>
+      <div class="mentor-rate"><strong>Rp${m.rate}K</strong><span>per hour</span></div>
+    </div>
+  `;
+}
+
+function toggleFav(id, e){
+  if(e) e.stopPropagation();
+  const wasSaved = state.savedIds.has(id);
+  if(wasSaved) state.savedIds.delete(id); else state.savedIds.add(id);
+  persist();
+  const ovBtn = document.getElementById('ovFavBtn');
+  if(ovBtn){
+    ovBtn.classList.toggle('on', !wasSaved);
+    ovBtn.setAttribute('aria-pressed', String(!wasSaved));
+    ovBtn.innerHTML = !wasSaved ? ic.heartFill : ic.heartOutline;
+  }
+  if(state.tab==='discover' || state.tab==='profile') renderBody();
+  showToast(!wasSaved ? `Saved ${mentorById(id).name.split(' ')[0]}` : `Removed ${mentorById(id).name.split(' ')[0]}`);
+}
+
+function openProfile(id){
+  const m = mentorById(id);
+  const saved = state.savedIds.has(id);
+  const el = document.getElementById('profileOverlay');
+  el.innerHTML = `
+    <div class="overlay-header">
+      <button class="back-btn" onclick="closeOverlay('profileOverlay')" aria-label="Back">${ic.chevronLeft}</button>
+      <div class="overlay-title">Mentor profile</div>
+      <button class="fav-btn ${saved?'on':''}" id="ovFavBtn" style="position:static; margin-left:auto;" onclick="toggleFav(${id})" aria-label="Save mentor" aria-pressed="${saved}">${saved?ic.heartFill:ic.heartOutline}</button>
+    </div>
+    <div class="overlay-body">
+      <div class="profile-hero">
+        <div class="avatar lg" style="background:${m.color}; margin:0 auto;">${initials(m.name)}</div>
+        <div class="mentor-name-row" style="justify-content:center; margin-top:12px;"><strong style="font-size:17px">${m.name}</strong>${m.verified?`<span class="badge-check">${ic.badge.replace('currentColor', m.color)}</span>`:''}</div>
+        <span class="cat-badge" style="background:color-mix(in srgb, var(--cat-${m.cat}) 16%, var(--surface)); color:var(--cat-${m.cat})">${m.label}</span>
+        <div class="rate-tag">Rp${m.rate}K<span>/ hour</span></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat">${starsCompact()}<span>${m.rating} rating</span></div>
+        <div class="stat"><strong>${m.reviews}</strong><span>Reviews</span></div>
+        <div class="stat"><strong>${m.dist}</strong><span>Away</span></div>
+      </div>
+      <div class="block">
+        <h4>About</h4>
+        <p>${m.bio}</p>
+      </div>
+      <div class="block">
+        <h4>Teaches</h4>
+        <div class="tag-row">${m.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      </div>
+      <div class="block" style="border-bottom:none;">
+        <h4>Availability</h4>
+        <div class="tag-row">${m.avail.map(t=>`<span class="tag">${ic.clock.replace('currentColor','var(--ink-faint)')} ${t}</span>`).join('')}</div>
+      </div>
+    </div>
+    <div class="cta-row">
+      <button class="btn btn-ghost" onclick="openChat(${m.id}); closeOverlay('profileOverlay')">${ic.msg}Message</button>
+      <button class="btn btn-primary" onclick="openBooking(${m.id})">${ic.calendar}Book session</button>
+    </div>
+  `;
+  el.classList.add('open');
+}
+
+function toggleNotifPanel(e){
+  if(e) e.stopPropagation();
+  const panel = document.getElementById('notifPanel');
+  const opening = !panel.classList.contains('open');
+  if(opening){
+    renderNotifPanel();
+    // Anchor the panel just under the bell, wherever it actually sits (safe-area aware)
+    const bell = document.getElementById('bellBtn');
+    const screenEl = document.getElementById('screen');
+    if(bell && screenEl){
+      const bellRect = bell.getBoundingClientRect();
+      const screenRect = screenEl.getBoundingClientRect();
+      panel.style.top = (bellRect.bottom - screenRect.top + 8) + 'px';
+    }
+    panel.classList.add('open');
+    if(state.hasNotif){ state.hasNotif = false; persist(); updateBell(); }
+  } else {
+    panel.classList.remove('open');
+  }
+}
+function renderNotifPanel(){
+  const panel = document.getElementById('notifPanel');
+  panel.innerHTML = `<div class="notif-head"><h5>Notifications</h5>${NOTIFS.length?`<button class="notif-clear" onclick="clearNotifs(event)">Clear all</button>`:''}</div>` + (NOTIFS.length
+    ? NOTIFS.map(n=>`<div class="notif-item"><strong>${escapeHTML(n.title)}</strong>${escapeHTML(n.body)}<br><span>${relTime(n.ts, true)}</span></div>`).join('')
+    : `<div class="notif-empty">You're all caught up.</div>`);
+}
+function clearNotifs(e){
+  if(e) e.stopPropagation();
+  NOTIFS = [];
+  persist();
+  renderNotifPanel();
+}
+
+/* ============================================================
+   SECTION 3 — CHAT
+   Each mentor keeps an independent thread (see THREADS above),
+   so opening a different person's chat always shows only their
+   own history — never mixed with anyone else's.
+   ============================================================ */
+function ensureChat(mentorId){
+  let c = CHATS.find(x=>x.mentorId===mentorId);
+  if(!c){ c = {mentorId, ts:Date.now(), unread:false}; CHATS.unshift(c); }
+  return c;
+}
+function bumpChatToTop(mentorId){
+  const idx = CHATS.findIndex(x=>x.mentorId===mentorId);
+  if(idx>0){ const [c] = CHATS.splice(idx,1); CHATS.unshift(c); }
+}
+function lastMessage(mentorId){
+  const t = THREADS[mentorId] || [];
+  if(!t.length) return {text:'Say hi 👋', mine:false};
+  const last = t[t.length-1];
+  if(last.who==='session') return {text:'Session requested', mine:false};
+  return {text:last.text, mine:last.who==='me'};
+}
+
+function renderChats(b){
+  if(!CHATS.length){
+    b.innerHTML = `<div class="empty-note">No conversations yet.<br>Message a mentor from their profile to start one.</div>`;
+    return;
+  }
+  b.innerHTML = CHATS.map(c=>{
+    const m = mentorById(c.mentorId);
+    const last = lastMessage(c.mentorId);
+    return `
+      <button class="chat-row" onclick="openChat(${c.mentorId})">
+        <div class="avatar sm" style="background:${m.color}">${initials(m.name)}</div>
+        <div class="chat-text">
+          <div class="chat-top"><strong>${m.name}</strong><time>${relTime(c.ts)}</time></div>
+          <p class="chat-preview">${last.mine?'You: ':''}${escapeHTML(last.text)}</p>
+        </div>
+        ${c.unread ? '<span class="unread" aria-label="Unread"></span>' : ''}
+      </button>
+    `;
+  }).join('');
+}
+
+function msgHTML(t){
+  if(t.who==='session') return `<div class="session-card"><p>Session requested</p><strong>60 min</strong></div>`;
+  return `<div class="msg ${t.who}">${escapeHTML(t.text)}</div>`;
+}
+
+function openChat(mentorId){
+  ensureChat(mentorId).unread = false;
+  persist();
+  state.openChatMentor = mentorId;
+  renderChatOverlay(mentorById(mentorId));
+  document.getElementById('chatOverlay').classList.add('open');
+  updateBadges();
+}
+function closeChatOverlay(){
+  state.openChatMentor = null;
+  closeOverlay('chatOverlay');
+  if(state.tab==='chats') renderBody(); else updateBadges();
+}
+
+function renderChatOverlay(m){
+  THREADS[m.id] = THREADS[m.id] || [];
+  const el = document.getElementById('chatOverlay');
+  el.innerHTML = `
+    <div class="overlay-header">
+      <button class="back-btn" onclick="closeChatOverlay()" aria-label="Back">${ic.chevronLeft}</button>
+      <div class="avatar sm" style="background:${m.color}">${initials(m.name)}</div>
+      <div class="overlay-title">${m.name}</div>
+    </div>
+    <div class="overlay-body" id="threadScroll">
+      <div class="thread" id="threadBody"></div>
+    </div>
+    <div class="composer">
+      <input type="text" id="chatInput" placeholder="Message ${m.name.split(' ')[0]}..." aria-label="Message ${m.name.split(' ')[0]}" autocomplete="off" onkeydown="if(event.key==='Enter')sendMessage(${m.id})" />
+      <button class="send-btn" onclick="sendMessage(${m.id})" aria-label="Send message">${ic.send}</button>
+    </div>
+  `;
+  renderThread(m.id);
+}
+// Re-renders ONLY the message list, so the composer keeps focus (and the mobile keyboard stays open).
+function renderThread(mentorId){
+  const tb = document.getElementById('threadBody');
+  if(!tb) return;
+  const t = THREADS[mentorId] || [];
+  tb.innerHTML = (t.length ? t.map(msgHTML).join('') : `<div class="empty-note">No messages yet — say hi!</div>`)
+    + ((state.pending[mentorId]||0)>0 ? `<div class="msg them typing" aria-label="Typing"><i></i><i></i><i></i></div>` : '');
+  const sc = document.getElementById('threadScroll');
+  if(sc) sc.scrollTop = sc.scrollHeight;
+}
+
+function sendMessage(mentorId){
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if(!text) return;
+  const t = THREADS[mentorId] || (THREADS[mentorId] = []);
+  t.push({who:'me', text});
+  input.value = '';
+  ensureChat(mentorId).ts = Date.now();
+  bumpChatToTop(mentorId);
+  state.pending[mentorId] = (state.pending[mentorId]||0) + 1;
+  renderThread(mentorId);
+  persist();
+  input.focus();
+
+  // Light "mentor is typing" simulation so the chat feels alive
+  setTimeout(()=>{
+    state.pending[mentorId] = Math.max(0, (state.pending[mentorId]||1) - 1);
+    const reply = REPLIES[Math.floor(Math.random()*REPLIES.length)];
+    (THREADS[mentorId] = THREADS[mentorId] || []).push({who:'them', text:reply});
+    const c = ensureChat(mentorId);
+    c.ts = Date.now();
+    bumpChatToTop(mentorId);
+    if(state.openChatMentor===mentorId){
+      renderThread(mentorId);
+    } else {
+      c.unread = true;
+      if(state.notifMessages) pushNotif('New message', `${mentorById(mentorId).name} replied to you.`);
+    }
+    persist();
+    if(state.tab==='chats') renderChats(document.getElementById('appBody'));
+    updateBadges();
+  }, 1200 + Math.random()*800);
+}
+
+/* ============================================================
+   SECTION 4 — BOOKING
+   A real month calendar: dots mark days with a session, tapping
+   a date filters the agenda to that day. "Book session" / "Book
+   again" open the date + time picker; "Reschedule" opens the same
+   picker but MOVES the existing booking instead of adding a new one.
+   Past days are disabled and clashing time slots are greyed out.
+   ============================================================ */
+function bookingDotsMap(){
+  const map = {};
+  BOOKINGS.forEach(x=>{ (map[x.date] = map[x.date] || []).push(x); });
+  return map;
+}
+function byWhen(a,b){ return a.date.localeCompare(b.date) || toMin(a.start)-toMin(b.start); }
+function upcomingBookings(){ return BOOKINGS.filter(isUpcoming).sort(byWhen); }
+function pastBookings(){ return BOOKINGS.filter(x=>!isUpcoming(x)).sort((a,b)=>byWhen(b,a)); }
+
+function buildCalendarHTML(year, month, opts={}){
+  const { selectedDate=null, dotsMap={}, onSelect='selectCalDay', minDate=null } = opts;
+  const firstDow = new Date(year, month, 1).getDay();
+  const numDays = new Date(year, month+1, 0).getDate();
+  const todayStr = ymd(TODAY);
+  let cells = '';
+  for(let i=0;i<firstDow;i++) cells += `<button class="cal-day pad" tabindex="-1" aria-hidden="true"></button>`;
+  for(let d=1; d<=numDays; d++){
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    let cls = 'cal-day';
+    if(dateStr===todayStr) cls += ' today';
+    if(dateStr===selectedDate) cls += ' selected';
+    const hasDots = !!dotsMap[dateStr];
+    if(hasDots && dateStr < todayStr) cls += ' past-dot';
+    const disabled = minDate && dateStr < minDate;
+    cells += `<button class="${cls}" ${disabled?'disabled':''} onclick="${onSelect}('${dateStr}')" aria-label="${friendlyDate(dateStr)}${hasDots?', has a session':''}" ${dateStr===selectedDate?'aria-pressed="true"':''}>${d}${hasDots?'<span class="cal-dot"></span>':''}</button>`;
+  }
+  return `
+    <div class="cal-dow">${['S','M','T','W','T','F','S'].map(x=>`<span>${x}</span>`).join('')}</div>
+    <div class="cal-grid">${cells}</div>
+  `;
+}
+
+function renderBookings(b){
+  const dots = bookingDotsMap();
+  const calHTML = buildCalendarHTML(state.calYear, state.calMonth, {selectedDate:state.selectedDate, dotsMap:dots, onSelect:'selectCalDay'});
+  const agendaHTML = state.selectedDate ? `
+    <div class="cal-agenda">
+      <h5>${friendlyDate(state.selectedDate)}</h5>
+      ${(dots[state.selectedDate]||[]).length ? dots[state.selectedDate].slice().sort(byWhen).map(bookingHTML).join('') : `<div class="empty-note" style="padding:10px 0">No sessions this day.</div>`}
+    </div>` : '';
+  const up = upcomingBookings(), past = pastBookings();
+
+  b.innerHTML = `
+    <div class="cal-card">
+      <div class="cal-head">
+        <strong>${MONTHS[state.calMonth]} ${state.calYear}</strong>
+        <div class="cal-nav">
+          <button class="mini-btn" onclick="goToday()">Today</button>
+          <button class="cal-nav-btn" onclick="calNav(-1)" aria-label="Previous month">${ic.chevronLeft}</button>
+          <button class="cal-nav-btn" onclick="calNav(1)" aria-label="Next month">${ic.chevronRight}</button>
+        </div>
+      </div>
+      ${calHTML}
+      ${agendaHTML}
+    </div>
+    ${!state.selectedDate ? `
+      <div class="section-label"><b>Upcoming</b></div>
+      ${up.length ? up.map(bookingHTML).join('') : `<div class="empty-note">Nothing booked yet — find a mentor on Discover.</div>`}
+      ${past.length ? `<div class="section-label" style="margin-top:22px"><b>Past</b></div>${past.map(bookingHTML).join('')}` : ''}
+    ` : ''}
+  `;
+}
+function selectCalDay(dateStr){ state.selectedDate = (state.selectedDate===dateStr) ? null : dateStr; renderBody(); }
+function goToday(){
+  state.calYear = TODAY.getFullYear(); state.calMonth = TODAY.getMonth();
+  state.selectedDate = ymd(TODAY);
+  renderBody();
+}
+function calNav(delta){
+  state.calMonth += delta;
+  if(state.calMonth<0){ state.calMonth=11; state.calYear--; }
+  if(state.calMonth>11){ state.calMonth=0; state.calYear++; }
+  renderBody();
+}
+
+function bookingHTML(x){
+  const m = mentorById(x.mentorId);
+  const d = new Date(x.date+'T00:00:00');
+  return `
+    <div class="booking-card">
+      <div class="booking-date"><strong>${d.getDate()}</strong><span>${MONTHS[d.getMonth()].slice(0,3)}</span></div>
+      <div class="booking-info">
+        <strong>${m.name}</strong>
+        <p>${m.label} · ${bookingTimeLabel(x)}</p>
+        ${isUpcoming(x)
+          ? `<div class="booking-actions"><button class="mini-btn primary" onclick="openChat(${m.id})">Message</button><button class="mini-btn" onclick="openBooking(${m.id}, '${x.id}')">Reschedule</button><button class="mini-btn danger" onclick="askCancelBooking('${x.id}')">Cancel</button></div>`
+          : `<div class="booking-actions"><button class="mini-btn" onclick="openBooking(${m.id})">Book again</button></div>`}
+      </div>
+    </div>
+  `;
+}
+function askCancelBooking(id){
+  const x = BOOKINGS.find(b=>b.id===id);
+  if(!x) return;
+  const m = mentorById(x.mentorId);
+  openDialog({
+    title:'Cancel this session?',
+    body:`Your session with ${m.name} on ${friendlyDate(x.date)} at ${x.start} will be removed.`,
+    confirmLabel:'Cancel session', danger:true
+  }, ()=>{
+    BOOKINGS = BOOKINGS.filter(b=>b.id!==id);
+    pushNotif('Booking cancelled', `Your session with ${m.name} on ${friendlyDate(x.date)} was cancelled.`);
+    persist();
+    renderBody();
+    showToast('Session cancelled');
+  });
+}
+
+// ---- New-booking flow (date + duration + time + format, for one mentor) ----
+const TIME_SLOTS = ['9:00 AM','11:00 AM','1:00 PM','3:00 PM','5:00 PM','7:00 PM'];
+
+function openBooking(mentorId, rescheduleId){
+  const ex = rescheduleId ? BOOKINGS.find(b=>b.id===rescheduleId) : null;
+  const base = ex ? new Date(ex.date+'T00:00:00') : TODAY;
+  bookingFlow = {
+    mentorId, year:base.getFullYear(), month:base.getMonth(),
+    date: ex ? ex.date : null, time: ex ? ex.start : null, dur: ex ? ex.dur : 60,
+    mode: ex && ex.place!=='Online' ? 'In person' : 'Online', place: ex ? ex.place : 'Online',
+    rescheduleId: ex ? ex.id : null,
+  };
+  renderBookingOverlay();
+  document.getElementById('bookingOverlay').classList.add('open');
+}
+// Returns a reason string if the slot can't be booked, otherwise ''.
+function slotProblem(date, start, dur){
+  if(!date) return '';
+  const s = toMin(start), e = s + dur;
+  if(date === ymd(TODAY)){
+    const now = new Date();
+    if(s <= now.getHours()*60 + now.getMinutes()) return 'past';
+  }
+  const clash = BOOKINGS.find(b => b.id!==bookingFlow.rescheduleId && b.date===date && toMin(b.start) < e && s < toMin(b.start)+b.dur);
+  return clash ? 'clash' : '';
+}
+function renderBookingOverlay(){
+  const f = bookingFlow;
+  const m = mentorById(f.mentorId);
+  if(f.time && f.date && slotProblem(f.date, f.time, f.dur)) f.time = null; // selection became invalid (date/duration changed)
+  const dots = bookingDotsMap();
+  const calHTML = buildCalendarHTML(f.year, f.month, {selectedDate:f.date, dotsMap:dots, onSelect:'pickBookingDate', minDate:ymd(TODAY)});
+  const canConfirm = f.date && f.time;
+  const atFirstMonth = f.year===TODAY.getFullYear() && f.month===TODAY.getMonth();
+  const el = document.getElementById('bookingOverlay');
+  el.innerHTML = `
+    <div class="overlay-header">
+      <button class="back-btn" onclick="closeOverlay('bookingOverlay')" aria-label="Back">${ic.chevronLeft}</button>
+      <div class="overlay-title">${f.rescheduleId?'Reschedule':'Book'} ${m.name.split(' ')[0]}</div>
+    </div>
+    <div class="overlay-body">
+      <div class="block">
+        <h4>Date</h4>
+        <div class="cal-card" style="margin:0; padding:0; border:none;">
+          <div class="cal-head">
+            <strong>${MONTHS[f.month]} ${f.year}</strong>
+            <div class="cal-nav">
+              <button class="cal-nav-btn" onclick="bookingCalNav(-1)" aria-label="Previous month" ${atFirstMonth?'disabled':''}>${ic.chevronLeft}</button>
+              <button class="cal-nav-btn" onclick="bookingCalNav(1)" aria-label="Next month">${ic.chevronRight}</button>
+            </div>
+          </div>
+          ${calHTML}
+        </div>
+      </div>
+      <div class="block">
+        <h4>Duration</h4>
+        <div class="dur-row">
+          ${[30,45,60].map(d=>`<button class="dur-btn ${f.dur===d?'active':''}" aria-pressed="${f.dur===d}" onclick="pickBookingDur(${d})">${d} min</button>`).join('')}
+        </div>
+      </div>
+      <div class="block">
+        <h4>Format</h4>
+        <div class="dur-row">
+          ${['Online','In person'].map(x=>`<button class="dur-btn ${f.mode===x?'active':''}" aria-pressed="${f.mode===x}" onclick="pickBookingMode('${x}')">${x}</button>`).join('')}
+        </div>
+      </div>
+      <div class="block" style="border-bottom:none;">
+        <h4>Time</h4>
+        <div class="slot-row">
+          ${TIME_SLOTS.map(t=>{
+            const bad = slotProblem(f.date, t, f.dur);
+            return `<button class="slot-btn ${f.time===t?'active':''}" ${bad?'disabled':''} ${bad?`title="${bad==='past'?'This time has passed':'Clashes with another session'}"`:''} aria-pressed="${f.time===t}" onclick="pickBookingTime('${t}')">${t}</button>`;
+          }).join('')}
+        </div>
+        <p class="hint">${f.date ? 'Greyed-out times have passed or clash with another session.' : 'Pick a date first to see which times are free.'}</p>
+      </div>
+    </div>
+    <div class="cta-row">
+      <button class="btn btn-primary" style="flex:1; ${canConfirm?'':'opacity:.45; pointer-events:none;'}" ${canConfirm?'':'disabled'} onclick="confirmBooking()">
+        ${canConfirm ? `${f.rescheduleId?'Reschedule':'Confirm'} · ${friendlyDate(f.date)}, ${f.time}` : 'Pick a date and time'}
+      </button>
+    </div>
+  `;
+}
+function bookingCalNav(delta){
+  let y = bookingFlow.year, mo = bookingFlow.month + delta;
+  if(mo<0){ mo=11; y--; }
+  if(mo>11){ mo=0; y++; }
+  if(y < TODAY.getFullYear() || (y===TODAY.getFullYear() && mo < TODAY.getMonth())) return; // can't browse the past
+  bookingFlow.year = y; bookingFlow.month = mo;
+  renderBookingOverlay();
+}
+function pickBookingDate(d){ bookingFlow.date = d; renderBookingOverlay(); }
+function pickBookingTime(t){ bookingFlow.time = t; renderBookingOverlay(); }
+function pickBookingDur(d){ bookingFlow.dur = d; renderBookingOverlay(); }
+function pickBookingMode(mode){
+  const ex = bookingFlow.rescheduleId ? BOOKINGS.find(b=>b.id===bookingFlow.rescheduleId) : null;
+  bookingFlow.mode = mode;
+  bookingFlow.place = mode==='Online' ? 'Online' : (ex && ex.place!=='Online' ? ex.place : 'In person');
+  renderBookingOverlay();
+}
+function confirmBooking(){
+  const f = bookingFlow;
+  if(!f.date || !f.time || slotProblem(f.date, f.time, f.dur)) return;
+  const m = mentorById(f.mentorId);
+  const rescheduled = !!f.rescheduleId;
+  if(rescheduled){
+    const b = BOOKINGS.find(x=>x.id===f.rescheduleId);
+    if(b) Object.assign(b, {mentorId:f.mentorId, date:f.date, start:f.time, dur:f.dur, place:f.place});
+  } else {
+    BOOKINGS.push({ id:'b'+Date.now(), mentorId:f.mentorId, date:f.date, start:f.time, dur:f.dur, place:f.place });
+  }
+  pushNotif(rescheduled ? 'Booking rescheduled' : 'Booking confirmed', `Your session with ${m.name} is set for ${friendlyDate(f.date)}, ${f.time}.`);
+  persist();
+  closeOverlay('bookingOverlay');
+  closeOverlay('profileOverlay');
+  state.selectedDate = f.date;
+  state.calYear = f.year;
+  state.calMonth = f.month;
+  setTab('bookings');
+  showToast(`${rescheduled?'Rescheduled':'Booked'} with ${m.name.split(' ')[0]} · ${friendlyDate(f.date)}`);
+}
+
+/* ============================================================
+   SECTION 5 — PROFILE
+   Learning/teaching mode, saved mentors (from Discover
+   favoriting), editable skill tags / rate / bio, and the
+   settings sheet.
+   ============================================================ */
+function setMode(mode){ state.profileMode = mode; state.addingTag = null; renderBody(); }
+function toggleTeachingVisible(){
+  state.teachingVisible = !state.teachingVisible;
+  persist();
+  renderBody();
+  showToast(state.teachingVisible ? 'Visible to students' : 'Hidden from students');
+}
+function tagList(which){ return which==='learning' ? state.learningTags : state.teachingTags; }
+function startAddTag(which){
+  state.addingTag = which;
+  renderBody();
+  const i = document.getElementById('tagInput');
+  if(i) i.focus();
+}
+function commitTag(which, val){
+  if(state.addingTag !== which) return; // already handled (Enter then blur)
+  state.addingTag = null;
+  const v = (val||'').trim();
+  const list = tagList(which);
+  if(v){
+    if(list.some(t=>t.toLowerCase()===v.toLowerCase())) showToast('Already in your list');
+    else if(list.length>=12) showToast('Up to 12 skills');
+    else list.push(v);
+    persist();
+  }
+  renderBody();
+}
+function tagKey(e, which){
+  if(e.key==='Enter'){ e.preventDefault(); commitTag(which, e.target.value); }
+  if(e.key==='Escape'){ e.stopPropagation(); state.addingTag = null; renderBody(); }
+}
+function removeTag(which, i){ tagList(which).splice(i,1); persist(); renderBody(); }
+function tagRowHTML(which){
+  const adding = state.addingTag===which;
+  return `<div class="tag-row">${tagList(which).map((t,i)=>`<span class="tag">${escapeHTML(t)}<button class="tag-x" onclick="removeTag('${which}',${i})" aria-label="Remove ${escapeHTML(t)}">${ic.x}</button></span>`).join('')}${
+    adding ? `<input class="tag-input" id="tagInput" maxlength="24" placeholder="New skill" aria-label="New skill" onkeydown="tagKey(event,'${which}')" onblur="commitTag('${which}', this.value)">`
+           : `<button class="tag add-tag" onclick="startAddTag('${which}')">+ Add</button>`}</div>`;
+}
+function setRate(v){
+  const n = Math.max(0, parseInt(v,10) || 0);
+  state.profile.rate = n;
+  persist();
+}
+function setAbout(v){
+  state.profile.about = v;
+  const c = document.getElementById('aboutCount');
+  if(c) c.textContent = v.length + '/280';
+  persist();
+}
+
+function renderProfile(b){
+  const savedMentors = MENTORS.filter(m=>state.savedIds.has(m.id));
+  const p = state.profile;
+  const uniqueMentors = new Set(BOOKINGS.map(x=>x.mentorId)).size;
+  b.innerHTML = `
+    <div class="profile-top">
+      <div class="avatar lg" style="background:var(--brand)">${escapeHTML(initials(p.name))}</div>
+      <h3>${escapeHTML(p.name || 'Your name')}</h3>
+      <p>${escapeHTML(p.school)}</p>
+    </div>
+    <div class="mode-switch" role="tablist">
+      <button class="mode-btn ${state.profileMode==='learning'?'active':''}" role="tab" aria-selected="${state.profileMode==='learning'}" onclick="setMode('learning')">Learning</button>
+      <button class="mode-btn ${state.profileMode==='teaching'?'active':''}" role="tab" aria-selected="${state.profileMode==='teaching'}" onclick="setMode('teaching')">Teaching</button>
+    </div>
+
+    ${state.profileMode==='learning' ? `
+      <div class="stat-row" style="border:none; padding-top:6px;">
+        <div class="stat"><strong>${BOOKINGS.length}</strong><span>Sessions</span></div>
+        <div class="stat"><strong>${uniqueMentors}</strong><span>Mentors</span></div>
+        <div class="stat"><strong>${state.savedIds.size}</strong><span>Saved</span></div>
+      </div>
+      <div class="field-label">Skills I'm learning</div>
+      ${tagRowHTML('learning')}
+      <div class="field-label">Saved mentors</div>
+      ${savedMentors.length ? savedMentors.map(m=>`
+        <div class="mentor-card" role="button" tabindex="0" style="margin-bottom:8px" onclick="openProfile(${m.id})" onkeydown="cardKey(event,${m.id})">
+          <button class="fav-btn on" onclick="toggleFav(${m.id}, event)" aria-label="Remove saved mentor">${ic.heartFill}</button>
+          <div class="avatar md" style="background:${m.color}">${initials(m.name)}</div>
+          <div class="mentor-main">
+            <div class="mentor-name-row"><strong>${m.name}</strong></div>
+            <span class="cat-badge" style="background:color-mix(in srgb, var(--cat-${m.cat}) 16%, var(--surface)); color:var(--cat-${m.cat})">${m.label}</span>
+          </div>
+        </div>
+      `).join('') : `<div class="empty-note">Tap the heart on a mentor's card to save them here.</div>`}
+    ` : `
+      <div class="stat-row" style="border:none; padding-top:6px;">
+        <div class="stat"><strong>0</strong><span>Students</span></div>
+        <div class="stat"><strong>—</strong><span>Rating</span></div>
+        <div class="stat"><strong>Rp0</strong><span>Earned</span></div>
+      </div>
+      <div class="toggle-row" style="margin:4px 2px 0;">
+        <div><strong>Visible to students</strong><span>Turn off to pause new requests</span></div>
+        <button class="switch ${state.teachingVisible?'':'off'}" role="switch" aria-checked="${state.teachingVisible}" onclick="toggleTeachingVisible()" aria-label="Toggle visibility"></button>
+      </div>
+      <div class="field-label">Skills I teach</div>
+      ${tagRowHTML('teaching')}
+      <div class="field-label">Hourly rate</div>
+      <label class="field-box rate-box"><span>Rp</span><input type="number" inputmode="numeric" min="0" step="5000" value="${p.rate}" onchange="setRate(this.value)" aria-label="Hourly rate in rupiah"><span>/ hour</span></label>
+      <div class="field-label">About what you teach</div>
+      <textarea class="field-box field-area" maxlength="280" placeholder="Describe what you're confident teaching and who it's for — this is what mentees see and filter by." aria-label="About what you teach" oninput="setAbout(this.value)">${escapeHTML(p.about)}</textarea>
+      <div class="char-count" id="aboutCount">${p.about.length}/280</div>
+    `}
+  `;
+}
+
+function openSettings(){
+  renderSettingsOverlay();
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+function setProfileField(key, v){
+  state.profile[key] = v;
+  persist();
+}
+function renderSettingsOverlay(){
+  const el = document.getElementById('settingsOverlay');
+  el.innerHTML = `
+    <div class="overlay-header">
+      <button class="back-btn" onclick="closeSettings()" aria-label="Back">${ic.chevronLeft}</button>
+      <div class="overlay-title">Settings</div>
+    </div>
+    <div class="overlay-body">
+      <div class="block">
+        <h4>Account</h4>
+        <label class="field-label" for="setName" style="margin-top:0">Display name</label>
+        <input id="setName" class="field-box field-input" maxlength="40" value="${escapeHTML(state.profile.name)}" oninput="setProfileField('name', this.value)">
+        <label class="field-label" for="setSchool">School / programme</label>
+        <input id="setSchool" class="field-box field-input" maxlength="60" value="${escapeHTML(state.profile.school)}" oninput="setProfileField('school', this.value)">
+      </div>
+      <div class="block">
+        <h4>Appearance</h4>
+        <div class="settings-row" style="border-bottom:none; padding-left:0;">
+          <div class="settings-label"><strong>Theme</strong><span>Match device, or force light / dark</span></div>
+          <div class="theme-row">
+            <button class="theme-opt ${state.theme==='light'?'active':''}" onclick="setTheme('light')" aria-label="Light">${ic.sun}</button>
+            <button class="theme-opt ${state.theme==='dark'?'active':''}" onclick="setTheme('dark')" aria-label="Dark">${ic.moon}</button>
+            <button class="theme-opt ${state.theme==='system'?'active':''}" onclick="setTheme('system')" aria-label="Match device">Auto</button>
+          </div>
+        </div>
+      </div>
+      <div class="block">
+        <h4>Notifications</h4>
+        <div class="settings-row" style="border-bottom:none; padding-left:0;">
+          <div class="settings-label"><strong>Session reminders</strong><span>Today and tomorrow, for booked sessions</span></div>
+          <button class="switch ${state.notifReminders?'':'off'}" role="switch" aria-checked="${state.notifReminders}" onclick="toggleNotifSetting('notifReminders')" aria-label="Toggle session reminders"></button>
+        </div>
+        <div class="settings-row" style="border-bottom:none; padding-left:0;">
+          <div class="settings-label"><strong>New messages</strong><span>When a mentor replies</span></div>
+          <button class="switch ${state.notifMessages?'':'off'}" role="switch" aria-checked="${state.notifMessages}" onclick="toggleNotifSetting('notifMessages')" aria-label="Toggle message notifications"></button>
+        </div>
+      </div>
+      <div class="block" style="border-bottom:none;">
+        <h4>Data &amp; about</h4>
+        <p class="hint" style="margin:0 0 12px">Everything here is saved only in this browser — there's no account or server.</p>
+        <button class="btn btn-ghost danger-text" style="width:100%" onclick="askReset()">Reset demo data</button>
+        <p class="hint" style="margin:14px 0 0">CourseConnect prototype v${APP_VERSION} · <a href="https://github.com/gloriackusuma/courseconnect" target="_blank" rel="noopener">View on GitHub</a></p>
+      </div>
+    </div>
+  `;
+}
+function closeSettings(){
+  closeOverlay('settingsOverlay');
+  if(state.tab==='profile') renderBody(); // pick up a changed name / school
+}
+function setTheme(mode){
+  state.theme = mode;
+  applyTheme();
+  persist();
+  renderSettingsOverlay();
+}
+function toggleNotifSetting(key){ state[key] = !state[key]; persist(); renderSettingsOverlay(); }
+function askReset(){
+  openDialog({
+    title:'Reset demo data?',
+    body:'This clears your saved mentors, bookings, messages and profile edits from this browser and restores the sample data.',
+    confirmLabel:'Reset', danger:true
+  }, ()=>{
+    try{ ['cc_state_v2','cc_saved','cc_theme'].forEach(k=>localStorage.removeItem(k)); }catch(e){}
+    location.reload();
+  });
+}
+
+/* ============================================================
+   RENDER: HEADER (per tab)
+   ============================================================ */
+function renderHeader(){
+  const h = document.getElementById('appHeader');
+  if(state.tab==='discover'){
+    h.innerHTML = `
+      <div class="header-top">
+        <div class="place-pill">${ic.pin}<span>Kemanggisan, Jakarta Barat</span></div>
+        <button class="icon-btn" id="bellBtn" onclick="toggleNotifPanel(event)" aria-label="Notifications">${ic.bell}${state.hasNotif?'<span class="dot-flag"></span>':''}</button>
+      </div>
+      <div class="h1">Find someone to<br>learn from nearby</div>
+      <div class="search-bar">${ic.search}<input id="searchInput" type="text" aria-label="Search a skill or a mentor's name" placeholder="Search a skill or a mentor's name" value="${escapeHTML(state.query)}" oninput="setQuery(this.value)" autocomplete="off"><button id="clearSearch" onclick="clearSearch()" aria-label="Clear search" ${state.query?'':'hidden'}>${ic.x}</button></div>
+      <div class="chip-row" id="chipRow"></div>
+    `;
+    renderChips();
+  } else if(state.tab==='chats'){
+    const unread = CHATS.filter(c=>c.unread).length;
+    h.innerHTML = `<div class="header-top"><div class="h1" style="margin:2px 0 0">Chats</div></div><p class="h1-sub">${unread?`${unread} unread — `:''}Message a mentor before you book, or coordinate a session.</p>`;
+  } else if(state.tab==='bookings'){
+    h.innerHTML = `<div class="header-top"><div class="h1" style="margin:2px 0 0">Bookings</div></div><p class="h1-sub">Tap a date to see what's on, or browse the lists below.</p>`;
+  } else {
+    h.innerHTML = `<div class="header-top"><div class="h1" style="margin:2px 0 0">Profile</div><button class="icon-btn" onclick="openSettings()" aria-label="Settings">${ic.gear}</button></div>`;
+  }
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+loadPersisted();
+checkReminders();
+setTab('discover');
+
+// Close the notification dropdown on any tap outside it
+document.getElementById('screen').addEventListener('click', function(e){
+  const panel = document.getElementById('notifPanel');
+  const bell = document.getElementById('bellBtn');
+  if(panel.classList.contains('open') && !panel.contains(e.target) && (!bell || !bell.contains(e.target))){
+    panel.classList.remove('open');
+  }
+});
+// Backdrop tap closes the confirm dialog
+document.getElementById('dialog').addEventListener('click', function(e){ if(e.target===this) closeDialog(false); });
+
+// Escape closes whatever is on top: dialog → settings → booking → chat → mentor profile → notifications
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Escape') return;
+  if(!document.getElementById('dialog').hidden){ closeDialog(false); return; }
+  const open = id => document.getElementById(id).classList.contains('open');
+  if(open('settingsOverlay')){ closeSettings(); return; }
+  if(open('bookingOverlay')){ closeOverlay('bookingOverlay'); return; }
+  if(open('chatOverlay')){ closeChatOverlay(); return; }
+  if(open('profileOverlay')){ closeOverlay('profileOverlay'); return; }
+  document.getElementById('notifPanel').classList.remove('open');
+});
+
+</script>
+</body>
+</html>
