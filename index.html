@@ -732,15 +732,56 @@
   .composer textarea:focus{ border-color:var(--brand); }
   .loading{ display:flex; align-items:center; justify-content:center; padding:40px 0; color:var(--ink-faint); font-size:13px; font-weight:700; }
   .toast{ white-space:normal; max-width:86%; text-align:center; }
-  .pad .btn{ width:100%; }
-  .dialog-backdrop{ z-index:1000; }
-  .toast{ z-index:1001; }
-  .notif-panel{ z-index:900; }
   .toast.error{ background:var(--danger); color:#fff; }
   @media (max-width: 560px){
     .input, .composer textarea{ font-size:16px; }
     .auth{ padding-top:calc(36px + env(safe-area-inset-top,0px)); }
   }
+
+  /* ---------- Admin role colour ---------- */
+  .screen[data-role="admin"]{--brand:#6B2FB3;--brand-deep:#4A1F7D;--brand-soft:#EEE5FA;}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .screen[data-role="admin"]{--brand:#B98AF0;--brand-deep:#DCC4FA;--brand-soft:#2E2347;} }
+  :root[data-theme="dark"] .screen[data-role="admin"]{--brand:#B98AF0;--brand-deep:#DCC4FA;--brand-soft:#2E2347;}
+  .screen[data-role="admin"] .app-header{background:linear-gradient(180deg,var(--brand-soft),var(--surface) 85%);}
+  .screen[data-role="admin"] .tabbar{background:var(--brand-soft);border-top-color:transparent;}
+  .role-bar button{ min-width:0; }
+
+  /* ---------- Payment ---------- */
+  .pill{ flex:none; display:inline-block; font-size:10.5px; font-weight:800; padding:3px 9px; border-radius:100px; white-space:nowrap; }
+  .pill.warn{ background:color-mix(in srgb, var(--gold) 20%, var(--surface)); color:color-mix(in srgb, var(--gold) 70%, var(--ink)); }
+  .pill.info{ background:var(--brand-soft); color:var(--brand-deep); }
+  .pill.good{ background:color-mix(in srgb, var(--good) 15%, var(--surface)); color:var(--good); }
+  .pill.bad{ background:color-mix(in srgb, var(--danger) 14%, var(--surface)); color:var(--danger); }
+  .pill.muted{ background:var(--surface-alt); color:var(--ink-faint); }
+  .block p .pill{ margin-right:4px; vertical-align:1px; }
+  .pay-amount{ text-align:center; padding:6px 0 16px; }
+  .pay-amount span{ display:block; font-size:12px; font-weight:700; color:var(--ink-faint); }
+  .pay-amount strong{ display:block; font-size:30px; font-weight:800; letter-spacing:-0.02em; margin:4px 0 2px; }
+  .pay-amount small{ font-size:12.5px; color:var(--ink-soft); font-weight:600; }
+  .va-box{ display:flex; align-items:center; justify-content:space-between; gap:10px; border:1.5px dashed var(--brand); background:var(--brand-soft); border-radius:var(--radius-md); padding:14px 16px; }
+  .va-box span{ display:block; font-size:11.5px; font-weight:800; color:var(--brand-deep); }
+  .va-box strong{ display:block; font-size:19px; font-weight:800; letter-spacing:.04em; margin-top:4px; font-variant-numeric:tabular-nums; }
+  .pay-meta{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:12px 2px 14px; font-size:12px; color:var(--ink-soft); font-weight:600; }
+  .form-note.bad{ background:color-mix(in srgb, var(--danger) 12%, var(--surface)); color:var(--danger); }
+  .pay-steps{ list-style:none; counter-reset:s; padding:0; margin:4px 0 0; }
+  .pay-steps li{ counter-increment:s; display:flex; align-items:center; gap:10px; padding:8px 0; font-size:13px; font-weight:600; color:var(--ink-faint); }
+  .pay-steps li::before{ content:counter(s); width:24px; height:24px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:800; background:var(--surface-alt); color:var(--ink-faint); }
+  .pay-steps li.done{ color:var(--ink-soft); }
+  .pay-steps li.done::before{ content:'✓'; background:var(--good); color:#fff; }
+  .pay-steps li.now{ color:var(--ink); font-weight:800; }
+  .pay-steps li.now::before{ background:var(--brand); color:#fff; }
+  .kv{ display:grid; grid-template-columns:auto 1fr; gap:5px 12px; margin-top:12px; font-size:12px; }
+  .kv span{ color:var(--ink-faint); font-weight:700; }
+  .kv b{ font-weight:700; color:var(--ink); overflow-wrap:anywhere; }
+  .m-card-top .chat-text strong{ display:block; }
+  .earn-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:4px 0 6px; }
+  .earn-row div{ background:var(--surface-alt); border-radius:14px; padding:11px 13px; }
+  .earn-row span{ display:block; font-size:11px; font-weight:700; color:var(--ink-faint); }
+  .earn-row strong{ display:block; font-size:15px; font-weight:800; margin-top:3px; }
+  .pad .btn{ width:100%; }
+  .dialog-backdrop{ z-index:1000; }
+  .toast{ z-index:1001; }
+  .notif-panel{ z-index:900; }
 </style>
 </head>
 <body>
@@ -753,7 +794,7 @@
   </div>
   <p>
     Mentors create classes for a course or a competition: seats, price, date and place.
-    Students join and land straight in the class group chat.
+    Students book a seat, pay, and land straight in the class group chat.
   </p>
 </div>
 
@@ -806,6 +847,11 @@ const ic = {
   send: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 11.5L21 3l-7 18-3-7-8-2.5z"/></svg>',
   sun: sv('<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.5M12 19v2.5M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2.5 12H5M19 12h2.5M4.2 19.8L6 18M18 6l1.8-1.8"/>'),
   moon: sv('<path d="M20 14.5A8.5 8.5 0 1110.5 4a6.8 6.8 0 009.5 10.5z"/>'),
+  card: sv('<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19M6.5 15h4"/>'),
+  shield: sv('<path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>'),
+  wallet: sv('<path d="M3 7.5A2.5 2.5 0 015.5 5H18v4"/><rect x="3" y="7.5" width="18" height="12" rx="2.5"/><circle cx="16.5" cy="13.5" r="1.3"/>'),
+  history: sv('<path d="M3 12a9 9 0 103-6.7L3 8"/><path d="M3 3v5h5M12 7.5V12l3 2"/>'),
+  copy: sv('<rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V6a2.5 2.5 0 00-2.5-2.5H6A2.5 2.5 0 003.5 6v7A2.5 2.5 0 006 15.5h2.5"/>'),
 };
 
 /* ============================================================
@@ -823,6 +869,11 @@ const state = {
   selectedDate: null, calY: new Date().getFullYear(), calM: new Date().getMonth(),
   theme: 'system', notifMessages: true,
   notifs: [], hasNotif: false,
+  bookings: [],                    // paid-class bookings I can see (mine, my classes', or all if admin)
+  seats: {},                       // classId -> seats taken (members + unpaid holds)
+  myAccount: null,                 // my bank account for payouts / refunds
+  accounts: {},                    // userId -> bank account (admin only)
+  payOpen: null,                   // bookingId shown in the payment sheet
 };
 const names = new Map();           // profile id -> full name
 let toastTimer = null, reloadTimer = null, dialogCb = null, overlayZ = 30;
@@ -1031,7 +1082,7 @@ function askLogout(){
    DATA
    ============================================================ */
 const CLASS_SELECT = `
-  id, host_id, title, category, subject, description, capacity, price, starts_at, duration_min, location, created_at,
+  id, host_id, title, category, subject, description, capacity, price, starts_at, duration_min, location, created_at, mentor_confirmed_at,
   host:profiles!classes_host_id_fkey ( id, full_name, campus, major, bio ),
   members:class_members ( user_id, joined_at, profile:profiles ( id, full_name, campus, major ) )`;
 
@@ -1073,9 +1124,37 @@ async function ensureNames(ids){
   const { data } = await sb.from('profiles').select('id, full_name').in('id', missing);
   (data || []).forEach(p => names.set(p.id, p.full_name));
 }
-async function reloadAll(){ await loadClasses(); await loadLastMessages(); }
+async function loadSeats(){
+  const { data, error } = await sb.rpc('seat_counts');
+  if (error) throw error;
+  state.seats = {};
+  (data || []).forEach(r => { state.seats[r.class_id] = r.taken; });
+}
+const BOOKING_SELECT = `*, user:profiles!bookings_user_id_fkey ( id, full_name ),
+  class:classes ( id, title, category, subject, starts_at, duration_min, price, location, host_id, mentor_confirmed_at,
+                  host:profiles!classes_host_id_fkey ( id, full_name ) )`;
+async function loadBookings(){
+  const { data, error } = await sb.from('bookings').select(BOOKING_SELECT).order('created_at', { ascending: false }).limit(1000);
+  if (error) throw error;
+  state.bookings = data || [];
+  state.bookings.forEach(b => { if (b.user) names.set(b.user.id, b.user.full_name); });
+}
+async function loadAccounts(){
+  const { data, error } = await sb.from('payout_accounts').select('*');
+  if (error) throw error;
+  state.accounts = {};
+  (data || []).forEach(a => { state.accounts[a.user_id] = a; });
+  state.myAccount = state.accounts[uid()] || null;
+}
+async function reloadAll(){
+  await loadClasses();
+  await Promise.all([loadSeats(), loadBookings(), loadAccounts(), loadLastMessages()]);
+}
 
 function classById(id){ return state.classes.find(c => c.id === id); }
+function seatsTaken(c){ return state.seats[c.id] ?? c.members.length; }
+function isAdmin(){ return !!state.me?.is_admin; }
+function classEnded(cls){ return new Date(cls.starts_at).getTime() + cls.duration_min * 60000 <= Date.now(); }
 function isHost(c){ return c.host_id === uid(); }
 function isMember(c){ return c.members.some(m => m.user_id === uid()); }
 function isMine(c){ return isHost(c) || isMember(c); }
@@ -1094,6 +1173,7 @@ function refreshVisible(){
   renderBody(); updateBadges();
   if (state.tab === 'chats' || state.tab === 'm-chats') renderHeader();
   if (state.detailId && $('detailOverlay').classList.contains('open')) renderDetail();
+  if (state.payOpen && $('payOverlay').classList.contains('open')) renderPayment();
 }
 
 /* ============================================================
@@ -1101,9 +1181,11 @@ function refreshVisible(){
    Student and Mentor are separate spaces with their own tabs.
    ============================================================ */
 const TABS = {
-  student: [['discover','Discover',ic.compass], ['chats','Chats',ic.msg,'chatDot'], ['bookings','Bookings',ic.calendar], ['profile','Profile',ic.user]],
+  student: [['discover','Discover',ic.compass], ['chats','Chats',ic.msg,'chatDot'], ['bookings','Bookings',ic.calendar,'bookDot'], ['profile','Profile',ic.user]],
   mentor:  [['m-home','My classes',ic.board,'mHomeDot'], ['m-chats','Groups',ic.msg,'mChatDot'], ['m-sched','Schedule',ic.calendar], ['profile','Profile',ic.user]],
+  admin:   [['a-pay','Payments',ic.card,'aPayDot'], ['a-payout','Payouts',ic.wallet,'aOutDot'], ['a-history','History',ic.history], ['profile','Profile',ic.user]],
 };
+const HOME_TAB = { student:'discover', mentor:'m-home', admin:'a-pay' };
 
 function renderShell(){
   screenEl.innerHTML = `
@@ -1114,6 +1196,7 @@ function renderShell(){
     <div class="overlay" id="chatOverlay" aria-hidden="true"></div>
     <div class="overlay" id="formOverlay" aria-hidden="true"></div>
     <div class="overlay" id="settingsOverlay" aria-hidden="true"></div>
+    <div class="overlay" id="payOverlay" aria-hidden="true"></div>
     <div class="notif-panel" id="notifPanel"></div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <div class="dialog-backdrop" id="dialog" hidden>
@@ -1136,33 +1219,40 @@ function renderShell(){
 
 function renderTabbar(){
   const nav = $('tabbar');
-  nav.setAttribute('aria-label', state.role === 'mentor' ? 'Mentor navigation' : 'Student navigation');
+  nav.setAttribute('aria-label', { student:'Student', mentor:'Mentor', admin:'Admin' }[state.role] + ' navigation');
   nav.innerHTML = TABS[state.role].map(t => `<button class="tab-btn" data-tab="${t[0]}" onclick="setTab('${t[0]}')">${t[2]}${t[1]}${t[3] ? `<span class="tab-dot" id="${t[3]}" hidden></span>` : ''}</button>`).join('');
 }
 function setRole(r){
   if (r === state.role) return;
   state.role = r; lsSet('cc_role', r);
-  ['detailOverlay','chatOverlay','formOverlay','settingsOverlay'].forEach(id => $(id).classList.contains('open') && closeOverlay(id));
+  ['detailOverlay','chatOverlay','formOverlay','settingsOverlay','payOverlay'].forEach(id => $(id).classList.contains('open') && closeOverlay(id));
   screenEl.dataset.role = r;
   renderTabbar();
   state.selectedDate = null;
-  setTab(r === 'mentor' ? 'm-home' : 'discover');
-  showToast(r === 'mentor' ? 'Mentor view: classes you host' : 'Student view: classes you join');
+  setTab(HOME_TAB[r]);
+  showToast({ student:'Student view: classes you join', mentor:'Mentor view: classes you host', admin:'Admin view: payments and payouts' }[r]);
 }
 function roleBarHTML(){
-  const m = state.role === 'mentor';
-  return `<div class="role-bar" role="tablist" aria-label="Switch between Student and Mentor">
-    <button role="tab" class="${m ? '' : 'on'}" aria-selected="${!m}" onclick="setRole('student')">Student<i id="rbS" hidden></i></button>
-    <button role="tab" class="${m ? 'on' : ''}" aria-selected="${m}" onclick="setRole('mentor')">Mentor<i id="rbM" hidden></i></button>
+  const roles = [['student','Student','rbS'], ['mentor','Mentor','rbM']];
+  if (isAdmin()) roles.push(['admin','Admin','rbA']);
+  return `<div class="role-bar" role="tablist" aria-label="Switch view">
+    ${roles.map(([r, l, id]) => `<button role="tab" class="${state.role === r ? 'on' : ''}" aria-selected="${state.role === r}" onclick="setRole('${r}')">${l}<i id="${id}" hidden></i></button>`).join('')}
   </div>`;
 }
 function updateBadges(){
   const sU = joinedClasses().filter(c => isUnread(c.id)).length;
   const mU = hostedClasses().filter(c => isUnread(c.id)).length;
   const set = (id, n, show) => { const e = $(id); if (e) { e.textContent = n; e.hidden = !(n && show); } };
-  set('rbS', sU, state.role !== 'student'); set('rbM', mU, state.role !== 'mentor');
+  const sTodo = studentTodo().length, mTodo = mentorTodo().length;
+  const aPay = isAdmin() ? adminPayQueue().filter(b => b.claimed_at).length : 0;
+  const aOut = isAdmin() ? adminPayouts().filter(b => payoutState(b) !== 'waiting').length : 0;
+  set('rbS', sU + sTodo, state.role !== 'student'); set('rbM', mU + mTodo, state.role !== 'mentor'); set('rbA', aPay + aOut, state.role !== 'admin');
   const d1 = $('chatDot'); if (d1) d1.hidden = !sU;
   const d2 = $('mChatDot'); if (d2) d2.hidden = !mU;
+  const d3 = $('mHomeDot'); if (d3) d3.hidden = !mTodo;
+  const d4 = $('aPayDot'); if (d4) d4.hidden = !aPay;
+  const d5 = $('aOutDot'); if (d5) d5.hidden = !aOut;
+  const d6 = $('bookDot'); if (d6) d6.hidden = !sTodo;
 }
 
 function setTab(tab){
@@ -1178,6 +1268,7 @@ function closeOverlay(id){
   const el = $(id); el.classList.remove('open'); el.setAttribute('aria-hidden', 'true');
   if (id === 'chatOverlay') { state.openChat = null; renderBody(); updateBadges(); }
   if (id === 'detailOverlay') state.detailId = null;
+  if (id === 'payOverlay') state.payOpen = null;
 }
 
 function renderHeader(){
@@ -1205,6 +1296,9 @@ function renderHeader(){
       html = simple('Groups', `${n ? `${n} with new messages. ` : ''}One group chat per class you host.`); break;
     }
     case 'm-sched': html = simple('Schedule', 'Classes where you are the mentor.'); break;
+    case 'a-pay': html = simple('Payments', 'Check each transfer, then verify it so the student joins the class.', bell); break;
+    case 'a-payout': html = simple('Payouts', 'After a class, release the money to the mentor or refund the student.'); break;
+    case 'a-history': html = simple('History', 'Every payment that has been settled, rejected or dropped.'); break;
     default: html = simple('Profile', '', gear);
   }
   h.innerHTML = roleBarHTML() + html;
@@ -1217,6 +1311,7 @@ function renderBody(){
   if (!state.loaded) { b.innerHTML = '<div class="loading">Loading…</div>'; return; }
   ({ discover: renderDiscover, chats: renderStudentChats, bookings: renderBookings,
      'm-home': renderMentorHome, 'm-chats': renderMentorChats, 'm-sched': renderMentorSched,
+     'a-pay': renderAdminPayments, 'a-payout': renderAdminPayouts, 'a-history': renderAdminHistory,
      profile: renderProfile })[state.tab](b);
 }
 
@@ -1240,7 +1335,7 @@ function renderDiscover(b){
   if (state.filter === 'course' || state.filter === 'competition') list = list.filter(c => c.category === state.filter);
   if (state.filter === 'free') list = list.filter(c => c.price === 0);
   if (q) list = list.filter(c => [c.title, c.subject, c.location, c.description, c.host?.full_name, c.host?.campus].some(v => (v || '').toLowerCase().includes(q)));
-  const left = c => c.capacity - c.members.length;
+  const left = c => c.capacity - seatsTaken(c);
   if (state.sort === 'cheapest') list.sort((a, z) => a.price - z.price || a.starts_at.localeCompare(z.starts_at));
   else if (state.sort === 'seats') list.sort((a, z) => left(z) - left(a) || a.starts_at.localeCompare(z.starts_at));
   if (!list.length) {
@@ -1256,7 +1351,7 @@ function renderDiscover(b){
 }
 
 function classCardHTML(c){
-  const taken = c.members.length, full = taken >= c.capacity, pct = Math.min(100, Math.round(taken / c.capacity * 100));
+  const taken = seatsTaken(c), full = taken >= c.capacity, pct = Math.min(100, Math.round(taken / c.capacity * 100));
   const tag = isHost(c) ? ' <span class="mine-tag">· You host</span>' : isMember(c) ? ' <span class="mine-tag">· Joined</span>' : '';
   return `
     <button class="class-card" onclick="openClass('${c.id}')">
@@ -1290,13 +1385,41 @@ function renderDetail(){
   const c = classById(state.detailId), el = $('detailOverlay');
   const head = (t) => `<div class="overlay-header"><button class="back-btn" onclick="closeOverlay('detailOverlay')" aria-label="Back">${ic.back}</button><div class="overlay-title">${t}</div></div>`;
   if (!c) { el.innerHTML = head('Class') + `<div class="empty-note">This class was deleted by its mentor.</div>`; return; }
-  const taken = c.members.length, full = taken >= c.capacity, host = isHost(c), member = isMember(c), started = hasStarted(c);
+  const taken = seatsTaken(c), full = taken >= c.capacity, host = isHost(c), member = isMember(c), started = hasStarted(c), ended = classEnded(c);
+  const myB = myBookingFor(c.id), active = myB && ['awaiting_payment','paid'].includes(bStatus(myB)) ? myB : null;
+  const paidMember = member && active && bStatus(active) === 'paid';
   let cta;
-  if (host) cta = `<button class="btn btn-outline-danger" style="flex:0 0 36%" onclick="askDeleteClass('${c.id}')">Delete</button><button class="btn btn-brand" onclick="openChat('${c.id}')">${ic.msg}Group chat</button>`;
-  else if (member) cta = `${started ? '' : `<button class="btn btn-ghost" style="flex:0 0 36%" onclick="askLeaveClass('${c.id}')">Leave</button>`}<button class="btn btn-brand" onclick="openChat('${c.id}')">${ic.msg}Group chat</button>`;
-  else if (started) cta = `<button class="btn btn-ghost" disabled>This class has started</button>`;
+  if (host) {
+    const canDelete = !classBookings(c.id).some(b => b.status === 'paid');
+    cta = `${canDelete ? `<button class="btn btn-outline-danger" style="flex:0 0 36%" onclick="askDeleteClass('${c.id}')">Delete</button>` : ''}<button class="btn btn-brand" onclick="openChat('${c.id}')">${ic.msg}Group chat</button>`;
+  } else if (member) {
+    cta = `${started || paidMember ? '' : `<button class="btn btn-ghost" style="flex:0 0 36%" onclick="askLeaveClass('${c.id}')">Leave</button>`}<button class="btn btn-brand" onclick="openChat('${c.id}')">${ic.msg}Group chat</button>`;
+  } else if (active && bStatus(active) === 'awaiting_payment') {
+    cta = `<button class="btn btn-primary" onclick="openPayment('${active.id}')">${ic.card}${active.claimed_at ? 'Payment being checked' : 'Continue payment'}</button>`;
+  } else if (started) cta = `<button class="btn btn-ghost" disabled>This class has started</button>`;
   else if (full) cta = `<button class="btn btn-ghost" disabled>Class is full</button>`;
-  else cta = `<button class="btn btn-primary" id="joinBtn" onclick="joinClass('${c.id}')">${c.price ? `Join for ${rupiah(c.price)}` : 'Join for free'}</button>`;
+  else if (c.price > 0) cta = `<button class="btn btn-primary" id="joinBtn" onclick="bookSeat('${c.id}')">Book a seat for ${rupiah(c.price)}</button>`;
+  else cta = `<button class="btn btn-primary" id="joinBtn" onclick="joinClass('${c.id}')">Join for free</button>`;
+
+  // Payment / confirmation blocks
+  let payBlock = '';
+  if (!host && c.price > 0) {
+    if (paidMember && ended) payBlock = menteeConfirmBlock(active);
+    else if (paidMember) payBlock = `<div class="block"><h4>Payment</h4><p>${statusPill('paid')} Your payment was verified. After the class, you’ll be asked to confirm it took place before the mentor gets paid.</p></div>`;
+    else if (myB && bStatus(myB) === 'rejected') payBlock = `<div class="block"><h4>Payment</h4><p>${statusPill('rejected')} ${esc(myB.admin_note || 'Your last payment was rejected.')}</p></div>`;
+    else if (!member) payBlock = `<div class="block"><h4>How payment works</h4><p>Book a seat to get a virtual account number. Pay it within 24 hours; once our admin verifies the transfer you join the class and its group chat. The mentor is paid only after the class, when you both confirm it happened.</p></div>`;
+  }
+  let hostBlock = '';
+  if (host && c.price > 0) {
+    const bs = classBookings(c.id).filter(b => ['awaiting_payment','paid','released','refunded'].includes(bStatus(b)));
+    const paid = bs.filter(b => ['paid','released'].includes(b.status));
+    hostBlock = `<div class="block"><h4>Payments (${paid.length} paid)</h4>
+      ${bs.length ? bs.map(b => `<div class="person-row">${avatar(b.user_id, b.user?.full_name, 'xs')}<div style="flex:1;min-width:0"><strong>${esc(b.user?.full_name || 'Student')}</strong></div>${statusPill(bStatus(b), b.claimed_at)}</div>`).join('') : '<p style="color:var(--ink-faint)">No bookings yet.</p>'}
+      ${ended && paid.length ? (c.mentor_confirmed_at
+          ? `<p class="hint">You confirmed this class took place. Our admin releases your payout once students confirm too.</p>`
+          : `<button class="btn btn-brand" style="width:100%;margin-top:12px" onclick="mentorConfirm('${c.id}')">Confirm the class took place</button><p class="hint">Needed before you get paid.</p>`) : ''}
+    </div>`;
+  }
 
   el.innerHTML = head(host ? 'Your class' : 'Class details') + `
     <div class="overlay-body">
@@ -1309,16 +1432,16 @@ function renderDetail(){
         <div class="fact"><span>Seats taken</span><strong>${taken} of ${c.capacity}</strong></div>
         <div class="fact"><span>Seats left</span><strong>${Math.max(0, c.capacity - taken)}</strong></div>
       </div>
+      ${payBlock}${hostBlock}
       ${c.description ? `<div class="block"><h4>About this class</h4><p class="pre">${esc(c.description)}</p></div>` : ''}
-      ${c.price && !host ? `<div class="block"><h4>Payment</h4><p>Pay the mentor directly (cash or transfer). Sort out the details in the group chat after you join.</p></div>` : ''}
       <div class="block">
         <h4>Mentor</h4>
         <div class="person-row">${avatar(c.host_id, c.host?.full_name)}<div><strong>${esc(c.host?.full_name || 'Mentor')}${host ? ' (you)' : ''}</strong><span>${esc([c.host?.campus, c.host?.major].filter(Boolean).join(', '))}</span></div></div>
         ${c.host?.bio ? `<p class="pre" style="margin-top:8px;font-size:12.5px;color:var(--ink-soft)">${esc(c.host.bio)}</p>` : ''}
       </div>
       <div class="block" style="border-bottom:none">
-        <h4>Students joined (${taken})</h4>
-        ${taken ? c.members.map(m => `<div class="person-row">${avatar(m.user_id, m.profile?.full_name, 'xs')}<div><strong>${esc(m.profile?.full_name || 'Student')}${m.user_id === uid() ? ' (you)' : ''}</strong></div></div>`).join('')
+        <h4>Students joined (${c.members.length})</h4>
+        ${c.members.length ? c.members.map(m => `<div class="person-row">${avatar(m.user_id, m.profile?.full_name, 'xs')}<div><strong>${esc(m.profile?.full_name || 'Student')}${m.user_id === uid() ? ' (you)' : ''}</strong></div></div>`).join('')
           : `<p style="color:var(--ink-faint)">No one has joined yet.</p>`}
       </div>
     </div>
@@ -1344,9 +1467,11 @@ function askLeaveClass(id){
 }
 function askDeleteClass(id){
   const c = classById(id);
+  if (classBookings(id).some(b => b.status === 'paid')) return showToast('Students have paid for this class. Ask the admin to refund them first.', true);
   openDialog({ title:'Delete this class?', body:`Everyone who joined “${c?.title}” loses their seat and the group chat is deleted.`, confirmLabel:'Delete class', danger:true }, async () => {
-    const { error } = await sb.from('classes').delete().eq('id', id);
+    const { data, error } = await sb.from('classes').delete().eq('id', id).select('id');
     if (error) return showToast(friendlyError(error), true);
+    if (!data || !data.length) return showToast('This class can’t be deleted because students have paid for it.', true);
     closeOverlay('detailOverlay');
     await reloadAll(); renderBody(); updateBadges();
     showToast('Class deleted');
@@ -1389,7 +1514,11 @@ function listsHTML(list, emptyUpcoming){
 }
 function renderBookings(b){
   const list = joinedClasses();
-  b.innerHTML = calendarHTML(list) + (state.selectedDate ? '' : listsHTML(list, `Nothing booked yet.<br><button class="link-btn" onclick="setTab('discover')">Find a class on Discover</button>`));
+  const todo = studentTodo();
+  const recent = state.bookings.filter(x => x.user_id === uid() && !todo.includes(x) && (bStatus(x) === 'awaiting_payment' || (['rejected','expired'].includes(bStatus(x)) && x.class && !hasStarted(x.class))));
+  const top = (todo.length ? `<div class="section-label"><b>Needs your action</b></div>${todo.map(myBookingRowHTML).join('')}` : '')
+    + (recent.length ? `<div class="section-label"><b>Payments</b></div>${recent.map(myBookingRowHTML).join('')}` : '');
+  b.innerHTML = top + calendarHTML(list) + (state.selectedDate ? '' : listsHTML(list, `Nothing booked yet.<br><button class="link-btn" onclick="setTab('discover')">Find a class on Discover</button>`));
 }
 function renderMentorSched(b){
   const list = hostedClasses();
@@ -1402,13 +1531,20 @@ function renderMentorSched(b){
 function renderMentorHome(b){
   const mine = hostedClasses(), up = mine.filter(c => !hasEnded(c));
   const students = new Set(mine.flatMap(c => c.members.map(m => m.user_id))).size;
-  const seats = up.reduce((s, c) => s + c.capacity, 0), filled = up.reduce((s, c) => s + c.members.length, 0);
+  const seats = up.reduce((s, c) => s + c.capacity, 0), filled = up.reduce((s, c) => s + seatsTaken(c), 0);
+  const mineB = state.bookings.filter(x => x.class?.host_id === uid());
+  const earned = mineB.filter(x => x.status === 'released').reduce((s, x) => s + x.amount, 0);
+  const pending = mineB.filter(x => x.status === 'paid').reduce((s, x) => s + x.amount, 0);
+  const todo = mentorTodo();
   b.innerHTML = `
     <div class="stat-row" style="border:none;padding-top:6px">
       <div class="stat"><strong>${up.length}</strong><span>Upcoming</span></div>
       <div class="stat"><strong>${students}</strong><span>Students</span></div>
       <div class="stat"><strong>${seats ? Math.round(filled / seats * 100) : 0}%</strong><span>Seats filled</span></div>
     </div>
+    <div class="earn-row"><div><span>Paid out to you</span><strong>${rupiah(earned) === 'Free' ? 'Rp0' : rupiah(earned)}</strong></div><div><span>Held until after class</span><strong>${pending ? rupiah(pending) : 'Rp0'}</strong></div></div>
+    ${state.myAccount ? '' : `<p class="hint">Add your bank account in Profile so the admin can pay you.</p>`}
+    ${todo.length ? `<div class="section-label" style="margin-top:16px"><b>Confirm finished classes</b></div>${todo.map(c => `<div class="m-card"><div class="m-card-top"><div class="chat-text"><strong>${esc(c.title)}</strong><p class="chat-preview">${whenLabel(c.starts_at)}, ${classBookings(c.id).filter(x => x.status === 'paid').length} paid students</p></div></div><p class="m-note">Confirm it took place so the admin can release your payout.</p><div class="m-actions"><button class="btn btn-brand" onclick="mentorConfirm('${c.id}')">Confirm it happened</button></div></div>`).join('')}` : ''}
     <button class="create-cta" onclick="openCreateForm()"><span class="plus">${ic.plus}</span><div><strong>Create a class</strong><span>Set seats, price, date and place.</span></div></button>
     <div class="section-label" style="margin-top:18px"><b>Upcoming</b></div>
     ${up.length ? up.map(classCardHTML).join('') : `<div class="empty-note">You haven’t got any upcoming classes.<br>Create one and it shows up on Discover for every student.</div>`}`;
@@ -1570,6 +1706,272 @@ function addMessage(m){
 }
 
 /* ============================================================
+   PAYMENTS — virtual account, admin verification, escrow payout
+   Student books a seat → pays the VA → admin verifies → student
+   joins. After the class, mentor + student confirm → admin
+   releases the money to the mentor (or refunds the student).
+   Prototype: VA numbers are random and no real money moves.
+   ============================================================ */
+const STATUS = {
+  awaiting_payment: ['Waiting for payment', 'warn'], checking: ['Being verified', 'info'],
+  paid: ['Paid', 'good'], rejected: ['Rejected', 'bad'], expired: ['Expired', 'muted'],
+  cancelled: ['Cancelled', 'muted'], released: ['Paid out', 'good'], refunded: ['Refunded', 'muted'],
+};
+function bStatus(b){ return b.status === 'awaiting_payment' && new Date(b.expires_at) <= new Date() && !b.claimed_at ? 'expired' : b.status; }
+function statusPill(st, claimed){ const [l, k] = STATUS[st === 'awaiting_payment' && claimed ? 'checking' : st] || [st, 'muted']; return `<span class="pill ${k}">${l}</span>`; }
+function myBookingFor(cid){ return state.bookings.find(b => b.class_id === cid && b.user_id === uid()); }
+function classBookings(cid){ return state.bookings.filter(b => b.class_id === cid); }
+function bookingById(id){ return state.bookings.find(b => b.id === id); }
+function vaFormat(n){ return String(n).replace(/(\d{4})(?=\d)/g, '$1 '); }
+function timeLeft(iso){
+  const ms = new Date(iso) - new Date(); if (ms <= 0) return 'expired';
+  const h = Math.floor(ms / 3600000), m = Math.floor(ms % 3600000 / 60000);
+  return h ? `${h} hr ${m} min left` : `${m} min left`;
+}
+function whenLabel(iso){ return `${fmtDate(iso, { weekday:'short', day:'numeric', month:'short' })}, ${fmtTime(iso)}`; }
+function accountLine(a){ return a ? `${a.bank_name} ${a.account_number} (${a.account_name})` : 'No bank account added yet'; }
+async function copyText(t){
+  try { await navigator.clipboard.writeText(t); showToast('Copied'); }
+  catch (e) { const i = document.createElement('textarea'); i.value = t; document.body.appendChild(i); i.select(); try { document.execCommand('copy'); showToast('Copied'); } catch (_) {} i.remove(); }
+}
+async function rpc(name, args, okMsg){
+  const { data, error } = await sb.rpc(name, args);
+  if (error) { showToast(friendlyError(error), true); return { error }; }
+  await reloadAll().catch(() => {});
+  refreshVisible();
+  if (okMsg) showToast(okMsg);
+  return { data };
+}
+
+/* ---------- Student: book, pay, cancel ---------- */
+async function bookSeat(cid){
+  const btn = $('joinBtn'); if (btn) btn.disabled = true;
+  const { data, error } = await rpc('request_seat', { cid });
+  if (error) { if (btn) btn.disabled = false; return; }
+  openPayment(data);
+}
+function openPayment(bid){ state.payOpen = bid; renderPayment(); openOverlay('payOverlay'); }
+function renderPayment(){
+  const el = $('payOverlay'), b = bookingById(state.payOpen);
+  const head = `<div class="overlay-header"><button class="back-btn" onclick="closeOverlay('payOverlay')" aria-label="Back">${ic.back}</button><div class="overlay-title">Payment</div></div>`;
+  if (!b) { el.innerHTML = head + `<div class="empty-note">This booking no longer exists.</div>`; return; }
+  const st = bStatus(b), c = b.class || {};
+  const step = st === 'paid' || st === 'released' ? 4 : b.claimed_at ? 3 : 1;
+  const steps = ['Transfer to the virtual account', 'Tap “I’ve paid”', 'Admin verifies your transfer', 'You join the class and its group chat'];
+  let cta = `<button class="btn btn-ghost" onclick="closeOverlay('payOverlay')">Back</button>`, note = '';
+  if (st === 'awaiting_payment' && !b.claimed_at) {
+    cta = `<button class="btn btn-ghost" style="flex:0 0 36%" onclick="askCancelBooking('${b.id}')">Cancel</button><button class="btn btn-primary" onclick="claimPayment('${b.id}')">I’ve paid</button>`;
+  } else if (st === 'awaiting_payment') {
+    note = `<div class="form-note">Thanks! Our admin is checking your transfer. You’ll join the group chat as soon as it’s verified.</div>`;
+  } else if (st === 'paid' || st === 'released') {
+    note = `<div class="form-note">Payment verified. You’re in the class.</div>`;
+    cta = `<button class="btn btn-brand" onclick="closeOverlay('payOverlay'); openChat('${b.class_id}')">${ic.msg}Open group chat</button>`;
+  } else {
+    note = `<div class="form-note bad">${st === 'rejected' ? esc(b.admin_note || 'Your payment was rejected.') : st === 'expired' ? 'This virtual account expired before payment. Book the seat again to get a new one.' : st === 'refunded' ? 'This payment was refunded to you.' : 'You cancelled this booking.'}</div>`;
+    const cls = classById(b.class_id);
+    if (cls && !hasStarted(cls) && !isMember(cls) && ['rejected','expired','cancelled'].includes(st)) cta = `<button class="btn btn-primary" onclick="closeOverlay('payOverlay'); bookSeat('${b.class_id}')">Book again</button>`;
+  }
+  el.innerHTML = head + `
+    <div class="overlay-body"><div class="pad">
+      <div class="pay-amount"><span>Amount to pay</span><strong>${rupiah(b.amount)}</strong><small>${esc(c.title || 'Class')}</small></div>
+      <div class="va-box">
+        <div><span>${esc(b.va_bank)} Virtual Account</span><strong>${vaFormat(b.va_number)}</strong></div>
+        <button class="icon-btn" onclick="copyText('${b.va_number}')" aria-label="Copy virtual account number">${ic.copy}</button>
+      </div>
+      <div class="pay-meta">${statusPill(st, b.claimed_at)}<span>${st === 'awaiting_payment' ? `Pay before ${whenLabel(b.expires_at)} (${timeLeft(b.expires_at)})` : `Booked ${whenLabel(b.created_at)}`}</span></div>
+      ${note}
+      <ol class="pay-steps">${steps.map((t, i) => `<li class="${i + 1 < step ? 'done' : i + 1 === step ? 'now' : ''}">${t}</li>`).join('')}</ol>
+      <p class="hint">Prototype: the virtual account number is random and no real money moves. The money is held by CourseConnect and only paid to the mentor after you confirm the class happened.</p>
+    </div></div>
+    <div class="cta-row">${cta}</div>`;
+}
+function claimPayment(bid){ rpc('claim_payment', { bid }, 'Thanks! We’ll let you know once it’s verified.'); }
+function askCancelBooking(bid){
+  openDialog({ title:'Cancel this booking?', body:'Your held seat goes back to the pool. Don’t cancel if you’ve already transferred.', confirmLabel:'Cancel booking', cancelLabel:'Keep', danger:true },
+    () => rpc('cancel_booking', { bid }, 'Booking cancelled').then(() => closeOverlay('payOverlay')));
+}
+
+/* ---------- After the class: confirmations ---------- */
+function menteeConfirmBlock(b){
+  if (b.mentee_confirmed_at) return `<div class="block"><h4>After the class</h4><p>${statusPill('paid')} You confirmed this class took place. Thanks!</p></div>`;
+  if (b.mentee_issue) return `<div class="block"><h4>After the class</h4><p>You reported a problem: “${esc(b.mentee_issue)}”. Our admin will contact you about a refund.</p></div>`;
+  return `<div class="block"><h4>Did this class take place?</h4><p>Your answer decides whether the mentor gets paid or you get a refund.</p>
+    <div class="m-actions"><button class="btn btn-ghost" onclick="openIssueForm('${b.id}')">Report a problem</button><button class="btn btn-brand" onclick="menteeConfirm('${b.id}')">Yes, it happened</button></div></div>`;
+}
+function menteeConfirm(bid){ rpc('mentee_confirm', { bid, happened: true, issue: null }, 'Thanks for confirming'); }
+function openIssueForm(bid){
+  $('formOverlay').innerHTML = `
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay('formOverlay')" aria-label="Back">${ic.back}</button><div class="overlay-title">Report a problem</div></div>
+    <form class="overlay-body" id="issueForm" novalidate><div class="pad">
+      <div class="field"><label for="issueText">What went wrong?</label><textarea class="input" id="issueText" maxlength="500" placeholder="e.g. The mentor didn’t show up, or the class was cut short."></textarea></div>
+      <p class="hint">The mentor won’t be paid until our admin reviews this. If the class didn’t happen, you’ll get a refund.</p>
+      <div class="form-error" id="issueError" role="alert"></div>
+      <button class="btn btn-danger" type="submit">Send report</button>
+    </div></form>`;
+  $('issueForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const issue = $('issueText').value.trim();
+    if (issue.length < 5) { $('issueError').textContent = 'Tell us a little about what happened.'; return; }
+    const { error } = await rpc('mentee_confirm', { bid, happened: false, issue }, 'Report sent to the admin');
+    if (!error) closeOverlay('formOverlay');
+  });
+  openOverlay('formOverlay');
+}
+function mentorConfirm(cid){
+  openDialog({ title:'Confirm the class took place?', body:'Our admin releases your payout once your students confirm too.', confirmLabel:'Confirm', cancelLabel:'Not yet' },
+    () => rpc('mentor_confirm_class', { cid }, 'Thanks! Class confirmed'));
+}
+function studentTodo(){
+  return state.bookings.filter(b => b.user_id === uid() && (
+    (bStatus(b) === 'awaiting_payment' && !b.claimed_at) ||
+    (b.status === 'paid' && b.class && classEnded(b.class) && !b.mentee_confirmed_at && !b.mentee_issue)));
+}
+function mentorTodo(){
+  return hostedClasses().filter(c => c.price > 0 && classEnded(c) && !c.mentor_confirmed_at && classBookings(c.id).some(b => b.status === 'paid'));
+}
+
+/* Booking row (student Bookings tab) */
+function myBookingRowHTML(b){
+  const st = bStatus(b), c = b.class || {};
+  const ended = c.starts_at && classEnded(c);
+  let act = `<button class="mini-btn primary" onclick="openPayment('${b.id}')">${st === 'awaiting_payment' && !b.claimed_at ? 'Pay now' : 'View'}</button>`;
+  if (b.status === 'paid' && ended && !b.mentee_confirmed_at && !b.mentee_issue)
+    act = `<button class="mini-btn" onclick="openIssueForm('${b.id}')">Report a problem</button><button class="mini-btn primary" onclick="menteeConfirm('${b.id}')">It happened</button>`;
+  return `<div class="m-card">
+    <div class="m-card-top"><div class="chat-text"><strong>${esc(c.title || 'Class')}</strong>
+      <p class="chat-preview">${c.starts_at ? whenLabel(c.starts_at) : ''}, ${rupiah(b.amount)}</p></div>${statusPill(st, b.claimed_at)}</div>
+    ${b.status === 'paid' && ended && !b.mentee_confirmed_at && !b.mentee_issue ? '<p class="m-note">Did this class take place? Your answer decides whether the mentor gets paid.</p>' : ''}
+    ${st === 'awaiting_payment' && !b.claimed_at ? `<p class="m-note">Pay before ${whenLabel(b.expires_at)} (${timeLeft(b.expires_at)}).</p>` : ''}
+    <div class="booking-actions">${act}</div></div>`;
+}
+
+/* ---------- Bank account (payouts for mentors, refunds for students) ---------- */
+function bankBlockHTML(){
+  const a = state.myAccount;
+  return `<div class="field-label">Bank account for payouts and refunds</div>
+    <div class="field-box">${a ? `<strong style="color:var(--ink)">${esc(a.bank_name)} ${esc(a.account_number)}</strong><br>${esc(a.account_name)}` : 'Not added yet. Mentors need this to get paid; students need it for refunds.'}</div>
+    <button class="btn btn-ghost" style="margin-top:10px;width:100%" onclick="openBankForm()">${a ? 'Change bank account' : 'Add bank account'}</button>
+    <p class="role-hint">Only you and the CourseConnect admin can see this.</p>`;
+}
+function openBankForm(){
+  const a = state.myAccount || {};
+  $('formOverlay').innerHTML = `
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay('formOverlay')" aria-label="Back">${ic.back}</button><div class="overlay-title">Bank account</div></div>
+    <form class="overlay-body" id="bankForm" novalidate><div class="pad">
+      <div class="field"><label for="bkName">Bank</label><input class="input" id="bkName" maxlength="40" placeholder="e.g. BCA, Mandiri, BNI" value="${esc(a.bank_name || '')}"></div>
+      <div class="field"><label for="bkNum">Account number</label><input class="input" id="bkNum" inputmode="numeric" maxlength="30" value="${esc(a.account_number || '')}"></div>
+      <div class="field"><label for="bkHolder">Account holder name</label><input class="input" id="bkHolder" maxlength="80" value="${esc(a.account_name || state.me.full_name || '')}"></div>
+      <div class="form-error" id="bankError" role="alert"></div>
+      <button class="btn btn-brand" type="submit">Save bank account</button>
+    </div></form>`;
+  $('bankForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const bank_name = $('bkName').value.trim(), account_number = $('bkNum').value.trim(), account_name = $('bkHolder').value.trim();
+    if (bank_name.length < 2) return void ($('bankError').textContent = 'Enter the bank name.');
+    if (!/^[0-9 -]{5,30}$/.test(account_number)) return void ($('bankError').textContent = 'Account number should be digits only.');
+    if (account_name.length < 2) return void ($('bankError').textContent = 'Enter the account holder’s name.');
+    const { error } = await sb.from('payout_accounts').upsert({ user_id: uid(), bank_name, account_number, account_name, updated_at: new Date().toISOString() });
+    if (error) return void ($('bankError').textContent = friendlyError(error));
+    await loadAccounts().catch(() => {});
+    closeOverlay('formOverlay'); renderBody(); showToast('Bank account saved');
+  });
+  openOverlay('formOverlay');
+}
+
+/* ---------- Admin ---------- */
+function adminPayQueue(){
+  return state.bookings.filter(b => b.status === 'awaiting_payment' && (b.claimed_at || new Date(b.expires_at) > new Date()))
+    .sort((a, z) => (z.claimed_at ? 1 : 0) - (a.claimed_at ? 1 : 0) || (a.claimed_at || a.created_at).localeCompare(z.claimed_at || z.created_at));
+}
+function adminPayouts(){ return state.bookings.filter(b => b.status === 'paid' && b.class && classEnded(b.class)); }
+function payoutState(b){ return b.mentee_issue ? 'issue' : (b.class?.mentor_confirmed_at && b.mentee_confirmed_at) ? 'ready' : 'waiting'; }
+function adminCard(b, body, actions){
+  const c = b.class || {};
+  return `<div class="m-card">
+    <div class="m-card-top">${avatar(b.user_id, b.user?.full_name)}<div class="chat-text"><strong>${esc(b.user?.full_name || 'Student')}</strong>
+      <p class="chat-preview">${esc(c.title || 'Class')}</p></div><span class="price">${rupiah(b.amount)}</span></div>
+    <div class="kv">${body}</div>
+    ${actions ? `<div class="m-actions">${actions}</div>` : ''}</div>`;
+}
+const kv = (k, v) => `<span>${k}</span><b>${v}</b>`;
+function renderAdminPayments(el){
+  const q = adminPayQueue(), claimed = q.filter(b => b.claimed_at);
+  el.innerHTML = `
+    <div class="stat-row" style="border:none;padding-top:6px">
+      <div class="stat"><strong>${claimed.length}</strong><span>To verify</span></div>
+      <div class="stat"><strong>${q.length - claimed.length}</strong><span>Not paid yet</span></div>
+    </div>
+    ${q.length ? q.map(b => adminCard(b,
+      kv('Virtual account', `${esc(b.va_bank)} ${vaFormat(b.va_number)}`) +
+      kv('Class date', b.class ? whenLabel(b.class.starts_at) : '-') +
+      kv('Status', b.claimed_at ? `Student says paid ${relTime(b.claimed_at)} ago` : `Not marked as paid (${timeLeft(b.expires_at)})`),
+      `<button class="btn btn-ghost" onclick="openRejectForm('${b.id}')">Reject</button><button class="btn btn-brand" onclick="askVerify('${b.id}')">Verify</button>`)).join('')
+      : `<div class="empty-note">No payments waiting. New ones appear here as students book.</div>`}`;
+}
+function askVerify(bid){
+  const b = bookingById(bid);
+  openDialog({ title:'Verify this payment?', body:`Confirm you received ${rupiah(b.amount)} on VA ${vaFormat(b.va_number)}. ${b.user?.full_name || 'The student'} will join “${b.class?.title}” and its group chat.`, confirmLabel:'Verify payment', cancelLabel:'Not yet' },
+    () => rpc('admin_review_payment', { bid, approve: true, note: null }, 'Payment verified'));
+}
+function openRejectForm(bid){
+  $('formOverlay').innerHTML = `
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay('formOverlay')" aria-label="Back">${ic.back}</button><div class="overlay-title">Reject payment</div></div>
+    <form class="overlay-body" id="rejectForm" novalidate><div class="pad">
+      <div class="field"><label for="rejNote">Reason (the student sees this)</label><textarea class="input" id="rejNote" maxlength="300">We couldn’t find your transfer. Please check the virtual account number and book again.</textarea></div>
+      <button class="btn btn-danger" type="submit">Reject payment</button>
+    </div></form>`;
+  $('rejectForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const { error } = await rpc('admin_review_payment', { bid, approve: false, note: $('rejNote').value.trim() }, 'Payment rejected');
+    if (!error) closeOverlay('formOverlay');
+  });
+  openOverlay('formOverlay');
+}
+function renderAdminPayouts(el){
+  const list = adminPayouts(), groups = { issue: [], ready: [], waiting: [] };
+  list.forEach(b => groups[payoutState(b)].push(b));
+  const upcoming = state.bookings.filter(b => b.status === 'paid' && b.class && !classEnded(b.class));
+  const held = state.bookings.filter(b => b.status === 'paid').reduce((s, b) => s + b.amount, 0);
+  const card = b => {
+    const mentorAcc = state.accounts[b.class?.host_id], studentAcc = state.accounts[b.user_id];
+    return adminCard(b,
+      kv('Mentor', esc(b.class?.host?.full_name || '-')) +
+      kv('Mentor’s bank', esc(accountLine(mentorAcc))) +
+      kv('Mentor confirmed', b.class?.mentor_confirmed_at ? 'Yes' : 'Not yet') +
+      kv('Student confirmed', b.mentee_confirmed_at ? 'Yes' : b.mentee_issue ? `<span class="danger-text">Problem: ${esc(b.mentee_issue)}</span>` : 'Not yet') +
+      kv('Student’s bank', esc(accountLine(studentAcc))),
+      `<button class="btn btn-ghost" onclick="askSettle('${b.id}','refund')">Refund student</button><button class="btn btn-brand" onclick="askSettle('${b.id}','release')">Release to mentor</button>`);
+  };
+  const sec = (t, arr, empty) => `<div class="section-label" style="margin-top:18px"><b>${t}</b> (${arr.length})</div>${arr.length ? arr.map(card).join('') : `<div class="empty-note" style="padding:12px">${empty}</div>`}`;
+  el.innerHTML = `
+    <div class="stat-row" style="border:none;padding-top:6px">
+      <div class="stat"><strong>${rupiah(held)}</strong><span>Held now</span></div>
+      <div class="stat"><strong>${upcoming.length}</strong><span>Paid, class ahead</span></div>
+    </div>
+    ${sec('Problems reported', groups.issue, 'No problems reported.')}
+    ${sec('Ready to release', groups.ready, 'Nothing ready yet. Both mentor and student need to confirm.')}
+    ${sec('Waiting for confirmation', groups.waiting, 'Nothing waiting.')}`;
+}
+function askSettle(bid, action){
+  const b = bookingById(bid), release = action === 'release';
+  const acc = state.accounts[release ? b.class?.host_id : b.user_id];
+  const warn = release && payoutState(b) !== 'ready' ? ' Not everyone has confirmed the class yet.' : '';
+  openDialog({ title: release ? 'Release to mentor?' : 'Refund the student?',
+    body: `Transfer ${rupiah(b.amount)} to ${accountLine(acc)}, then confirm here.${warn}`,
+    confirmLabel: release ? 'Mark as paid out' : 'Mark as refunded', cancelLabel:'Not yet', danger: !release },
+    () => rpc('admin_settle', { bid, action, note: null }, release ? 'Marked as paid out' : 'Marked as refunded'));
+}
+function renderAdminHistory(el){
+  const list = state.bookings.filter(b => ['released','refunded','rejected','cancelled'].includes(b.status) || bStatus(b) === 'expired');
+  el.innerHTML = list.length ? list.map(b => adminCard(b,
+    kv('Status', statusPill(bStatus(b))) +
+    kv('Mentor', esc(b.class?.host?.full_name || '-')) +
+    kv(b.settled_at ? 'Settled' : 'Booked', whenLabel(b.settled_at || b.verified_at || b.created_at)) +
+    (b.admin_note ? kv('Note', esc(b.admin_note)) : ''), '')).join('')
+    : `<div class="empty-note">Nothing here yet.</div>`;
+}
+
+/* ============================================================
    PROFILE + SETTINGS
    ============================================================ */
 function renderProfile(b){
@@ -1579,7 +1981,7 @@ function renderProfile(b){
       ${avatar(me.id, me.full_name, 'lg')}
       <h3>${esc(me.full_name)}</h3>
       <p>${esc([me.campus, me.major].filter(Boolean).join(', ') || state.session.user.email)}</p>
-      <span class="role-pill">${mentor ? 'Mentor view' : 'Student view'}</span>
+      <span class="role-pill">${state.role === 'admin' ? 'Admin view' : mentor ? 'Mentor view' : 'Student view'}</span>
     </div>
     <div class="stat-row" style="border:none">
       <div class="stat"><strong>${joinedClasses().length}</strong><span>Joined</span></div>
@@ -1588,6 +1990,7 @@ function renderProfile(b){
     <div class="field-label">${mentor ? 'About you (shown on your classes)' : 'About you'}</div>
     <div class="field-box" style="white-space:pre-wrap">${me.bio ? esc(me.bio) : 'Add a short bio: what you’re good at, courses you aced, competitions you’ve won.'}</div>
     <button class="btn btn-ghost" style="margin-top:14px;width:100%" onclick="openEditProfile()">Edit profile</button>
+    ${bankBlockHTML()}
     <p class="role-hint">Switch between Student and Mentor at the top. Same account, two views.</p>`;
 }
 
@@ -1677,6 +2080,23 @@ function subscribeRealtime(){
     })
     .on('postgres_changes', { event:'*', schema:'public', table:'class_members' }, scheduleReload)
     .on('postgres_changes', { event:'*', schema:'public', table:'classes' }, scheduleReload)
+    .on('postgres_changes', { event:'*', schema:'public', table:'bookings' }, ({ eventType, new: b }) => {
+      if (b && b.id) {
+        const title = classById(b.class_id)?.title || bookingById(b.id)?.class?.title || 'your class';
+        const prev = bookingById(b.id);
+        if (b.user_id === uid() && prev && prev.status !== b.status) {
+          if (b.status === 'paid') { pushNotif('Payment verified', `You’re in “${title}”. Say hi in the group chat!`); showToast('Payment verified. You’re in!'); }
+          if (b.status === 'rejected') { pushNotif('Payment rejected', b.admin_note || `Your payment for “${title}” was rejected.`); showToast('Your payment was rejected', true); }
+          if (b.status === 'refunded') pushNotif('Refund sent', `Your payment for “${title}” was refunded.`);
+        }
+        if (isAdmin() && b.status === 'awaiting_payment' && b.claimed_at && !(prev && prev.claimed_at)) {
+          pushNotif('Payment to verify', `A student says they paid for “${title}”.`);
+          if (state.role === 'admin') showToast('New payment to verify');
+        }
+        if (prev && prev.class?.host_id === uid() && prev.status !== 'released' && b.status === 'released') pushNotif('Payout sent', `${rupiah(b.amount)} for “${title}” was released to you.`);
+      }
+      scheduleReload();
+    })
     .subscribe();
 }
 
@@ -1688,19 +2108,23 @@ function configured(){ return !SUPABASE_URL.includes('YOUR-PROJECT') && !SUPABAS
 
 async function start(session){
   state.session = session; started = true; state.loaded = false;
-  state.role = lsGet('cc_role', 'student') === 'mentor' ? 'mentor' : 'student';
+  state.role = ['student','mentor','admin'].includes(lsGet('cc_role', 'student')) ? lsGet('cc_role', 'student') : 'student';
   state.notifMessages = lsGet('cc_notif_msgs', true);
   state.notifs = lsGet('cc_notifs_' + session.user.id, []);
   state.hasNotif = false;
   renderShell();
-  setTab(state.role === 'mentor' ? 'm-home' : 'discover');
-  try { await loadMe(); await reloadAll(); }
+  setTab(HOME_TAB[state.role]);
+  try {
+    await loadMe();
+    if (state.role === 'admin' && !isAdmin()) { state.role = 'student'; screenEl.dataset.role = 'student'; renderTabbar(); state.tab = 'discover'; }
+    await reloadAll();
+  }
   catch (e) {
     $('appBody').innerHTML = `<div class="empty-note">${esc(friendlyError(e))}<br>If this is a new Supabase project, run <b>supabase/schema.sql</b> first.<br><br><button class="btn btn-brand" onclick="location.reload()">Try again</button></div>`;
     return;
   }
   state.loaded = true;
-  renderHeader(); renderBody(); updateBadges();
+  setTab(state.tab);
   subscribeRealtime();
 }
 
