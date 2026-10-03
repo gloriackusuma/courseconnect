@@ -2046,6 +2046,12 @@ function renderSettings(){
           <button class="switch ${state.notifMessages ? '' : 'off'}" onclick="toggleMsgNotif()" aria-label="Toggle message pop-ups"></button>
         </div>
       </div>
+      <div class="block"><h4>Live updates</h4>
+        <div class="settings-row" style="border-bottom:none;padding-left:0">
+          <div class="settings-label"><strong>Connection</strong><span>New messages, seats and payments update without refreshing</span></div>
+          <span id="liveState">${liveLabel()}</span>
+        </div>
+      </div>
       <div class="block" style="border-bottom:none"><h4>Account</h4>
         <div class="settings-row" style="padding-left:0"><div class="settings-label"><strong>Email</strong><span>${esc(state.session?.user?.email)}</span></div></div>
         <button class="btn btn-outline-danger" style="width:100%;margin-top:14px" onclick="askLogout()">Log out</button>
@@ -2057,8 +2063,13 @@ function toggleMsgNotif(){ state.notifMessages = !state.notifMessages; lsSet('cc
 /* ============================================================
    REALTIME — RLS only delivers messages from your own groups
    ============================================================ */
+let liveStatus = 'connecting', hadDrop = false, liveGen = 0, retryTimer = null, retryDelay = 2000, pollTimer = null, chatPollTimer = null;
 function subscribeRealtime(){
+  const gen = ++liveGen;
+  clearTimeout(retryTimer);
   sb.removeAllChannels();
+  try { if (state.session?.access_token) sb.realtime.setAuth(state.session.access_token); } catch (e) {}
+  setLive('connecting');
   sb.channel('cc-live')
     .on('postgres_changes', { event:'INSERT', schema:'public', table:'messages' }, async ({ new: m }) => {
       await ensureNames([m.user_id]);
@@ -2097,8 +2108,75 @@ function subscribeRealtime(){
       }
       scheduleReload();
     })
-    .subscribe();
+    .subscribe((status) => {
+      if (gen !== liveGen) return;                       // an older channel we already replaced
+      if (status === 'SUBSCRIBED') {
+        setLive('live'); retryDelay = 2000;
+        if (hadDrop) { hadDrop = false; catchUp(); }     // fetch whatever we missed while offline
+      } else if (['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)) {
+        setLive('offline'); hadDrop = true;
+        clearTimeout(retryTimer);
+        retryTimer = setTimeout(() => { if (gen === liveGen && state.session) subscribeRealtime(); }, retryDelay);
+        retryDelay = Math.min(retryDelay * 2, 30000);
+      }
+    });
+  startPolling();
 }
+
+/* ---------- Safety net: never make people refresh ----------
+   Realtime pushes changes instantly. If the connection drops
+   (phone asleep, tab in background, flaky wifi), we reconnect
+   and catch up; while it's down we poll every few seconds. */
+function setLive(s){
+  liveStatus = s;
+  const el = $('liveState'); if (el) el.innerHTML = liveLabel();
+}
+function liveLabel(){
+  return { live:'<span class="pill good">Connected</span>', connecting:'<span class="pill info">Connecting…</span>', offline:'<span class="pill warn">Reconnecting…</span>' }[liveStatus] || '';
+}
+let catching = false;
+async function catchUp(){
+  if (catching || !state.loaded || !sb) return;
+  catching = true;
+  try {
+    await reloadAll();
+    refreshVisible();
+    if (state.openChat) await pullNewMessages(state.openChat);
+  } catch (e) {} finally { catching = false; }
+}
+async function pullNewMessages(cid){
+  const lastId = state.chatMsgs.reduce((m, x) => Math.max(m, x.id), 0);
+  const { data } = await sb.from('messages').select('id, class_id, user_id, kind, body, created_at')
+    .eq('class_id', cid).gt('id', lastId).order('id', { ascending: true }).limit(200);
+  if (!data || !data.length || state.openChat !== cid) return;
+  await ensureNames(data.map(m => m.user_id));
+  data.forEach(addMessage);
+}
+function startPolling(){
+  clearInterval(pollTimer); clearInterval(chatPollTimer);
+  // Whole app: every 10s while disconnected, every 60s anyway as a backstop.
+  let tick = 0;
+  pollTimer = setInterval(() => {
+    if (document.visibilityState !== 'visible' || !state.session) return;
+    tick++;
+    if (liveStatus !== 'live' || tick % 6 === 0) catchUp();
+  }, 10000);
+  // Open chat: every 4s while disconnected.
+  chatPollTimer = setInterval(() => {
+    if (document.visibilityState === 'visible' && state.openChat && liveStatus !== 'live') pullNewMessages(state.openChat).catch(() => {});
+  }, 4000);
+}
+function stopLive(){
+  liveGen++; clearTimeout(retryTimer); clearInterval(pollTimer); clearInterval(chatPollTimer);
+  if (sb) sb.removeAllChannels();
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible' || !state.session || !state.loaded) return;
+  if (liveStatus !== 'live') subscribeRealtime();
+  catchUp();
+});
+window.addEventListener('online', () => { if (state.session && state.loaded) { subscribeRealtime(); catchUp(); } });
+window.addEventListener('offline', () => { hadDrop = true; setLive('offline'); });
 
 /* ============================================================
    BOOT
@@ -2139,10 +2217,11 @@ function boot(){
       if (event === 'PASSWORD_RECOVERY' || (recovering && session)) { recovering = true; state.session = session; return renderNewPassword(); }
       if (event === 'SIGNED_OUT' || !session) {
         started = false; state.loaded = false; state.session = null; state.me = null; state.classes = []; state.lastMsg = {};
-        sb.removeAllChannels(); authMode = 'login'; return renderAuth();
+        stopLive(); authMode = 'login'; return renderAuth();
       }
       const switched = state.session && state.session.user.id !== session.user.id;
       state.session = session;
+      if (event === 'TOKEN_REFRESHED') { try { sb.realtime.setAuth(session.access_token); } catch (e) {} }
       if (!started || switched) start(session);
     }, 0);
   });
