@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>CourseConnect — Learn from mentors nearby</title>
-<meta name="description" content="CourseConnect is a location-aware learning network prototype: browse nearby mentors by skill, message them, and book sessions.">
+<title>CourseConnect — Classes for courses and competitions</title>
+<meta name="description" content="Join study classes for your courses and competition mentoring, or host your own. Every class gets its own group chat.">
 <meta name="theme-color" content="#3547E0">
 <meta property="og:type" content="website">
 <meta property="og:title" content="CourseConnect">
-<meta property="og:description" content="Find someone to learn from nearby — browse mentors, chat, and book sessions.">
+<meta property="og:description" content="Join a class, land in its group chat, learn together.">
 <meta property="og:image" content="assets/logo.png">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -616,6 +616,131 @@
     .toast{bottom:calc(80px + env(safe-area-inset-bottom,0px));max-width:calc(100% - 32px);white-space:normal;text-align:center;}
     .dialog-card{max-width:400px;}
   }
+
+  /* ============================================================
+     LIVE APP — auth, class cards, class detail, forms, group chat
+     (added on top of the prototype styles above)
+     ============================================================ */
+  .btn-brand{ background:var(--brand); color:#fff; }
+  .btn-outline-danger{ background:transparent; color:var(--danger); border:1px solid var(--border); }
+  .screen[data-role="mentor"] .btn-brand{ background:var(--brand); }
+
+  /* Boot + auth */
+  .boot{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:30px; text-align:center; color:var(--ink-faint); font-size:13px; font-weight:700; line-height:1.6; }
+  .boot img{ width:60px; height:60px; object-fit:contain; }
+  .boot code{ background:var(--surface-alt); color:var(--ink); padding:2px 6px; border-radius:6px; font-size:12px; }
+  .auth{ flex:1; overflow-y:auto; padding:calc(56px + env(safe-area-inset-top,0px)) 24px 28px; display:flex; flex-direction:column; }
+  .auth img.auth-logo{ width:64px; height:64px; object-fit:contain; }
+  .auth h1{ font-size:25px; font-weight:800; letter-spacing:-0.02em; margin:16px 0 6px; line-height:1.2; }
+  .auth .lead{ margin:0 0 20px; color:var(--ink-soft); font-size:13.5px; line-height:1.55; }
+  .auth-switch{ margin-top:16px; font-size:13px; color:var(--ink-soft); text-align:center; line-height:2; }
+  .link-btn{ background:none; border:none; padding:0; color:var(--brand); font-weight:800; font-size:inherit; }
+
+  /* Forms */
+  .field{ display:flex; flex-direction:column; gap:6px; margin-bottom:13px; }
+  .field > label{ font-size:12px; font-weight:800; color:var(--ink-soft); }
+  .field .sub{ font-size:11.5px; color:var(--ink-faint); font-weight:600; }
+  .input{
+    width:100%; border:1px solid var(--border); background:var(--surface); color:var(--ink);
+    border-radius:12px; padding:12px 13px; font-size:14px; font-family:inherit; outline:none;
+  }
+  .input:focus{ border-color:var(--brand); }
+  textarea.input{ resize:vertical; min-height:84px; line-height:1.5; }
+  .row-2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .seg{ display:flex; background:var(--surface-alt); border-radius:12px; padding:4px; }
+  .seg button{ flex:1; border:none; background:none; padding:9px 0; border-radius:9px; font-size:12.5px; font-weight:800; color:var(--ink-soft); }
+  .seg button.active{ background:var(--surface); color:var(--ink); box-shadow:var(--shadow); }
+  .form-error{ color:var(--danger); font-size:12.5px; font-weight:700; margin:2px 0 10px; min-height:1em; }
+  .form-note{ background:var(--brand-soft); color:var(--brand-deep); border-radius:12px; padding:12px 13px; font-size:12.5px; line-height:1.5; font-weight:600; margin-bottom:16px; }
+  .pad{ padding:18px; }
+
+  /* Class card */
+  .class-card{
+    display:flex; gap:13px; width:100%; text-align:left; padding:13px; margin-bottom:10px; color:var(--ink);
+    border:1px solid var(--border); border-radius:var(--radius-md); background:var(--surface); font-family:inherit;
+  }
+  .date-block{ flex:none; align-self:flex-start; width:52px; border-radius:13px; padding:8px 0; text-align:center; background:var(--brand-soft); color:var(--brand-deep); }
+  .date-block.competition{ background:color-mix(in srgb, var(--accent) 16%, var(--surface)); color:var(--accent); }
+  .date-block strong{ display:block; font-size:19px; font-weight:800; line-height:1; }
+  .date-block span{ display:block; font-size:10.5px; font-weight:800; margin-top:3px; }
+  .date-block em{ display:block; font-style:normal; font-size:10px; font-weight:700; margin-top:4px; opacity:.85; }
+  .class-main{ flex:1; min-width:0; }
+  .class-title{ font-size:14.5px; font-weight:800; letter-spacing:-0.01em; line-height:1.3; margin:0; }
+  .kind-badge{ display:inline-block; font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:100px; margin-top:6px; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; vertical-align:top; }
+  .kind-badge.course{ background:color-mix(in srgb, var(--brand) 14%, var(--surface)); color:var(--brand); }
+  .kind-badge.competition{ background:color-mix(in srgb, var(--accent) 16%, var(--surface)); color:var(--accent); }
+  .class-meta{ margin:7px 0 0; font-size:12px; color:var(--ink-soft); font-weight:600; line-height:1.6; }
+  .class-meta span{ display:flex; align-items:center; gap:5px; min-width:0; }
+  .class-meta span b{ font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .class-meta svg{ width:12px; height:12px; flex:none; color:var(--ink-faint); }
+  .class-foot{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:9px; }
+  .seats{ flex:1; min-width:0; }
+  .seats-bar{ height:5px; border-radius:10px; background:var(--surface-alt); overflow:hidden; }
+  .seats-bar i{ display:block; height:100%; background:var(--brand); border-radius:10px; }
+  .seats-bar.full i{ background:var(--ink-faint); }
+  .seats small{ display:block; font-size:11px; font-weight:700; color:var(--ink-faint); margin-top:4px; }
+  .price{ font-size:13.5px; font-weight:800; white-space:nowrap; }
+  .mine-tag{ color:var(--good); }
+
+  /* Class detail */
+  .detail-hero{ padding:20px 20px 16px; }
+  .detail-hero h2{ font-size:21px; font-weight:800; letter-spacing:-0.015em; margin:8px 0 0; line-height:1.25; overflow-wrap:anywhere; }
+  .facts{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--border); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .fact{ background:var(--surface); padding:12px 20px; }
+  .fact span{ display:block; font-size:11px; font-weight:700; color:var(--ink-faint); }
+  .fact strong{ display:block; font-size:13.5px; font-weight:800; margin-top:3px; overflow-wrap:anywhere; }
+  .block p.pre{ white-space:pre-wrap; overflow-wrap:anywhere; }
+  .person-row{ display:flex; align-items:center; gap:11px; padding:6px 0; }
+  .person-row strong{ font-size:13.5px; font-weight:800; display:block; }
+  .person-row span{ font-size:12px; color:var(--ink-soft); font-weight:600; }
+  .avatar.xs{ width:30px; height:30px; font-size:11px; }
+  .cta-row{ flex:none; border-top:1px solid var(--border); padding-bottom:calc(16px + env(safe-area-inset-bottom,0px)); }
+
+  /* Mentor home */
+  .create-cta{ width:100%; display:flex; align-items:center; gap:12px; text-align:left; border:1.5px dashed var(--brand); background:var(--brand-soft); color:var(--brand-deep); border-radius:var(--radius-md); padding:14px; margin:6px 0 4px; font-family:inherit; }
+  .create-cta .plus{ width:38px; height:38px; border-radius:12px; background:var(--brand); color:#fff; display:flex; align-items:center; justify-content:center; flex:none; }
+  .create-cta .plus svg{ width:18px; height:18px; }
+  .create-cta strong{ display:block; font-size:14px; font-weight:800; }
+  .create-cta span{ font-size:12px; font-weight:600; opacity:.85; }
+
+  /* Group chat */
+  .group-icon{ width:44px; height:44px; border-radius:14px; flex:none; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:#fff; }
+  .group-icon.sm{ width:38px; height:38px; border-radius:12px; }
+  .chat-top strong{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .chat-top time{ flex:none; }
+  .chat-row .unread{ margin-top:0; }
+  .head-btn{ background:none; border:none; padding:0; text-align:left; min-width:0; color:var(--ink); font-family:inherit; }
+  .overlay-sub{ font-size:11.5px; color:var(--ink-faint); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .overlay-title{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .thread{ gap:3px; }
+  .bubble-wrap{ display:flex; flex-direction:column; max-width:80%; margin-top:6px; }
+  .bubble-wrap.me{ align-self:flex-end; align-items:flex-end; }
+  .bubble-wrap.them{ align-self:flex-start; align-items:flex-start; }
+  .bubble-wrap.cont{ margin-top:2px; }
+  .bubble-author{ font-size:11px; font-weight:800; color:var(--ink-soft); margin:0 0 3px 4px; }
+  .bubble{ padding:9px 13px; border-radius:16px; font-size:13.5px; line-height:1.45; white-space:pre-wrap; overflow-wrap:anywhere; }
+  .bubble-wrap.them .bubble{ background:var(--surface-alt); color:var(--ink); border-bottom-left-radius:5px; }
+  .bubble-wrap.me .bubble{ background:var(--brand); color:#fff; border-bottom-right-radius:5px; }
+  .bubble-time{ font-size:10px; color:var(--ink-faint); margin:3px 4px 0; font-weight:600; }
+  .sys-msg{ align-self:center; font-size:11.5px; color:var(--ink-faint); font-weight:700; background:var(--surface-alt); padding:5px 11px; border-radius:100px; margin:8px 0; text-align:center; }
+  .day-sep{ align-self:center; font-size:11px; color:var(--ink-faint); font-weight:800; margin:12px 0 4px; }
+  .composer{ align-items:flex-end; }
+  .composer textarea{
+    flex:1; border:1px solid var(--border); background:var(--surface-alt); color:var(--ink); border-radius:20px;
+    padding:10px 15px; font-size:14px; font-family:inherit; outline:none; resize:none; max-height:110px; line-height:1.4;
+  }
+  .composer textarea:focus{ border-color:var(--brand); }
+  .loading{ display:flex; align-items:center; justify-content:center; padding:40px 0; color:var(--ink-faint); font-size:13px; font-weight:700; }
+  .toast{ white-space:normal; max-width:86%; text-align:center; }
+  .pad .btn{ width:100%; }
+  .dialog-backdrop{ z-index:1000; }
+  .toast{ z-index:1001; }
+  .notif-panel{ z-index:900; }
+  .toast.error{ background:var(--danger); color:#fff; }
+  @media (max-width: 560px){
+    .input, .composer textarea{ font-size:16px; }
+    .auth{ padding-top:calc(36px + env(safe-area-inset-top,0px)); }
+  }
 </style>
 </head>
 <body>
@@ -626,1392 +751,991 @@
     <img src="data:image/png;base64,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" alt="CourseConnect logo" width="40" height="40">
     <span>CourseConnect</span>
   </div>
-
   <p>
-    A location-aware learning network — browse nearby mentors by skill,
-    message them directly, and book time to learn. This is an interactive
-    prototype: tap through it below.
+    Mentors create classes for a course or a competition: seats, price, date and place.
+    Students join and land straight in the class group chat.
   </p>
 </div>
 
   <div class="device">
     <div class="notch"></div>
-    <div class="screen" id="screen">
-
-      <!-- ============ APP HEADER (per tab) ============ -->
-      <div class="app-header" id="appHeader"></div>
-
-      <!-- ============ MAIN SCROLL BODY ============ -->
-      <div class="app-body" id="appBody"></div>
-
-      <!-- ============ TAB BAR ============ -->
-      <nav class="tabbar" id="tabbar" aria-label="Main">
-        <button class="tab-btn" data-tab="discover" onclick="setTab('discover')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5 5-2z"/></svg>
-          Discover
-        </button>
-        <button class="tab-btn" data-tab="chats" onclick="setTab('chats')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-8.9 8.4 9 9 0 01-3.2-.6L4 20l1-4.5A8.3 8.3 0 013 11.5 8.4 8.4 0 0112 3a8.4 8.4 0 019 8.5z"/></svg>
-          Chats
-          <span class="tab-dot" id="chatDot" hidden></span>
-        </button>
-        <button class="tab-btn" data-tab="bookings" onclick="setTab('bookings')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>
-          Bookings
-        </button>
-        <button class="tab-btn" data-tab="profile" onclick="setTab('profile')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.2" r="3.6"/><path d="M4.5 20c1.4-4 4.2-6 7.5-6s6.1 2 7.5 6"/></svg>
-          Profile
-        </button>
-      </nav>
-
-      <!-- ============ OVERLAYS ============ -->
-      <div class="overlay" id="profileOverlay"></div>
-      <div class="overlay" id="chatOverlay"></div>
-      <div class="overlay" id="bookingOverlay"></div>
-      <div class="overlay" id="settingsOverlay"></div>
-
-      <!-- ============ FLOATING UI (notif panel, toast) ============ -->
-      <div class="notif-panel" id="notifPanel"></div>
-      <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-      <!-- Confirm dialog (cancel booking, reset data) -->
-      <div class="dialog-backdrop" id="dialog" hidden>
-        <div class="dialog-card" role="alertdialog" aria-modal="true" aria-labelledby="dialogTitle" aria-describedby="dialogBody">
-          <h4 id="dialogTitle"></h4>
-          <p id="dialogBody"></p>
-          <div class="dialog-actions">
-            <button class="btn btn-ghost" id="dialogCancel" onclick="closeDialog(false)">Keep</button>
-            <button class="btn btn-primary" id="dialogOk" onclick="closeDialog(true)">Confirm</button>
-          </div>
-        </div>
-      </div>
-
+    <div class="screen" id="screen" data-role="student">
+      <div class="boot"><span>Loading…</span></div>
     </div>
   </div>
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <script>
 /* ============================================================
-   ICONS
-   Every icon used anywhere in the app lives here so a new one
-   only ever needs to be added in one place.
+   CONFIG — paste your Supabase values here (see README.md)
+   Supabase → Project Settings → API Keys:
+     Project URL  → SUPABASE_URL
+     anon / publishable key → SUPABASE_ANON_KEY
+   The anon key is meant to be public; Row Level Security in
+   supabase/schema.sql protects the data. Never paste the
+   service_role / secret key here.
    ============================================================ */
-const ic = {
-  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>',
-  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 1112 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 19.5a2 2 0 004 0"/></svg>',
-  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.4"/></svg>',
-  star:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6.3 6.9.7-5.2 4.6 1.6 6.8L12 17.6l-6.2 3.3 1.6-6.8-5.2-4.6 6.9-.7z"/></svg>',
-  starOutline:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2.5l2.9 6.3 6.9.7-5.2 4.6 1.6 6.8L12 17.6l-6.2 3.3 1.6-6.8-5.2-4.6 6.9-.7z"/></svg>',
-  chevronLeft:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
-  chevronRight:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
-  badge:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5l2.3 2 3-.6 1 2.9 2.9 1-.6 3 2 2.3-2 2.3.6 3-2.9 1-1 2.9-3-.6-2.3 2-2.3-2-3 .6-1-2.9-2.9-1 .6-3-2-2.3 2-2.3-.6-3 2.9-1 1-2.9 3 .6z"/><path d="M9 12.2l2 2 4-4.4" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  msg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-8.9 8.4 9 9 0 01-3.2-.6L4 20l1-4.5A8.3 8.3 0 013 11.5 8.4 8.4 0 0112 3a8.4 8.4 0 019 8.5z"/></svg>',
-  calendar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>',
-  send:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 11.5L21 3l-7 18-3-7-8-2.5z"/></svg>',
-  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
-  sliders:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h9M17 6h3M4 12h3M9 12h11M4 18h13M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="7" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>',
-  heartOutline:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9A5.5 5.5 0 0112 6.5 5.5 5.5 0 0121.8 11.5c-2.3 4.4-9.8 9-9.8 9z"/></svg>',
-  heartFill:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20.5s-7.5-4.6-9.8-9A5.5 5.5 0 0112 6.5 5.5 5.5 0 0121.8 11.5c-2.3 4.4-9.8 9-9.8 9z"/></svg>',
-  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19 12a7 7 0 00-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 00-2-1.2L14 3h-4l-.4 2.6a7 7 0 00-2 1.2l-2.3-.9-2 3.4 2 1.5a7 7 0 000 2.4l-2 1.5 2 3.4 2.3-.9a7 7 0 002 1.2L10 21h4l.4-2.6a7 7 0 002-1.2l2.3.9 2-3.4-2-1.5c.07-.4.1-.8.1-1.2z"/></svg>',
-  sun:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.5M12 19v2.5M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2.5 12H5M19 12h2.5M4.2 19.8L6 18M18 6l1.8-1.8"/></svg>',
-  moon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1110.5 4a6.8 6.8 0 009.5 10.5z"/></svg>',
-  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
-};
+const SUPABASE_URL = 'https://ctbitjwdaavqozdbyxyg.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_1psqgrvITHeT7WK7152_HQ_Ts6GgifV';
+
+const $ = (id) => document.getElementById(id);
+const screenEl = $('screen');
+const LOGO = (document.querySelector('.wordmark img') || {}).src || '';
+let sb = null;
 
 /* ============================================================
-   DATA
-   Seed data for the prototype. MENTORS / CATS stay fixed;
-   CHATS, THREADS, BOOKINGS and NOTIFS are mutated as the person
-   interacts and are saved to this browser (see persist()).
+   ICONS
    ============================================================ */
-const APP_VERSION = '1.1.0';
-const STORE_KEY = 'cc_state_v2';
-const DAY_MS = 86400000;
-// Real "today" (midnight) so the calendar and sample bookings are always current.
-const TODAY = (()=>{ const d = new Date(); d.setHours(0,0,0,0); return d; })();
-const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
-const CATS = [
-  {id:'all', label:'All'},
-  {id:'coding', label:'Coding'},
-  {id:'languages', label:'Languages'},
-  {id:'music', label:'Music'},
-  {id:'design', label:'Design'},
-  {id:'business', label:'Business'},
-  {id:'academics', label:'Academics'},
-  {id:'fitness', label:'Fitness'},
-  {id:'photography', label:'Photo'},
-];
-
-const MENTORS = [
-  {id:1, name:'Raka Pratama', cat:'coding', label:'Python · Web Dev', rating:4.9, reviews:128, rate:85, dist:'0.6 km', verified:true, color:'#3547E0',
-    bio:"Backend engineer teaching Python fundamentals up through intro data structures. I focus on debugging skills, not just syntax — bring me your broken code.",
-    tags:['Python','Web Dev','Git'], avail:['Tue evenings','Thu evenings','Sat afternoon']},
-  {id:2, name:'Alya Nugraha', cat:'languages', label:'Mandarin · IELTS', rating:4.8, reviews:94, rate:60, dist:'1.2 km', verified:true, color:'#0E8272',
-    bio:"Native Mandarin speaker with three years tutoring HSK 1–4. Also happy to do casual conversation practice if you just want to get comfortable speaking.",
-    tags:['Mandarin','IELTS','Conversation'], avail:['Mon mornings','Wed evenings']},
-  {id:3, name:'Bimo Santoso', cat:'music', label:'Guitar · Theory', rating:5.0, reviews:61, rate:70, dist:'2.4 km', verified:false, color:'#D9481C',
-    bio:"Self-taught guitarist turned instructor. I teach chords, basic theory, and — more importantly — how to actually enjoy practicing so it sticks.",
-    tags:['Guitar','Music Theory'], avail:['Fri evenings','Sun afternoon']},
-  {id:4, name:'Cinta Wijaya', cat:'design', label:'Figma · UI Basics', rating:4.7, reviews:73, rate:90, dist:'0.9 km', verified:true, color:'#7A2FC0',
-    bio:"Product design intern sharing everything I wish someone had taught me before my first internship — Figma workflow, components, and portfolio feedback.",
-    tags:['Figma','UI Design','Portfolio Review'], avail:['Tue afternoon','Sat morning']},
-  {id:5, name:'Dimas Aditya', cat:'business', label:'Finance · Excel', rating:4.9, reviews:110, rate:100, dist:'1.7 km', verified:true, color:'#B9760A',
-    bio:"Finance senior and case-competition regular. I break down DCF models and financial modeling in Excel without burying you in jargon.",
-    tags:['Financial Modeling','Excel','Case Prep'], avail:['Mon evenings','Thu afternoon']},
-  {id:6, name:'Farhan Putra', cat:'academics', label:'Calculus · Stats', rating:4.8, reviews:156, rate:55, dist:'0.4 km', verified:true, color:'#0E7FA8',
-    bio:"Math tutor for first- and second-year students. I explain the 'why' behind a method first, then we drill problems until it's automatic.",
-    tags:['Calculus','Statistics','Exam Prep'], avail:['Wed afternoon','Sat evening']},
-  {id:7, name:'Erika Halim', cat:'fitness', label:'Yoga · Mobility', rating:4.6, reviews:48, rate:65, dist:'3.1 km', verified:false, color:'#1F8A3B',
-    bio:"Certified instructor focused on beginner-friendly flows and injury-safe stretching routines for people who sit at a desk all day.",
-    tags:['Yoga','Mobility','Beginners'], avail:['Tue morning','Sun morning']},
-  {id:8, name:'Grace Lim', cat:'photography', label:'Portrait · Editing', rating:4.9, reviews:67, rate:80, dist:'2.0 km', verified:true, color:'#C22A6D',
-    bio:"Campus photographer teaching composition, natural lighting, and a practical Lightroom editing workflow you can actually keep up with.",
-    tags:['Portraits','Lightroom','Composition'], avail:['Fri afternoon','Sat morning']},
-];
-
-const SORTS = [
-  {id:'best',   label:'Best match'},
-  {id:'rating', label:'Top rated'},
-  {id:'price',  label:'Lowest price'},
-  {id:'near',   label:'Nearest'},
-];
-
-// One independent message history per mentor — switching mentors switches threads.
-const SEED_THREADS = {
-  5: [
-    {who:'them', text:"Hey! Saw you're prepping for a case comp — happy to help with the modeling side."},
-    {who:'me', text:"That'd be great. Mainly stuck on building a 3-statement model from scratch."},
-    {who:'them', text:"No worries, that trips up almost everyone at first. I can walk through the linkages with you."},
-    {who:'session', text:''},
-    {who:'them', text:"Sounds good — let's do Thursday 4pm at the library?"},
-  ],
-  1: [
-    {who:'me', text:"Hey, quick one — my recursion function keeps hitting max call stack, any idea why?"},
-    {who:'them', text:"Usually a missing or unreachable base case. Mind pasting the function?"},
-    {who:'me', text:"Just dropped it above, thanks for taking a look."},
-    {who:'them', text:"Sent you the practice repo, take a look before we meet"},
-  ],
-  6: [
-    {who:'them', text:"How did the derivative problem set go in the end?"},
-    {who:'me', text:"Rough at first, but that chain-rule trick you showed really clicked once I slowed down."},
-    {who:'me', text:"Thanks for the session! That derivative trick really helped"},
-  ],
-  4: [
-    {who:'them', text:"Happy to look over your portfolio whenever — just send the Figma link."},
-    {who:'them', text:"Also wanted to check — is Saturday morning still open on your side?"},
-    {who:'me', text:"Is Saturday morning still open?"},
-  ],
+const sv = p => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>';
+const ic = {
+  search: sv('<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>'),
+  x: sv('<path d="M6 6l12 12M18 6L6 18"/>'),
+  bell: sv('<path d="M6 9a6 6 0 1112 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 19.5a2 2 0 004 0"/>'),
+  gear: sv('<circle cx="12" cy="12" r="3.2"/><path d="M19 12a7 7 0 00-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 00-2-1.2L14 3h-4l-.4 2.6a7 7 0 00-2 1.2l-2.3-.9-2 3.4 2 1.5a7 7 0 000 2.4l-2 1.5 2 3.4 2.3-.9a7 7 0 002 1.2L10 21h4l.4-2.6a7 7 0 002-1.2l2.3.9 2-3.4-2-1.5c.07-.4.1-.8.1-1.2z"/>'),
+  back: sv('<path d="M15 5l-7 7 7 7"/>'),
+  next: sv('<path d="M9 5l7 7-7 7"/>'),
+  plus: sv('<path d="M12 5v14M5 12h14"/>'),
+  pin: sv('<path d="M12 22s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.4"/>'),
+  user: sv('<circle cx="12" cy="8.2" r="3.6"/><path d="M4.5 20c1.4-4 4.2-6 7.5-6s6.1 2 7.5 6"/>'),
+  msg: sv('<path d="M21 11.5a8.4 8.4 0 01-8.9 8.4 9 9 0 01-3.2-.6L4 20l1-4.5A8.3 8.3 0 013 11.5 8.4 8.4 0 0112 3a8.4 8.4 0 019 8.5z"/>'),
+  calendar: sv('<rect x="3.5" y="5" width="17" height="16" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/>'),
+  compass: sv('<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5 5-2z"/>'),
+  board: sv('<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>'),
+  send: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 11.5L21 3l-7 18-3-7-8-2.5z"/></svg>',
+  sun: sv('<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.5M12 19v2.5M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2.5 12H5M19 12h2.5M4.2 19.8L6 18M18 6l1.8-1.8"/>'),
+  moon: sv('<path d="M20 14.5A8.5 8.5 0 1110.5 4a6.8 6.8 0 009.5 10.5z"/>'),
 };
-
-const REPLIES = [
-  "Sounds good!",
-  "Got it, thanks for the update.",
-  "I'll take a look and get back to you.",
-  "Works for me 👍",
-  "Let's confirm the details closer to the day.",
-  "Makes sense — see you then.",
-];
-
-function addDays(n){ const d = new Date(TODAY); d.setDate(d.getDate()+n); return ymd(d); }
-function seedBookings(){ return [
-  {id:'b1', mentorId:5, date:addDays(2),  start:'4:00 PM', dur:60, place:'Online'},
-  {id:'b2', mentorId:1, date:addDays(4),  start:'6:30 PM', dur:45, place:'Library, L3'},
-  {id:'b3', mentorId:6, date:addDays(-4), start:'2:00 PM', dur:60, place:'Online'},
-]; }
-function seedChats(){ const n = Date.now(); return [
-  {mentorId:5, ts:n-2*60000,            unread:true},
-  {mentorId:1, ts:n-3600000,            unread:true},
-  {mentorId:6, ts:n-DAY_MS-3600000,     unread:false},
-  {mentorId:4, ts:n-3*DAY_MS,           unread:false},
-]; }
-function seedNotifs(){ const n = Date.now(); return [
-  {title:'Booking confirmed', body:`Your session with Dimas Aditya is set for ${friendlyDate(addDays(2))}.`, ts:n-2*3600000},
-  {title:'New message', body:'Raka Pratama sent you the practice repo.', ts:n-5*3600000},
-  {title:'Session complete', body:'How did your session with Farhan Putra go?', ts:n-4*DAY_MS},
-]; }
-
-let CHATS = seedChats();
-let THREADS = JSON.parse(JSON.stringify(SEED_THREADS));
-let BOOKINGS = seedBookings();
-let NOTIFS = seedNotifs();
-
-/* ---------- Mentor-side data (separate from everything the student side uses) ---------- */
-const STUDENTS = [
-  {id:101, name:'Nadia Putri', color:'#7A2FC0'},
-  {id:102, name:'Kevin Tanoto', color:'#D9481C'},
-  {id:103, name:'Salsa Rahma', color:'#0E7FA8'},
-];
-const STUDENT_REPLIES = ['Thank you! 🙏','That works for me.','Got it, see you then.','Could we go a bit slower on that part?'];
-let MREQS = [
-  {id:'r1', sid:101, date:addDays(3), start:'3:00 PM', dur:60, place:'Online', note:"I'm new to Excel — could we start with formulas and pivot tables?"},
-  {id:'r2', sid:102, date:addDays(5), start:'5:00 PM', dur:90, place:'Library, L2', note:'Want to practise a DCF before my case competition.'},
-];
-let MSESS = [
-  {id:'s1', sid:103, date:addDays(1),  start:'10:00 AM', dur:60, place:'Online'},
-  {id:'s2', sid:101, date:addDays(-3), start:'1:00 PM',  dur:60, place:'Library, L1'},
-];
-let MCHATS = [{sid:101, ts:Date.now()-600000, unread:true},{sid:102, ts:Date.now()-7200000, unread:true},{sid:103, ts:Date.now()-DAY_MS, unread:false}];
-let MTHREADS = {
-  101:[{who:'them', text:"Hi! I'm new to Excel — could we start with formulas and pivot tables?"}],
-  102:[{who:'them', text:'Hey, I requested Friday for DCF practice. Does that work?'},{who:'me', text:"Looking at my schedule now, I'll confirm shortly."}],
-  103:[{who:'me', text:"Great session today — here's the template we used."},{who:'them', text:'Thanks, super helpful!'}],
-};
-NOTIFS.push({role:'mentor', title:'New request', body:`Nadia Putri wants a session on ${friendlyDate(addDays(3))}.`, ts:Date.now()-1800000});
 
 /* ============================================================
    STATE
    ============================================================ */
-let state = {
-  role:'student', tab:'discover', activeCat:'all', sort:'best', query:'', profileMode:'learning',
-  savedIds: new Set([1]),
-  openChatMentor: null, pending:{}, addingTag:null,
-  calYear: TODAY.getFullYear(), calMonth: TODAY.getMonth(), selectedDate: null,
-  theme:'system', hasNotif:true,
-  teachingVisible:true, notifReminders:true, notifMessages:true,
-  profile:{ name:'Glo Christophera', school:'BINUS University · Finance', rate:100000, about:'' },
-  learningTags:['Financial Modeling','Public Speaking','Python'],
-  teachingTags:['Financial Modeling','Case Prep','Excel'],
-  reminded:new Set(),
+const state = {
+  session: null, me: null, loaded: false,
+  role: 'student',                 // student | mentor
+  tab: 'discover',
+  filter: 'all', sort: 'soonest', query: '',
+  classes: [],                     // from 90 days ago onward, with host + members
+  lastMsg: {},                     // classId -> newest message
+  openChat: null, chatMsgs: [],
+  detailId: null,
+  selectedDate: null, calY: new Date().getFullYear(), calM: new Date().getMonth(),
+  theme: 'system', notifMessages: true,
+  notifs: [], hasNotif: false,
 };
-let bookingFlow = { mentorId:null, year:0, month:0, date:null, time:null, dur:60, mode:'Online', place:'Online', rescheduleId:null };
-let toastTimer = null;
-let dialogCb = null;
+const names = new Map();           // profile id -> full name
+let toastTimer = null, reloadTimer = null, dialogCb = null, overlayZ = 30;
+let started = false, authMode = 'login';
+let recovering = /type=recovery/.test(location.hash);
 
 /* ============================================================
-   SHARED HELPERS
+   HELPERS
    ============================================================ */
-function mentorById(id){ return MENTORS.find(m=>m.id===id); }
-function catInfo(id){ return CATS.find(c=>c.id===id) || CATS[0]; }
-function initials(name){ const s = (name||'').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); return s || '?'; }
-function starsCompact(){ return `<span class="stars">${ic.star.replace('currentColor','var(--gold)')}</span>`; }
-function escapeHTML(s){
-  return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function initials(n){ return String(n || '?').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() || '?'; }
+const COLORS = ['#3547E0','#0E8272','#D9481C','#7A2FC0','#B9760A','#0E7FA8','#C22A6D','#1F8A3B'];
+function colorFor(id){ let h = 0; for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return COLORS[h % COLORS.length]; }
+function avatar(id, name, size = 'sm'){ return `<div class="avatar ${size}" style="background:${colorFor(id)}">${esc(initials(name))}</div>`; }
+const rpFmt = new Intl.NumberFormat('id-ID');
+function rupiah(n){ return n > 0 ? `Rp${rpFmt.format(n)}` : 'Free'; }
+function fmtDate(iso, o){ return new Date(iso).toLocaleDateString('en-GB', o); }
+function fmtTime(iso){ return new Date(iso).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' }); }
+function ymd(d){ d = new Date(d); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function endTime(c){ return new Date(new Date(c.starts_at).getTime() + c.duration_min * 60000).toISOString(); }
+function durLabel(m){ return m % 60 === 0 ? `${m/60} hr` : m > 60 ? `${Math.floor(m/60)} hr ${m%60} min` : `${m} min`; }
+function relTime(iso){
+  const d = new Date(iso), now = new Date(), s = (now - d) / 1000;
+  if (s < 60) return 'now';
+  if (s < 3600) return `${Math.floor(s/60)}m`;
+  if (ymd(d) === ymd(now)) return fmtTime(iso);
+  const y = new Date(now); y.setDate(now.getDate() - 1);
+  if (ymd(d) === ymd(y)) return 'Yesterday';
+  return fmtDate(iso, { day:'numeric', month:'short' });
 }
-function ymd(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
-function friendlyDate(dateStr){
-  const d = new Date(dateStr+'T00:00:00');
-  return d.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'});
-}
-function toMin(str){
-  const m = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(str);
-  if(!m) return 0;
-  let h = parseInt(m[1],10) % 12;
-  if(m[3].toUpperCase()==='PM') h += 12;
-  return h*60 + parseInt(m[2],10);
-}
-function relTime(ts, long){
-  const diff = Date.now()-ts, m = Math.floor(diff/60000), h = Math.floor(diff/3600000);
-  if(m<1) return long ? 'Just now' : 'now';
-  if(m<60) return long ? `${m}m ago` : `${m}m`;
-  if(h<24) return long ? `${h}h ago` : `${h}h`;
-  const day0 = new Date(ts); day0.setHours(0,0,0,0);
-  const days = Math.round((TODAY - day0)/DAY_MS);
-  if(days<=1) return 'Yesterday';
-  if(days<7) return long ? `${days}d ago` : new Date(ts).toLocaleDateString('en-US',{weekday:'short'});
-  return new Date(ts).toLocaleDateString('en-US',{month:'short', day:'numeric'});
-}
-function isUpcoming(x){ return x.date >= ymd(TODAY); }
-function bookingTimeLabel(x){ return `${x.start} · ${x.dur} min · ${x.place}`; }
-function formatRp(n){ return 'Rp ' + Number(n||0).toLocaleString('en-US'); }
+function localInput(d){ const p = n => String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; }
+function uid(){ return state.session?.user?.id; }
+function first(n){ return String(n || '').split(' ')[0]; }
+function kindLabel(c){ return c === 'competition' ? 'Competition' : 'Course'; }
+function badgeText(c){ return `${kindLabel(c.category)}${c.subject ? ': ' + c.subject : ''}`; }
+function lsGet(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } }
+function lsSet(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 
-function showToast(msg){
-  const t = document.getElementById('toast');
-  if(!t) return;
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+function showToast(msg, isError = false){
+  const t = $('toast'); if (!t) return;
+  t.textContent = msg; t.classList.toggle('error', isError); t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), isError ? 3600 : 2300);
+}
+function friendlyError(err){
+  const m = (err && (err.message || err.error_description)) || String(err || 'Something went wrong');
+  if (/Invalid login credentials/i.test(m)) return 'Wrong email or password.';
+  if (/Email not confirmed/i.test(m)) return 'Confirm your email first — open the link we sent to your inbox.';
+  if (/already registered/i.test(m)) return 'That email already has an account. Log in instead.';
+  if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'Can’t reach the server. Check your connection and try again.';
+  if (/row-level security/i.test(m)) return 'You don’t have permission to do that.';
+  return m;
 }
 
-/* ---------- Persistence (localStorage, safe if blocked) ---------- */
-function persist(){
-  try{
-    localStorage.setItem(STORE_KEY, JSON.stringify({
-      v:2,
-      savedIds:[...state.savedIds], theme:state.theme, hasNotif:state.hasNotif,
-      teachingVisible:state.teachingVisible, notifReminders:state.notifReminders, notifMessages:state.notifMessages,
-      profile:state.profile, learningTags:state.learningTags, teachingTags:state.teachingTags,
-      reminded:[...state.reminded],
-      bookings:BOOKINGS, chats:CHATS, threads:THREADS, notifs:NOTIFS,
-      role:state.role, mreqs:MREQS, msess:MSESS, mchats:MCHATS, mthreads:MTHREADS,
-    }));
-  }catch(e){}
-}
-function loadPersisted(){
-  let d = null;
-  try{ d = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); }catch(e){}
-  if(d && typeof d === 'object'){
-    if(Array.isArray(d.savedIds)) state.savedIds = new Set(d.savedIds.filter(id=>mentorById(id)));
-    if(['light','dark','system'].includes(d.theme)) state.theme = d.theme;
-    ['hasNotif','teachingVisible','notifReminders','notifMessages'].forEach(k=>{ if(typeof d[k]==='boolean') state[k] = d[k]; });
-    if(d.profile && typeof d.profile==='object'){
-      state.profile = {
-        name: typeof d.profile.name==='string' ? d.profile.name : state.profile.name,
-        school: typeof d.profile.school==='string' ? d.profile.school : state.profile.school,
-        rate: Number.isFinite(d.profile.rate) ? d.profile.rate : state.profile.rate,
-        about: typeof d.profile.about==='string' ? d.profile.about : '',
-      };
-    }
-    if(Array.isArray(d.learningTags)) state.learningTags = d.learningTags.filter(t=>typeof t==='string');
-    if(Array.isArray(d.teachingTags)) state.teachingTags = d.teachingTags.filter(t=>typeof t==='string');
-    if(Array.isArray(d.reminded)) state.reminded = new Set(d.reminded);
-    if(Array.isArray(d.bookings)) BOOKINGS = d.bookings.filter(b=>b && mentorById(b.mentorId) && b.date && b.start && b.dur);
-    if(Array.isArray(d.chats)) CHATS = d.chats.filter(c=>c && mentorById(c.mentorId));
-    if(d.threads && typeof d.threads==='object'){
-      THREADS = {};
-      Object.keys(d.threads).forEach(k=>{ if(Array.isArray(d.threads[k])) THREADS[k] = d.threads[k]; });
-    }
-    if(Array.isArray(d.notifs)) NOTIFS = d.notifs;
-    if(['student','mentor'].includes(d.role)) state.role = d.role;
-    if(Array.isArray(d.mreqs)) MREQS = d.mreqs;
-    if(Array.isArray(d.msess)) MSESS = d.msess;
-    if(Array.isArray(d.mchats)) MCHATS = d.mchats;
-    if(d.mthreads && typeof d.mthreads==='object') MTHREADS = d.mthreads;
-  } else {
-    // Migrate the two keys used by the original prototype
-    try{
-      const raw = localStorage.getItem('cc_saved');
-      if(raw){ state.savedIds = new Set(JSON.parse(raw)); }
-      const theme = localStorage.getItem('cc_theme');
-      if(theme) state.theme = theme;
-    }catch(e){}
-  }
-  applyTheme();
-}
+/* ---------- Theme ---------- */
 function applyTheme(){
-  const root = document.documentElement;
-  if(state.theme==='system') root.removeAttribute('data-theme');
-  else root.setAttribute('data-theme', state.theme);
+  state.theme = lsGet('cc_theme', 'system');
+  if (state.theme === 'system') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', state.theme);
+}
+function setTheme(mode){ lsSet('cc_theme', mode); applyTheme(); renderSettings(); }
+
+/* ---------- In-app confirm dialog ---------- */
+function openDialog({ title, body, confirmLabel = 'Confirm', cancelLabel = 'Keep', danger = false }, cb){
+  $('dialogTitle').textContent = title;
+  $('dialogBody').textContent = body;
+  $('dialogOk').textContent = confirmLabel;
+  $('dialogOk').className = 'btn ' + (danger ? 'btn-danger' : 'btn-brand');
+  $('dialogCancel').textContent = cancelLabel;
+  dialogCb = cb; $('dialog').hidden = false; $('dialogOk').focus();
+}
+function closeDialog(run){ $('dialog').hidden = true; const cb = dialogCb; dialogCb = null; if (run && cb) cb(); }
+
+/* ---------- Unread markers (per user, this browser) ---------- */
+function seenMap(){ return lsGet('cc_seen_' + uid(), {}); }
+function markSeen(id){ const m = seenMap(); m[id] = new Date().toISOString(); lsSet('cc_seen_' + uid(), m); }
+function isUnread(id){
+  const last = state.lastMsg[id];
+  if (!last || last.user_id === uid()) return false;
+  const seen = seenMap()[id];
+  return !seen || last.created_at > seen;
 }
 
-/* ---------- In-app confirm dialog (replaces confirm()/prompt()) ---------- */
-function openDialog(opts, cb){
-  dialogCb = cb;
-  document.getElementById('dialogTitle').textContent = opts.title;
-  document.getElementById('dialogBody').textContent = opts.body;
-  const ok = document.getElementById('dialogOk');
-  ok.textContent = opts.confirmLabel || 'Confirm';
-  ok.className = 'btn ' + (opts.danger ? 'btn-danger' : 'btn-primary');
-  document.getElementById('dialog').hidden = false;
-  document.getElementById('dialogCancel').focus();
-}
-function closeDialog(runCb){
-  const cb = dialogCb; dialogCb = null;
-  document.getElementById('dialog').hidden = true;
-  if(runCb && cb) cb();
-}
-
-/* ---------- Notifications ---------- */
-function pushNotif(title, body, role){
-  NOTIFS.unshift({title, body, role:role||'student', ts:Date.now()});
-  if(NOTIFS.length>20) NOTIFS.length = 20;
+/* ---------- Notifications (bell) ---------- */
+function pushNotif(title, body){
+  state.notifs.unshift({ title, body, at: new Date().toISOString() });
+  state.notifs = state.notifs.slice(0, 30);
   state.hasNotif = true;
-  persist();
+  lsSet('cc_notifs_' + uid(), state.notifs);
   updateBell();
 }
 function updateBell(){
-  const bell = document.getElementById('bellBtn');
-  if(!bell) return;
-  const dot = bell.querySelector('.dot-flag');
-  if(state.hasNotif && !dot){ bell.insertAdjacentHTML('beforeend','<span class="dot-flag"></span>'); }
-  if(!state.hasNotif && dot){ dot.remove(); }
+  const b = $('bellBtn'); if (!b) return;
+  b.querySelector('.dot-flag')?.remove();
+  if (state.hasNotif) b.insertAdjacentHTML('beforeend', '<span class="dot-flag"></span>');
 }
-function updateBadges(){
-  updateRoleBadges();
-  const dot = document.getElementById('chatDot');
-  if(dot) dot.hidden = !CHATS.some(c=>c.unread);
-}
-function checkReminders(){
-  if(!state.notifReminders) return;
-  const today = ymd(TODAY), tomorrow = addDays(1);
-  BOOKINGS.forEach(b=>{
-    const key = b.id + '@' + b.date;
-    if((b.date===today || b.date===tomorrow) && !state.reminded.has(key)){
-      state.reminded.add(key);
-      pushNotif('Reminder', `Session with ${mentorById(b.mentorId).name} ${b.date===today?'today':'tomorrow'} at ${b.start}.`);
-    }
-  });
-}
-
-/* ============================================================
-   SECTION 1 — APP SHELL
-   Tab switching + the overlay open/close plumbing shared by
-   every section below.
-   ============================================================ */
-function setTab(tab){
-  state.tab = tab;
-  document.querySelectorAll('.tab-btn').forEach(b=>{
-    const on = b.dataset.tab===tab;
-    b.classList.toggle('active', on);
-    b.setAttribute('aria-current', on ? 'page' : 'false');
-  });
-  document.getElementById('appBody').scrollTop = 0;
-  document.getElementById('notifPanel').classList.remove('open');
-  renderHeader();
-  renderBody();
-}
-function renderBody(){
-  const b = document.getElementById('appBody');
-  if(state.tab==='discover') renderDiscover(b);
-  else if(state.tab==='chats') renderChats(b);
-  else if(state.tab==='bookings') renderBookings(b);
-  else if(state.tab==='profile' || state.tab==='m-profile') renderProfile(b);
-  else if(state.tab==='m-home') renderMHome(b);
-  else if(state.tab==='m-chats') renderMChats(b);
-  else if(state.tab==='m-sched') renderMSched(b);
-  updateBadges();
-}
-function closeOverlay(id){ document.getElementById(id).classList.remove('open'); }
-
-/* ============================================================
-   SECTION 2 — DISCOVER
-   Search + category filtering + sorting, mentor cards,
-   favoriting, the mentor detail overlay, and notifications.
-   ============================================================ */
-function setQuery(v){
-  state.query = v;
-  syncClear();
-  renderDiscover(document.getElementById('appBody')); // only the list re-renders, so the search input keeps focus
-}
-function syncClear(){ const b = document.getElementById('clearSearch'); if(b) b.hidden = !state.query; }
-function clearSearch(){
-  state.query = '';
-  const i = document.getElementById('searchInput');
-  if(i){ i.value = ''; i.focus(); }
-  syncClear();
-  renderDiscover(document.getElementById('appBody'));
-}
-function setCat(cat){ state.activeCat = cat; renderChips(); renderBody(); }
-function setSort(v){ state.sort = v; renderBody(); }
-
-function renderChips(){
-  const row = document.getElementById('chipRow');
-  if(!row) return;
-  row.innerHTML = CATS.map(c=>`
-    <button class="chip ${state.activeCat===c.id?'active':''}" aria-pressed="${state.activeCat===c.id}" onclick="setCat('${c.id}')">${c.label}</button>
-  `).join('');
-}
-
-function sortedMentors(list){
-  const arr = [...list];
-  if(state.sort==='rating') arr.sort((a,b)=> b.rating-a.rating || b.reviews-a.reviews);
-  else if(state.sort==='price') arr.sort((a,b)=> a.rate-b.rate);
-  else if(state.sort==='near') arr.sort((a,b)=> parseFloat(a.dist)-parseFloat(b.dist));
-  return arr;
-}
-
-function renderDiscover(b){
-  const q = (state.query||'').trim().toLowerCase();
-  let list = state.activeCat==='all' ? MENTORS : MENTORS.filter(m=>m.cat===state.activeCat);
-  if(q){
-    list = list.filter(m =>
-      m.name.toLowerCase().includes(q) ||
-      m.label.toLowerCase().includes(q) ||
-      m.tags.some(t=>t.toLowerCase().includes(q))
-    );
-  }
-  list = sortedMentors(list);
-  b.innerHTML = `
-    <div class="section-row">
-      <div class="section-label">${list.length} mentor${list.length===1?'':'s'} <b>${q ? `matching "${escapeHTML(state.query)}"` : 'near you'}</b></div>
-      <select class="sort-select" aria-label="Sort mentors" onchange="setSort(this.value)">
-        ${SORTS.map(s=>`<option value="${s.id}" ${state.sort===s.id?'selected':''}>${s.label}</option>`).join('')}
-      </select>
-    </div>
-    ${list.length ? list.map(mentorCardHTML).join('') : `<div class="empty-note">No mentors match${q?' your search':' this category'}.<br>Try a different search or category.</div>`}
-  `;
-}
-
-function cardKey(e, id){
-  if(e.target !== e.currentTarget) return; // ignore Enter/Space pressed on the heart button inside the card
-  if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openProfile(id); }
-}
-
-function mentorCardHTML(m){
-  const saved = state.savedIds.has(m.id);
-  return `
-    <div class="mentor-card" role="button" tabindex="0" onclick="openProfile(${m.id})" onkeydown="cardKey(event,${m.id})">
-      <button class="fav-btn ${saved?'on':''}" onclick="toggleFav(${m.id}, event)" aria-label="${saved?'Remove saved mentor':'Save mentor'}" aria-pressed="${saved}">${saved?ic.heartFill:ic.heartOutline}</button>
-      <div class="avatar md" style="background:${m.color}">${initials(m.name)}</div>
-      <div class="mentor-main">
-        <div class="mentor-name-row"><strong>${m.name}</strong>${m.verified?`<span class="badge-check" style="color:var(--brand)" title="Verified">${ic.badge.replace('currentColor', m.color)}</span>`:''}</div>
-        <span class="cat-badge" style="background:color-mix(in srgb, var(--cat-${m.cat}) 16%, var(--surface)); color:var(--cat-${m.cat})">${m.label}</span>
-        <p class="mentor-bio">${m.bio}</p>
-        <div class="mentor-meta">
-          ${starsCompact()}
-          <span>${m.rating} (${m.reviews})</span>
-          <span>· ${m.dist}</span>
-        </div>
-      </div>
-      <div class="mentor-rate"><strong>Rp${m.rate}K</strong><span>per hour</span></div>
-    </div>
-  `;
-}
-
-function toggleFav(id, e){
-  if(e) e.stopPropagation();
-  const wasSaved = state.savedIds.has(id);
-  if(wasSaved) state.savedIds.delete(id); else state.savedIds.add(id);
-  persist();
-  const ovBtn = document.getElementById('ovFavBtn');
-  if(ovBtn){
-    ovBtn.classList.toggle('on', !wasSaved);
-    ovBtn.setAttribute('aria-pressed', String(!wasSaved));
-    ovBtn.innerHTML = !wasSaved ? ic.heartFill : ic.heartOutline;
-  }
-  if(state.tab==='discover' || state.tab==='profile') renderBody();
-  showToast(!wasSaved ? `Saved ${mentorById(id).name.split(' ')[0]}` : `Removed ${mentorById(id).name.split(' ')[0]}`);
-}
-
-function openProfile(id){
-  const m = mentorById(id);
-  const saved = state.savedIds.has(id);
-  const el = document.getElementById('profileOverlay');
-  el.innerHTML = `
-    <div class="overlay-header">
-      <button class="back-btn" onclick="closeOverlay('profileOverlay')" aria-label="Back">${ic.chevronLeft}</button>
-      <div class="overlay-title">Mentor profile</div>
-      <button class="fav-btn ${saved?'on':''}" id="ovFavBtn" style="position:static; margin-left:auto;" onclick="toggleFav(${id})" aria-label="Save mentor" aria-pressed="${saved}">${saved?ic.heartFill:ic.heartOutline}</button>
-    </div>
-    <div class="overlay-body">
-      <div class="profile-hero">
-        <div class="avatar lg" style="background:${m.color}; margin:0 auto;">${initials(m.name)}</div>
-        <div class="mentor-name-row" style="justify-content:center; margin-top:12px;"><strong style="font-size:17px">${m.name}</strong>${m.verified?`<span class="badge-check">${ic.badge.replace('currentColor', m.color)}</span>`:''}</div>
-        <span class="cat-badge" style="background:color-mix(in srgb, var(--cat-${m.cat}) 16%, var(--surface)); color:var(--cat-${m.cat})">${m.label}</span>
-        <div class="rate-tag">Rp${m.rate}K<span>/ hour</span></div>
-      </div>
-      <div class="stat-row">
-        <div class="stat">${starsCompact()}<span>${m.rating} rating</span></div>
-        <div class="stat"><strong>${m.reviews}</strong><span>Reviews</span></div>
-        <div class="stat"><strong>${m.dist}</strong><span>Away</span></div>
-      </div>
-      <div class="block">
-        <h4>About</h4>
-        <p>${m.bio}</p>
-      </div>
-      <div class="block">
-        <h4>Teaches</h4>
-        <div class="tag-row">${m.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
-      </div>
-      <div class="block" style="border-bottom:none;">
-        <h4>Availability</h4>
-        <div class="tag-row">${m.avail.map(t=>`<span class="tag">${ic.clock.replace('currentColor','var(--ink-faint)')} ${t}</span>`).join('')}</div>
-      </div>
-    </div>
-    <div class="cta-row">
-      <button class="btn btn-ghost" onclick="openChat(${m.id}); closeOverlay('profileOverlay')">${ic.msg}Message</button>
-      <button class="btn btn-primary" onclick="openBooking(${m.id})">${ic.calendar}Book session</button>
-    </div>
-  `;
-  el.classList.add('open');
-}
-
 function toggleNotifPanel(e){
-  if(e) e.stopPropagation();
-  const panel = document.getElementById('notifPanel');
-  const opening = !panel.classList.contains('open');
-  if(opening){
-    renderNotifPanel();
-    // Anchor the panel just under the bell, wherever it actually sits (safe-area aware)
-    const bell = document.getElementById('bellBtn');
-    const screenEl = document.getElementById('screen');
-    if(bell && screenEl){
-      const bellRect = bell.getBoundingClientRect();
-      const screenRect = screenEl.getBoundingClientRect();
-      panel.style.top = (bellRect.bottom - screenRect.top + 8) + 'px';
-    }
-    panel.classList.add('open');
-    if(state.hasNotif){ state.hasNotif = false; persist(); updateBell(); }
-  } else {
-    panel.classList.remove('open');
-  }
-}
-function renderNotifPanel(){
-  const panel = document.getElementById('notifPanel');
-  const list = NOTIFS.filter(n=>(n.role||'student')===state.role);
-  panel.innerHTML = `<div class="notif-head"><h5>Notifications</h5>${list.length?`<button class="notif-clear" onclick="clearNotifs(event)">Clear all</button>`:''}</div>` + (list.length
-    ? list.map(n=>`<div class="notif-item"><strong>${escapeHTML(n.title)}</strong>${escapeHTML(n.body)}<br><span>${relTime(n.ts, true)}</span></div>`).join('')
-    : `<div class="notif-empty">You're all caught up.</div>`);
-}
-function clearNotifs(e){
-  if(e) e.stopPropagation();
-  NOTIFS = NOTIFS.filter(n=>(n.role||'student')!==state.role);
-  persist();
-  renderNotifPanel();
+  if (e) e.stopPropagation();
+  const panel = $('notifPanel'), opening = !panel.classList.contains('open');
+  if (!opening) return panel.classList.remove('open');
+  panel.innerHTML = `<h5>Notifications</h5>` + (state.notifs.length
+    ? state.notifs.map(n => `<div class="notif-item"><strong>${esc(n.title)}</strong>${esc(n.body)}<br><span>${relTime(n.at)}</span></div>`).join('')
+    : `<div class="notif-empty">You’re all caught up.</div>`);
+  const bell = $('bellBtn');
+  if (bell) panel.style.top = (bell.getBoundingClientRect().bottom - screenEl.getBoundingClientRect().top + 8) + 'px';
+  panel.classList.add('open');
+  state.hasNotif = false; updateBell();
 }
 
 /* ============================================================
-   SECTION 3 — CHAT
-   Each mentor keeps an independent thread (see THREADS above),
-   so opening a different person's chat always shows only their
-   own history — never mixed with anyone else's.
+   AUTH
    ============================================================ */
-function ensureChat(mentorId){
-  let c = CHATS.find(x=>x.mentorId===mentorId);
-  if(!c){ c = {mentorId, ts:Date.now(), unread:false}; CHATS.unshift(c); }
-  return c;
-}
-function bumpChatToTop(mentorId){
-  const idx = CHATS.findIndex(x=>x.mentorId===mentorId);
-  if(idx>0){ const [c] = CHATS.splice(idx,1); CHATS.unshift(c); }
-}
-function lastMessage(mentorId){
-  const t = THREADS[mentorId] || [];
-  if(!t.length) return {text:'Say hi 👋', mine:false};
-  const last = t[t.length-1];
-  if(last.who==='session') return {text:'Session requested', mine:false};
-  return {text:last.text, mine:last.who==='me'};
-}
-
-function renderChats(b){
-  if(!CHATS.length){
-    b.innerHTML = `<div class="empty-note">No conversations yet.<br>Message a mentor from their profile to start one.</div>`;
-    return;
-  }
-  b.innerHTML = CHATS.map(c=>{
-    const m = mentorById(c.mentorId);
-    const last = lastMessage(c.mentorId);
-    return `
-      <button class="chat-row" onclick="openChat(${c.mentorId})">
-        <div class="avatar sm" style="background:${m.color}">${initials(m.name)}</div>
-        <div class="chat-text">
-          <div class="chat-top"><strong>${m.name}</strong><time>${relTime(c.ts)}</time></div>
-          <p class="chat-preview">${last.mine?'You: ':''}${escapeHTML(last.text)}</p>
-        </div>
-        ${c.unread ? '<span class="unread" aria-label="Unread"></span>' : ''}
-      </button>
-    `;
-  }).join('');
-}
-
-function msgHTML(t){
-  if(t.who==='session') return `<div class="session-card"><p>Session requested</p><strong>60 min</strong></div>`;
-  return `<div class="msg ${t.who}">${escapeHTML(t.text)}</div>`;
-}
-
-function openChat(mentorId){
-  ensureChat(mentorId).unread = false;
-  persist();
-  state.openChatMentor = mentorId;
-  renderChatOverlay(mentorById(mentorId));
-  document.getElementById('chatOverlay').classList.add('open');
-  updateBadges();
-}
-function closeChatOverlay(){
-  state.openChatMentor = null;
-  closeOverlay('chatOverlay');
-  if(state.tab==='chats') renderBody(); else updateBadges();
-}
-
-function renderChatOverlay(m){
-  THREADS[m.id] = THREADS[m.id] || [];
-  const el = document.getElementById('chatOverlay');
-  el.innerHTML = `
-    <div class="overlay-header">
-      <button class="back-btn" onclick="closeChatOverlay()" aria-label="Back">${ic.chevronLeft}</button>
-      <div class="avatar sm" style="background:${m.color}">${initials(m.name)}</div>
-      <div class="overlay-title">${m.name}</div>
+function renderAuth(note = ''){
+  const su = authMode === 'signup', rs = authMode === 'reset';
+  screenEl.dataset.role = 'student';
+  screenEl.innerHTML = `
+    <div class="auth">
+      <img class="auth-logo" src="${LOGO}" alt="CourseConnect">
+      <h1>${su ? 'Create your account' : rs ? 'Reset your password' : 'Welcome back'}</h1>
+      <p class="lead">${su ? 'Join classes for your courses and competitions, or host one yourself.'
+        : rs ? 'Enter your email and we’ll send you a link to set a new password.'
+        : 'Log in to see classes, your bookings and your group chats.'}</p>
+      ${note ? `<div class="form-note">${note}</div>` : ''}
+      <form id="authForm" novalidate>
+        ${su ? `
+          <div class="field"><label for="aName">Full name</label><input class="input" id="aName" autocomplete="name" maxlength="60"></div>
+          <div class="row-2">
+            <div class="field"><label for="aCampus">Campus</label><input class="input" id="aCampus" placeholder="e.g. BINUS" maxlength="80"></div>
+            <div class="field"><label for="aMajor">Major</label><input class="input" id="aMajor" placeholder="e.g. Finance" maxlength="80"></div>
+          </div>` : ''}
+        <div class="field"><label for="aEmail">Email</label><input class="input" id="aEmail" type="email" autocomplete="email"></div>
+        ${rs ? '' : `<div class="field"><label for="aPass">Password</label><input class="input" id="aPass" type="password" autocomplete="${su ? 'new-password' : 'current-password'}">${su ? '<span class="sub">At least 6 characters.</span>' : ''}</div>`}
+        <div class="form-error" id="authError" role="alert"></div>
+        <button class="btn btn-brand" id="authSubmit" type="submit">${su ? 'Create account' : rs ? 'Send reset link' : 'Log in'}</button>
+      </form>
+      <div class="auth-switch">
+        ${su ? `Already have an account? <button class="link-btn" data-mode="login">Log in</button>`
+          : rs ? `<button class="link-btn" data-mode="login">Back to log in</button>`
+          : `New here? <button class="link-btn" data-mode="signup">Create an account</button><br><button class="link-btn" data-mode="reset">Forgot password?</button>`}
+      </div>
     </div>
-    <div class="overlay-body" id="threadScroll">
-      <div class="thread" id="threadBody"></div>
-    </div>
-    <div class="composer">
-      <input type="text" id="chatInput" placeholder="Message ${m.name.split(' ')[0]}..." aria-label="Message ${m.name.split(' ')[0]}" autocomplete="off" onkeydown="if(event.key==='Enter')sendMessage(${m.id})" />
-      <button class="send-btn" onclick="sendMessage(${m.id})" aria-label="Send message">${ic.send}</button>
-    </div>
-  `;
-  renderThread(m.id);
-}
-// Re-renders ONLY the message list, so the composer keeps focus (and the mobile keyboard stays open).
-function renderThread(mentorId){
-  const tb = document.getElementById('threadBody');
-  if(!tb) return;
-  const t = THREADS[mentorId] || [];
-  tb.innerHTML = (t.length ? t.map(msgHTML).join('') : `<div class="empty-note">No messages yet — say hi!</div>`)
-    + ((state.pending[mentorId]||0)>0 ? `<div class="msg them typing" aria-label="Typing"><i></i><i></i><i></i></div>` : '');
-  const sc = document.getElementById('threadScroll');
-  if(sc) sc.scrollTop = sc.scrollHeight;
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>`;
+  screenEl.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => { authMode = b.dataset.mode; renderAuth(); }));
+  $('authForm').addEventListener('submit', submitAuth);
 }
 
-function sendMessage(mentorId){
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim();
-  if(!text) return;
-  const t = THREADS[mentorId] || (THREADS[mentorId] = []);
-  t.push({who:'me', text});
-  input.value = '';
-  ensureChat(mentorId).ts = Date.now();
-  bumpChatToTop(mentorId);
-  state.pending[mentorId] = (state.pending[mentorId]||0) + 1;
-  renderThread(mentorId);
-  persist();
-  input.focus();
-
-  // Light "mentor is typing" simulation so the chat feels alive
-  setTimeout(()=>{
-    state.pending[mentorId] = Math.max(0, (state.pending[mentorId]||1) - 1);
-    const reply = REPLIES[Math.floor(Math.random()*REPLIES.length)];
-    (THREADS[mentorId] = THREADS[mentorId] || []).push({who:'them', text:reply});
-    const c = ensureChat(mentorId);
-    c.ts = Date.now();
-    bumpChatToTop(mentorId);
-    if(state.openChatMentor===mentorId){
-      renderThread(mentorId);
+async function submitAuth(e){
+  e.preventDefault();
+  const err = $('authError'), btn = $('authSubmit'); err.textContent = '';
+  const email = $('aEmail').value.trim(), pass = $('aPass') ? $('aPass').value : '';
+  if (!/^\S+@\S+\.\S+$/.test(email)) { err.textContent = 'Enter a valid email address.'; return; }
+  const redirectTo = location.origin + location.pathname;
+  btn.disabled = true;
+  try {
+    if (authMode === 'login') {
+      if (!pass) throw new Error('Enter your password.');
+      const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+      if (error) throw error;
+    } else if (authMode === 'signup') {
+      const full_name = $('aName').value.trim();
+      if (!full_name) throw new Error('Enter your full name.');
+      if (pass.length < 6) throw new Error('Password needs at least 6 characters.');
+      const { data, error } = await sb.auth.signUp({ email, password: pass,
+        options: { emailRedirectTo: redirectTo, data: { full_name, campus: $('aCampus').value.trim(), major: $('aMajor').value.trim() } } });
+      if (error) throw error;
+      if (!data.session) { authMode = 'login'; renderAuth(`Almost done — open the confirmation link sent to <b>${esc(email)}</b>, then log in here.`); }
     } else {
-      c.unread = true;
-      if(state.notifMessages) pushNotif('New message', `${mentorById(mentorId).name} replied to you.`);
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
+      if (error) throw error;
+      authMode = 'login'; renderAuth(`If <b>${esc(email)}</b> has an account, a reset link is on its way.`);
     }
-    persist();
-    if(state.tab==='chats') renderChats(document.getElementById('appBody'));
-    updateBadges();
-  }, 1200 + Math.random()*800);
+  } catch (ex) { err.textContent = friendlyError(ex); }
+  finally { if (document.body.contains(btn)) btn.disabled = false; }
 }
 
-/* ============================================================
-   SECTION 4 — BOOKING
-   A real month calendar: dots mark days with a session, tapping
-   a date filters the agenda to that day. "Book session" / "Book
-   again" open the date + time picker; "Reschedule" opens the same
-   picker but MOVES the existing booking instead of adding a new one.
-   Past days are disabled and clashing time slots are greyed out.
-   ============================================================ */
-function bookingDotsMap(){
-  const map = {};
-  BOOKINGS.forEach(x=>{ (map[x.date] = map[x.date] || []).push(x); });
-  return map;
-}
-function byWhen(a,b){ return a.date.localeCompare(b.date) || toMin(a.start)-toMin(b.start); }
-function upcomingBookings(){ return BOOKINGS.filter(isUpcoming).sort(byWhen); }
-function pastBookings(){ return BOOKINGS.filter(x=>!isUpcoming(x)).sort((a,b)=>byWhen(b,a)); }
-
-function buildCalendarHTML(year, month, opts={}){
-  const { selectedDate=null, dotsMap={}, onSelect='selectCalDay', minDate=null } = opts;
-  const firstDow = new Date(year, month, 1).getDay();
-  const numDays = new Date(year, month+1, 0).getDate();
-  const todayStr = ymd(TODAY);
-  let cells = '';
-  for(let i=0;i<firstDow;i++) cells += `<button class="cal-day pad" tabindex="-1" aria-hidden="true"></button>`;
-  for(let d=1; d<=numDays; d++){
-    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    let cls = 'cal-day';
-    if(dateStr===todayStr) cls += ' today';
-    if(dateStr===selectedDate) cls += ' selected';
-    const hasDots = !!dotsMap[dateStr];
-    if(hasDots && dateStr < todayStr) cls += ' past-dot';
-    const disabled = minDate && dateStr < minDate;
-    cells += `<button class="${cls}" ${disabled?'disabled':''} onclick="${onSelect}('${dateStr}')" aria-label="${friendlyDate(dateStr)}${hasDots?', has a session':''}" ${dateStr===selectedDate?'aria-pressed="true"':''}>${d}${hasDots?'<span class="cal-dot"></span>':''}</button>`;
-  }
-  return `
-    <div class="cal-dow">${['S','M','T','W','T','F','S'].map(x=>`<span>${x}</span>`).join('')}</div>
-    <div class="cal-grid">${cells}</div>
-  `;
-}
-
-function renderBookings(b){
-  const dots = bookingDotsMap();
-  const calHTML = buildCalendarHTML(state.calYear, state.calMonth, {selectedDate:state.selectedDate, dotsMap:dots, onSelect:'selectCalDay'});
-  const agendaHTML = state.selectedDate ? `
-    <div class="cal-agenda">
-      <h5>${friendlyDate(state.selectedDate)}</h5>
-      ${(dots[state.selectedDate]||[]).length ? dots[state.selectedDate].slice().sort(byWhen).map(bookingHTML).join('') : `<div class="empty-note" style="padding:10px 0">No sessions this day.</div>`}
-    </div>` : '';
-  const up = upcomingBookings(), past = pastBookings();
-
-  b.innerHTML = `
-    <div class="cal-card">
-      <div class="cal-head">
-        <strong>${MONTHS[state.calMonth]} ${state.calYear}</strong>
-        <div class="cal-nav">
-          <button class="mini-btn" onclick="goToday()">Today</button>
-          <button class="cal-nav-btn" onclick="calNav(-1)" aria-label="Previous month">${ic.chevronLeft}</button>
-          <button class="cal-nav-btn" onclick="calNav(1)" aria-label="Next month">${ic.chevronRight}</button>
-        </div>
-      </div>
-      ${calHTML}
-      ${agendaHTML}
+function renderNewPassword(){
+  screenEl.innerHTML = `
+    <div class="auth">
+      <img class="auth-logo" src="${LOGO}" alt="CourseConnect">
+      <h1>Set a new password</h1>
+      <p class="lead">Choose a new password for your account.</p>
+      <form id="pwForm" novalidate>
+        <div class="field"><label for="newPass">New password</label><input class="input" id="newPass" type="password" autocomplete="new-password"></div>
+        <div class="form-error" id="pwError" role="alert"></div>
+        <button class="btn btn-brand" type="submit">Save password</button>
+      </form>
     </div>
-    ${!state.selectedDate ? `
-      <div class="section-label"><b>Upcoming</b></div>
-      ${up.length ? up.map(bookingHTML).join('') : `<div class="empty-note">Nothing booked yet — find a mentor on Discover.</div>`}
-      ${past.length ? `<div class="section-label" style="margin-top:22px"><b>Past</b></div>${past.map(bookingHTML).join('')}` : ''}
-    ` : ''}
-  `;
-}
-function selectCalDay(dateStr){ state.selectedDate = (state.selectedDate===dateStr) ? null : dateStr; renderBody(); }
-function goToday(){
-  state.calYear = TODAY.getFullYear(); state.calMonth = TODAY.getMonth();
-  state.selectedDate = ymd(TODAY);
-  renderBody();
-}
-function calNav(delta){
-  state.calMonth += delta;
-  if(state.calMonth<0){ state.calMonth=11; state.calYear--; }
-  if(state.calMonth>11){ state.calMonth=0; state.calYear++; }
-  renderBody();
-}
-
-function bookingHTML(x){
-  const m = mentorById(x.mentorId);
-  const d = new Date(x.date+'T00:00:00');
-  return `
-    <div class="booking-card">
-      <div class="booking-date"><strong>${d.getDate()}</strong><span>${MONTHS[d.getMonth()].slice(0,3)}</span></div>
-      <div class="booking-info">
-        <strong>${m.name}</strong>
-        <p>${m.label} · ${bookingTimeLabel(x)}</p>
-        ${isUpcoming(x)
-          ? `<div class="booking-actions"><button class="mini-btn primary" onclick="openChat(${m.id})">Message</button><button class="mini-btn" onclick="openBooking(${m.id}, '${x.id}')">Reschedule</button><button class="mini-btn danger" onclick="askCancelBooking('${x.id}')">Cancel</button></div>`
-          : `<div class="booking-actions"><button class="mini-btn" onclick="openBooking(${m.id})">Book again</button></div>`}
-      </div>
-    </div>
-  `;
-}
-function askCancelBooking(id){
-  const x = BOOKINGS.find(b=>b.id===id);
-  if(!x) return;
-  const m = mentorById(x.mentorId);
-  openDialog({
-    title:'Cancel this session?',
-    body:`Your session with ${m.name} on ${friendlyDate(x.date)} at ${x.start} will be removed.`,
-    confirmLabel:'Cancel session', danger:true
-  }, ()=>{
-    BOOKINGS = BOOKINGS.filter(b=>b.id!==id);
-    pushNotif('Booking cancelled', `Your session with ${m.name} on ${friendlyDate(x.date)} was cancelled.`);
-    persist();
-    renderBody();
-    showToast('Session cancelled');
+    <div class="toast" id="toast"></div>`;
+  $('pwForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const p = $('newPass').value;
+    if (p.length < 6) { $('pwError').textContent = 'Password needs at least 6 characters.'; return; }
+    const { error } = await sb.auth.updateUser({ password: p });
+    if (error) { $('pwError').textContent = friendlyError(error); return; }
+    recovering = false; history.replaceState(null, '', location.pathname);
+    start((await sb.auth.getSession()).data.session);
+    setTimeout(() => showToast('Password saved'), 400);
   });
 }
 
-// ---- New-booking flow (date + duration + time + format, for one mentor) ----
-const TIME_SLOTS = ['9:00 AM','11:00 AM','1:00 PM','3:00 PM','5:00 PM','7:00 PM'];
-
-function openBooking(mentorId, rescheduleId){
-  const ex = rescheduleId ? BOOKINGS.find(b=>b.id===rescheduleId) : null;
-  const base = ex ? new Date(ex.date+'T00:00:00') : TODAY;
-  bookingFlow = {
-    mentorId, year:base.getFullYear(), month:base.getMonth(),
-    date: ex ? ex.date : null, time: ex ? ex.start : null, dur: ex ? ex.dur : 60,
-    mode: ex && ex.place!=='Online' ? 'In person' : 'Online', place: ex ? ex.place : 'Online',
-    rescheduleId: ex ? ex.id : null,
-  };
-  renderBookingOverlay();
-  document.getElementById('bookingOverlay').classList.add('open');
-}
-// Returns a reason string if the slot can't be booked, otherwise ''.
-function slotProblem(date, start, dur){
-  if(!date) return '';
-  const s = toMin(start), e = s + dur;
-  if(date === ymd(TODAY)){
-    const now = new Date();
-    if(s <= now.getHours()*60 + now.getMinutes()) return 'past';
-  }
-  const clash = BOOKINGS.find(b => b.id!==bookingFlow.rescheduleId && b.date===date && toMin(b.start) < e && s < toMin(b.start)+b.dur);
-  return clash ? 'clash' : '';
-}
-function renderBookingOverlay(){
-  const f = bookingFlow;
-  const m = mentorById(f.mentorId);
-  if(f.time && f.date && slotProblem(f.date, f.time, f.dur)) f.time = null; // selection became invalid (date/duration changed)
-  const dots = bookingDotsMap();
-  const calHTML = buildCalendarHTML(f.year, f.month, {selectedDate:f.date, dotsMap:dots, onSelect:'pickBookingDate', minDate:ymd(TODAY)});
-  const canConfirm = f.date && f.time;
-  const atFirstMonth = f.year===TODAY.getFullYear() && f.month===TODAY.getMonth();
-  const el = document.getElementById('bookingOverlay');
-  el.innerHTML = `
-    <div class="overlay-header">
-      <button class="back-btn" onclick="closeOverlay('bookingOverlay')" aria-label="Back">${ic.chevronLeft}</button>
-      <div class="overlay-title">${f.rescheduleId?'Reschedule':'Book'} ${m.name.split(' ')[0]}</div>
-    </div>
-    <div class="overlay-body">
-      <div class="block">
-        <h4>Date</h4>
-        <div class="cal-card" style="margin:0; padding:0; border:none;">
-          <div class="cal-head">
-            <strong>${MONTHS[f.month]} ${f.year}</strong>
-            <div class="cal-nav">
-              <button class="cal-nav-btn" onclick="bookingCalNav(-1)" aria-label="Previous month" ${atFirstMonth?'disabled':''}>${ic.chevronLeft}</button>
-              <button class="cal-nav-btn" onclick="bookingCalNav(1)" aria-label="Next month">${ic.chevronRight}</button>
-            </div>
-          </div>
-          ${calHTML}
-        </div>
-      </div>
-      <div class="block">
-        <h4>Duration</h4>
-        <div class="dur-row">
-          ${[30,45,60].map(d=>`<button class="dur-btn ${f.dur===d?'active':''}" aria-pressed="${f.dur===d}" onclick="pickBookingDur(${d})">${d} min</button>`).join('')}
-        </div>
-      </div>
-      <div class="block">
-        <h4>Format</h4>
-        <div class="dur-row">
-          ${['Online','In person'].map(x=>`<button class="dur-btn ${f.mode===x?'active':''}" aria-pressed="${f.mode===x}" onclick="pickBookingMode('${x}')">${x}</button>`).join('')}
-        </div>
-      </div>
-      <div class="block" style="border-bottom:none;">
-        <h4>Time</h4>
-        <div class="slot-row">
-          ${TIME_SLOTS.map(t=>{
-            const bad = slotProblem(f.date, t, f.dur);
-            return `<button class="slot-btn ${f.time===t?'active':''}" ${bad?'disabled':''} ${bad?`title="${bad==='past'?'This time has passed':'Clashes with another session'}"`:''} aria-pressed="${f.time===t}" onclick="pickBookingTime('${t}')">${t}</button>`;
-          }).join('')}
-        </div>
-        <p class="hint">${f.date ? 'Greyed-out times have passed or clash with another session.' : 'Pick a date first to see which times are free.'}</p>
-      </div>
-    </div>
-    <div class="cta-row">
-      <button class="btn btn-primary" style="flex:1; ${canConfirm?'':'opacity:.45; pointer-events:none;'}" ${canConfirm?'':'disabled'} onclick="confirmBooking()">
-        ${canConfirm ? `${f.rescheduleId?'Reschedule':'Confirm'} · ${friendlyDate(f.date)}, ${f.time}` : 'Pick a date and time'}
-      </button>
-    </div>
-  `;
-}
-function bookingCalNav(delta){
-  let y = bookingFlow.year, mo = bookingFlow.month + delta;
-  if(mo<0){ mo=11; y--; }
-  if(mo>11){ mo=0; y++; }
-  if(y < TODAY.getFullYear() || (y===TODAY.getFullYear() && mo < TODAY.getMonth())) return; // can't browse the past
-  bookingFlow.year = y; bookingFlow.month = mo;
-  renderBookingOverlay();
-}
-function pickBookingDate(d){ bookingFlow.date = d; renderBookingOverlay(); }
-function pickBookingTime(t){ bookingFlow.time = t; renderBookingOverlay(); }
-function pickBookingDur(d){ bookingFlow.dur = d; renderBookingOverlay(); }
-function pickBookingMode(mode){
-  const ex = bookingFlow.rescheduleId ? BOOKINGS.find(b=>b.id===bookingFlow.rescheduleId) : null;
-  bookingFlow.mode = mode;
-  bookingFlow.place = mode==='Online' ? 'Online' : (ex && ex.place!=='Online' ? ex.place : 'In person');
-  renderBookingOverlay();
-}
-function confirmBooking(){
-  const f = bookingFlow;
-  if(!f.date || !f.time || slotProblem(f.date, f.time, f.dur)) return;
-  const m = mentorById(f.mentorId);
-  const rescheduled = !!f.rescheduleId;
-  if(rescheduled){
-    const b = BOOKINGS.find(x=>x.id===f.rescheduleId);
-    if(b) Object.assign(b, {mentorId:f.mentorId, date:f.date, start:f.time, dur:f.dur, place:f.place});
-  } else {
-    BOOKINGS.push({ id:'b'+Date.now(), mentorId:f.mentorId, date:f.date, start:f.time, dur:f.dur, place:f.place });
-  }
-  pushNotif(rescheduled ? 'Booking rescheduled' : 'Booking confirmed', `Your session with ${m.name} is set for ${friendlyDate(f.date)}, ${f.time}.`);
-  persist();
-  closeOverlay('bookingOverlay');
-  closeOverlay('profileOverlay');
-  state.selectedDate = f.date;
-  state.calYear = f.year;
-  state.calMonth = f.month;
-  setTab('bookings');
-  showToast(`${rescheduled?'Rescheduled':'Booked'} with ${m.name.split(' ')[0]} · ${friendlyDate(f.date)}`);
+function askLogout(){
+  openDialog({ title:'Log out?', body:'You can log back in any time with your email and password.', confirmLabel:'Log out', cancelLabel:'Stay', danger:true },
+    () => sb.auth.signOut());
 }
 
 /* ============================================================
-   SECTION 5 — PROFILE
-   Learning/teaching mode, saved mentors (from Discover
-   favoriting), editable skill tags / rate / bio, and the
-   settings sheet.
+   DATA
    ============================================================ */
-function setMode(mode){ state.profileMode = mode; state.addingTag = null; renderBody(); }
-function toggleTeachingVisible(){
-  state.teachingVisible = !state.teachingVisible;
-  persist();
-  renderBody();
-  showToast(state.teachingVisible ? 'Visible to students' : 'Hidden from students');
-}
-function tagList(which){ return which==='learning' ? state.learningTags : state.teachingTags; }
-function startAddTag(which){
-  state.addingTag = which;
-  renderBody();
-  const i = document.getElementById('tagInput');
-  if(i) i.focus();
-}
-function commitTag(which, val){
-  if(state.addingTag !== which) return; // already handled (Enter then blur)
-  state.addingTag = null;
-  const v = (val||'').trim();
-  const list = tagList(which);
-  if(v){
-    if(list.some(t=>t.toLowerCase()===v.toLowerCase())) showToast('Already in your list');
-    else if(list.length>=12) showToast('Up to 12 skills');
-    else list.push(v);
-    persist();
+const CLASS_SELECT = `
+  id, host_id, title, category, subject, description, capacity, price, starts_at, duration_min, location, created_at,
+  host:profiles!classes_host_id_fkey ( id, full_name, campus, major, bio ),
+  members:class_members ( user_id, joined_at, profile:profiles ( id, full_name, campus, major ) )`;
+
+async function loadMe(){
+  let { data, error } = await sb.from('profiles').select('*').eq('id', uid()).maybeSingle();
+  if (error) throw error;
+  if (!data) {
+    const meta = state.session.user.user_metadata || {};
+    const res = await sb.from('profiles').insert({ id: uid(),
+      full_name: (meta.full_name || state.session.user.email.split('@')[0]).slice(0, 60),
+      campus: meta.campus || null, major: meta.major || null }).select('*').single();
+    if (res.error) throw res.error;
+    data = res.data;
   }
-  renderBody();
+  state.me = data; names.set(data.id, data.full_name);
 }
-function tagKey(e, which){
-  if(e.key==='Enter'){ e.preventDefault(); commitTag(which, e.target.value); }
-  if(e.key==='Escape'){ e.stopPropagation(); state.addingTag = null; renderBody(); }
+async function loadClasses(){
+  const since = new Date(Date.now() - 90 * 864e5).toISOString();
+  const { data, error } = await sb.from('classes').select(CLASS_SELECT).gte('starts_at', since).order('starts_at', { ascending: true }).limit(500);
+  if (error) throw error;
+  state.classes = data || [];
+  for (const c of state.classes) {
+    if (c.host) names.set(c.host.id, c.host.full_name);
+    for (const m of c.members) if (m.profile) names.set(m.profile.id, m.profile.full_name);
+  }
 }
-function removeTag(which, i){ tagList(which).splice(i,1); persist(); renderBody(); }
-function tagRowHTML(which){
-  const adding = state.addingTag===which;
-  return `<div class="tag-row">${tagList(which).map((t,i)=>`<span class="tag">${escapeHTML(t)}<button class="tag-x" onclick="removeTag('${which}',${i})" aria-label="Remove ${escapeHTML(t)}">${ic.x}</button></span>`).join('')}${
-    adding ? `<input class="tag-input" id="tagInput" maxlength="24" placeholder="New skill" aria-label="New skill" onkeydown="tagKey(event,'${which}')" onblur="commitTag('${which}', this.value)">`
-           : `<button class="tag add-tag" onclick="startAddTag('${which}')">+ Add</button>`}</div>`;
+async function loadLastMessages(){
+  const ids = state.classes.filter(isMine).map(c => c.id);
+  state.lastMsg = {};
+  if (!ids.length) return;
+  const { data, error } = await sb.from('messages').select('id, class_id, user_id, kind, body, created_at')
+    .in('class_id', ids).order('created_at', { ascending: false }).limit(1000);
+  if (error) throw error;
+  for (const m of data) if (!state.lastMsg[m.class_id]) state.lastMsg[m.class_id] = m;
 }
-function setRate(v){
-  const n = Math.max(0, parseInt(v,10) || 0);
-  state.profile.rate = n;
-  persist();
+async function ensureNames(ids){
+  const missing = [...new Set(ids)].filter(id => id && !names.has(id));
+  if (!missing.length) return;
+  const { data } = await sb.from('profiles').select('id, full_name').in('id', missing);
+  (data || []).forEach(p => names.set(p.id, p.full_name));
 }
-function setAbout(v){
-  state.profile.about = v;
-  const c = document.getElementById('aboutCount');
-  if(c) c.textContent = v.length + '/280';
-  persist();
-}
+async function reloadAll(){ await loadClasses(); await loadLastMessages(); }
 
-function renderProfile(b){
-  const savedMentors = MENTORS.filter(m=>state.savedIds.has(m.id));
-  const p = state.profile;
-  const uniqueMentors = new Set(BOOKINGS.map(x=>x.mentorId)).size;
-  const teach = state.role==='mentor';
-  const earned = Math.round(MSESS.filter(x=>!isUpcoming(x)).reduce((a,x)=>a+x.dur/60*p.rate,0)/1000);
-  b.innerHTML = `
-    <div class="profile-top">
-      <div class="avatar lg" style="background:var(--brand)">${escapeHTML(initials(p.name))}</div>
-      <h3>${escapeHTML(p.name || 'Your name')}</h3>
-      <p>${escapeHTML(p.school)}</p>
-    </div>
-    <div style="text-align:center"><span class="role-pill">${teach?'Mentor profile':'Student profile'}</span></div>
-    <p class="role-hint">${teach?'This is how students see you. Your learning profile is under Student.':'Your learning goals. Your teaching profile is under Mentor.'}</p>
+function classById(id){ return state.classes.find(c => c.id === id); }
+function isHost(c){ return c.host_id === uid(); }
+function isMember(c){ return c.members.some(m => m.user_id === uid()); }
+function isMine(c){ return isHost(c) || isMember(c); }
+function hasStarted(c){ return new Date(c.starts_at) <= new Date(); }
+function hasEnded(c){ return new Date(endTime(c)) <= new Date(); }
+function joinedClasses(){ return state.classes.filter(isMember); }
+function hostedClasses(){ return state.classes.filter(isHost); }
 
-    ${!teach ? `
-      <div class="stat-row" style="border:none; padding-top:6px;">
-        <div class="stat"><strong>${BOOKINGS.length}</strong><span>Sessions</span></div>
-        <div class="stat"><strong>${uniqueMentors}</strong><span>Mentors</span></div>
-        <div class="stat"><strong>${state.savedIds.size}</strong><span>Saved</span></div>
-      </div>
-      <div class="field-label">Skills I'm learning</div>
-      ${tagRowHTML('learning')}
-      <div class="field-label">Saved mentors</div>
-      ${savedMentors.length ? savedMentors.map(m=>`
-        <div class="mentor-card" role="button" tabindex="0" style="margin-bottom:8px" onclick="openProfile(${m.id})" onkeydown="cardKey(event,${m.id})">
-          <button class="fav-btn on" onclick="toggleFav(${m.id}, event)" aria-label="Remove saved mentor">${ic.heartFill}</button>
-          <div class="avatar md" style="background:${m.color}">${initials(m.name)}</div>
-          <div class="mentor-main">
-            <div class="mentor-name-row"><strong>${m.name}</strong></div>
-            <span class="cat-badge" style="background:color-mix(in srgb, var(--cat-${m.cat}) 16%, var(--surface)); color:var(--cat-${m.cat})">${m.label}</span>
-          </div>
-        </div>
-      `).join('') : `<div class="empty-note">Tap the heart on a mentor's card to save them here.</div>`}
-    ` : `
-      <div class="stat-row" style="border:none; padding-top:6px;">
-        <div class="stat"><strong>${new Set(MSESS.map(x=>x.sid)).size}</strong><span>Students</span></div>
-        <div class="stat"><strong>—</strong><span>Rating</span></div>
-        <div class="stat"><strong>Rp${earned}k</strong><span>Earned</span></div>
-      </div>
-      <div class="toggle-row" style="margin:4px 2px 0;">
-        <div><strong>Visible to students</strong><span>Turn off to pause new requests</span></div>
-        <button class="switch ${state.teachingVisible?'':'off'}" role="switch" aria-checked="${state.teachingVisible}" onclick="toggleTeachingVisible()" aria-label="Toggle visibility"></button>
-      </div>
-      <div class="field-label">Skills I teach</div>
-      ${tagRowHTML('teaching')}
-      <div class="field-label">Hourly rate</div>
-      <label class="field-box rate-box"><span>Rp</span><input type="number" inputmode="numeric" min="0" step="5000" value="${p.rate}" onchange="setRate(this.value)" aria-label="Hourly rate in rupiah"><span>/ hour</span></label>
-      <div class="field-label">About what you teach</div>
-      <textarea class="field-box field-area" maxlength="280" placeholder="Describe what you're confident teaching and who it's for — this is what mentees see and filter by." aria-label="About what you teach" oninput="setAbout(this.value)">${escapeHTML(p.about)}</textarea>
-      <div class="char-count" id="aboutCount">${p.about.length}/280</div>
-    `}
-  `;
+function scheduleReload(){
+  clearTimeout(reloadTimer);
+  reloadTimer = setTimeout(async () => {
+    try { await reloadAll(); refreshVisible(); } catch (e) {}
+  }, 400);
 }
-
-function openSettings(){
-  renderSettingsOverlay();
-  document.getElementById('settingsOverlay').classList.add('open');
-}
-function setProfileField(key, v){
-  state.profile[key] = v;
-  persist();
-}
-function renderSettingsOverlay(){
-  const el = document.getElementById('settingsOverlay');
-  el.innerHTML = `
-    <div class="overlay-header">
-      <button class="back-btn" onclick="closeSettings()" aria-label="Back">${ic.chevronLeft}</button>
-      <div class="overlay-title">Settings</div>
-    </div>
-    <div class="overlay-body">
-      <div class="block">
-        <h4>Account</h4>
-        <label class="field-label" for="setName" style="margin-top:0">Display name</label>
-        <input id="setName" class="field-box field-input" maxlength="40" value="${escapeHTML(state.profile.name)}" oninput="setProfileField('name', this.value)">
-        <label class="field-label" for="setSchool">School / programme</label>
-        <input id="setSchool" class="field-box field-input" maxlength="60" value="${escapeHTML(state.profile.school)}" oninput="setProfileField('school', this.value)">
-      </div>
-      <div class="block">
-        <h4>Appearance</h4>
-        <div class="settings-row" style="border-bottom:none; padding-left:0;">
-          <div class="settings-label"><strong>Theme</strong><span>Match device, or force light / dark</span></div>
-          <div class="theme-row">
-            <button class="theme-opt ${state.theme==='light'?'active':''}" onclick="setTheme('light')" aria-label="Light">${ic.sun}</button>
-            <button class="theme-opt ${state.theme==='dark'?'active':''}" onclick="setTheme('dark')" aria-label="Dark">${ic.moon}</button>
-            <button class="theme-opt ${state.theme==='system'?'active':''}" onclick="setTheme('system')" aria-label="Match device">Auto</button>
-          </div>
-        </div>
-      </div>
-      <div class="block">
-        <h4>Notifications</h4>
-        <div class="settings-row" style="border-bottom:none; padding-left:0;">
-          <div class="settings-label"><strong>Session reminders</strong><span>Today and tomorrow, for booked sessions</span></div>
-          <button class="switch ${state.notifReminders?'':'off'}" role="switch" aria-checked="${state.notifReminders}" onclick="toggleNotifSetting('notifReminders')" aria-label="Toggle session reminders"></button>
-        </div>
-        <div class="settings-row" style="border-bottom:none; padding-left:0;">
-          <div class="settings-label"><strong>New messages</strong><span>When a mentor replies</span></div>
-          <button class="switch ${state.notifMessages?'':'off'}" role="switch" aria-checked="${state.notifMessages}" onclick="toggleNotifSetting('notifMessages')" aria-label="Toggle message notifications"></button>
-        </div>
-      </div>
-      <div class="block" style="border-bottom:none;">
-        <h4>Data &amp; about</h4>
-        <p class="hint" style="margin:0 0 12px">Everything here is saved only in this browser — there's no account or server.</p>
-        <button class="btn btn-ghost danger-text" style="width:100%" onclick="askReset()">Reset demo data</button>
-        <p class="hint" style="margin:14px 0 0">CourseConnect prototype v${APP_VERSION} · <a href="https://github.com/gloriackusuma/courseconnect" target="_blank" rel="noopener">View on GitHub</a></p>
-      </div>
-    </div>
-  `;
-}
-function closeSettings(){
-  closeOverlay('settingsOverlay');
-  if(state.tab==='profile') renderBody(); // pick up a changed name / school
-}
-function setTheme(mode){
-  state.theme = mode;
-  applyTheme();
-  persist();
-  renderSettingsOverlay();
-}
-function toggleNotifSetting(key){ state[key] = !state[key]; persist(); renderSettingsOverlay(); }
-function askReset(){
-  openDialog({
-    title:'Reset demo data?',
-    body:'This clears your saved mentors, bookings, messages and profile edits from this browser and restores the sample data.',
-    confirmLabel:'Reset', danger:true
-  }, ()=>{
-    try{ ['cc_state_v2','cc_saved','cc_theme'].forEach(k=>localStorage.removeItem(k)); }catch(e){}
-    location.reload();
-  });
+function refreshVisible(){
+  renderBody(); updateBadges();
+  if (state.tab === 'chats' || state.tab === 'm-chats') renderHeader();
+  if (state.detailId && $('detailOverlay').classList.contains('open')) renderDetail();
 }
 
 /* ============================================================
-   RENDER: HEADER (per tab)
+   SHELL · ROLES · TABS
+   Student and Mentor are separate spaces with their own tabs.
    ============================================================ */
-function renderStudentHeader(){
-  const h = document.getElementById('appHeader');
-  if(state.tab==='discover'){
-    h.innerHTML = `
-      <div class="header-top">
-        <div class="place-pill">${ic.pin}<span>Kemanggisan, Jakarta Barat</span></div>
-        <button class="icon-btn" id="bellBtn" onclick="toggleNotifPanel(event)" aria-label="Notifications">${ic.bell}${state.hasNotif?'<span class="dot-flag"></span>':''}</button>
-      </div>
-      <div class="h1">Find someone to<br>learn from nearby</div>
-      <div class="search-bar">${ic.search}<input id="searchInput" type="text" aria-label="Search a skill or a mentor's name" placeholder="Search a skill or a mentor's name" value="${escapeHTML(state.query)}" oninput="setQuery(this.value)" autocomplete="off"><button id="clearSearch" onclick="clearSearch()" aria-label="Clear search" ${state.query?'':'hidden'}>${ic.x}</button></div>
-      <div class="chip-row" id="chipRow"></div>
-    `;
-    renderChips();
-  } else if(state.tab==='chats'){
-    const unread = CHATS.filter(c=>c.unread).length;
-    h.innerHTML = `<div class="header-top"><div class="h1" style="margin:2px 0 0">Chats</div></div><p class="h1-sub">${unread?`${unread} unread — `:''}Message a mentor before you book, or coordinate a session.</p>`;
-  } else if(state.tab==='bookings'){
-    h.innerHTML = `<div class="header-top"><div class="h1" style="margin:2px 0 0">Bookings</div></div><p class="h1-sub">Tap a date to see what's on, or browse the lists below.</p>`;
-  } else {
-    h.innerHTML = `<div class="header-top"><div class="h1" style="margin:2px 0 0">Profile</div><button class="icon-btn" onclick="openSettings()" aria-label="Settings">${ic.gear}</button></div>`;
-  }
-}
-
-/* ============================================================
-   ROLES — separate Student / Mentor spaces
-   Each role has its own tabs, colour, data, chats and notifications.
-   ============================================================ */
-const sv = p => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';
-const TABICON = {
-  compass: sv('<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5 5-2z"/>'),
-  user: sv('<circle cx="12" cy="8.2" r="3.6"/><path d="M4.5 20c1.4-4 4.2-6 7.5-6s6.1 2 7.5 6"/>'),
-  inbox: sv('<path d="M3 13l2.5-7h13L21 13v6H3z"/><path d="M3 13h5l1.5 2.5h5L16 13h5"/>'),
-};
 const TABS = {
-  student:[['discover','Discover',TABICON.compass],['chats','Chats',ic.msg,'chatDot'],['bookings','Bookings',ic.calendar],['profile','Profile',TABICON.user]],
-  mentor:[['m-home','Requests',TABICON.inbox,'mReqDot'],['m-chats','Students',ic.msg,'mChatDot'],['m-sched','Schedule',ic.calendar],['m-profile','Profile',TABICON.user]],
+  student: [['discover','Discover',ic.compass], ['chats','Chats',ic.msg,'chatDot'], ['bookings','Bookings',ic.calendar], ['profile','Profile',ic.user]],
+  mentor:  [['m-home','My classes',ic.board,'mHomeDot'], ['m-chats','Groups',ic.msg,'mChatDot'], ['m-sched','Schedule',ic.calendar], ['profile','Profile',ic.user]],
 };
+
+function renderShell(){
+  screenEl.innerHTML = `
+    <div class="app-header" id="appHeader"></div>
+    <div class="app-body" id="appBody"><div class="loading">Loading…</div></div>
+    <nav class="tabbar" id="tabbar" aria-label="Main"></nav>
+    <div class="overlay" id="detailOverlay" aria-hidden="true"></div>
+    <div class="overlay" id="chatOverlay" aria-hidden="true"></div>
+    <div class="overlay" id="formOverlay" aria-hidden="true"></div>
+    <div class="overlay" id="settingsOverlay" aria-hidden="true"></div>
+    <div class="notif-panel" id="notifPanel"></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="dialog-backdrop" id="dialog" hidden>
+      <div class="dialog-card" role="alertdialog" aria-modal="true" aria-labelledby="dialogTitle" aria-describedby="dialogBody">
+        <h4 id="dialogTitle"></h4><p id="dialogBody"></p>
+        <div class="dialog-actions">
+          <button class="btn btn-ghost" id="dialogCancel" onclick="closeDialog(false)">Keep</button>
+          <button class="btn btn-brand" id="dialogOk" onclick="closeDialog(true)">Confirm</button>
+        </div>
+      </div>
+    </div>`;
+  $('dialog').addEventListener('click', e => { if (e.target.id === 'dialog') closeDialog(false); });
+  screenEl.addEventListener('click', e => {
+    const panel = $('notifPanel'), bell = $('bellBtn');
+    if (panel && panel.classList.contains('open') && !panel.contains(e.target) && (!bell || !bell.contains(e.target))) panel.classList.remove('open');
+  });
+  screenEl.dataset.role = state.role;
+  renderTabbar();
+}
+
 function renderTabbar(){
-  const nav = document.getElementById('tabbar');
-  nav.setAttribute('aria-label', state.role==='mentor' ? 'Mentor navigation' : 'Student navigation');
-  nav.innerHTML = TABS[state.role].map(t=>`<button class="tab-btn" data-tab="${t[0]}" onclick="setTab('${t[0]}')">${t[2]}${t[1]}${t[3]?`<span class="tab-dot" id="${t[3]}" hidden></span>`:''}</button>`).join('');
+  const nav = $('tabbar');
+  nav.setAttribute('aria-label', state.role === 'mentor' ? 'Mentor navigation' : 'Student navigation');
+  nav.innerHTML = TABS[state.role].map(t => `<button class="tab-btn" data-tab="${t[0]}" onclick="setTab('${t[0]}')">${t[2]}${t[1]}${t[3] ? `<span class="tab-dot" id="${t[3]}" hidden></span>` : ''}</button>`).join('');
 }
 function setRole(r){
-  if(r===state.role) return;
-  state.role = r; persist();
-  ['profileOverlay','chatOverlay','bookingOverlay','settingsOverlay'].forEach(closeOverlay);
-  state.openChatMentor = null; state.openChatStudent = null;
-  document.getElementById('screen').dataset.role = r;
+  if (r === state.role) return;
+  state.role = r; lsSet('cc_role', r);
+  ['detailOverlay','chatOverlay','formOverlay','settingsOverlay'].forEach(id => $(id).classList.contains('open') && closeOverlay(id));
+  screenEl.dataset.role = r;
   renderTabbar();
-  setTab(r==='mentor' ? 'm-home' : 'discover');
-  showToast(r==='mentor' ? 'Mentor view — you are teaching' : 'Student view — you are learning');
+  state.selectedDate = null;
+  setTab(r === 'mentor' ? 'm-home' : 'discover');
+  showToast(r === 'mentor' ? 'Mentor view: classes you host' : 'Student view: classes you join');
 }
 function roleBarHTML(){
-  const m = state.role==='mentor';
+  const m = state.role === 'mentor';
   return `<div class="role-bar" role="tablist" aria-label="Switch between Student and Mentor">
-    <button role="tab" class="${m?'':'on'}" aria-selected="${!m}" onclick="setRole('student')">Student<i id="rbS" hidden></i></button>
-    <button role="tab" class="${m?'on':''}" aria-selected="${m}" onclick="setRole('mentor')">Mentor<i id="rbM" hidden></i></button>
+    <button role="tab" class="${m ? '' : 'on'}" aria-selected="${!m}" onclick="setRole('student')">Student<i id="rbS" hidden></i></button>
+    <button role="tab" class="${m ? 'on' : ''}" aria-selected="${m}" onclick="setRole('mentor')">Mentor<i id="rbM" hidden></i></button>
   </div>`;
 }
-function updateRoleBadges(){
-  const sU = CHATS.filter(c=>c.unread).length, mU = MCHATS.filter(c=>c.unread).length + MREQS.length;
-  const set = (id,n,show)=>{ const e = document.getElementById(id); if(e){ e.textContent = n; e.hidden = !(n && show); } };
-  set('rbS', sU, state.role!=='student'); set('rbM', mU, state.role!=='mentor');
-  const d = document.getElementById('mChatDot'); if(d) d.hidden = !MCHATS.some(c=>c.unread);
-  const r = document.getElementById('mReqDot'); if(r) r.hidden = !MREQS.length;
-}
-function renderHeader(){
-  const h = document.getElementById('appHeader');
-  if(state.role==='mentor') renderMentorHeader(h); else renderStudentHeader();
-  h.insertAdjacentHTML('afterbegin', roleBarHTML());
-  updateBadges();
-}
-function renderMentorHeader(h){
-  const T = {'m-home':['Requests','Students who want to learn from you.'],'m-chats':['Students','Conversations with the people you teach.'],'m-sched':['Schedule','Sessions where you are the mentor.'],'m-profile':['Mentor profile','What students see about you.']}[state.tab] || ['Requests',''];
-  const act = state.tab==='m-home' ? `<button class="icon-btn" id="bellBtn" onclick="toggleNotifPanel(event)" aria-label="Notifications">${ic.bell}${state.hasNotif?'<span class="dot-flag"></span>':''}</button>`
-            : state.tab==='m-profile' ? `<button class="icon-btn" onclick="openSettings()" aria-label="Settings">${ic.gear}</button>` : '';
-  h.innerHTML = `<div class="header-top"><div class="h1" style="margin:2px 0 0">${T[0]}</div>${act}</div><p class="h1-sub">${T[1]}</p>`;
+function updateBadges(){
+  const sU = joinedClasses().filter(c => isUnread(c.id)).length;
+  const mU = hostedClasses().filter(c => isUnread(c.id)).length;
+  const set = (id, n, show) => { const e = $(id); if (e) { e.textContent = n; e.hidden = !(n && show); } };
+  set('rbS', sU, state.role !== 'student'); set('rbM', mU, state.role !== 'mentor');
+  const d1 = $('chatDot'); if (d1) d1.hidden = !sU;
+  const d2 = $('mChatDot'); if (d2) d2.hidden = !mU;
 }
 
-/* ---------- Mentor: requests, schedule, student chats ---------- */
-function sById(id){ return STUDENTS.find(s=>s.id===id) || {id, name:'Student', color:'#888'}; }
-function sRowHTML(s, line){ return `<div class="avatar sm" style="background:${s.color}">${initials(s.name)}</div><div class="chat-text"><strong>${escapeHTML(s.name)}</strong><p class="chat-preview">${line}</p></div>`; }
-function reqHTML(r){
-  const s = sById(r.sid);
-  return `<div class="m-card"><div class="m-card-top">${sRowHTML(s, friendlyDate(r.date)+' · '+bookingTimeLabel(r))}</div>
-    <p class="m-note">“${escapeHTML(r.note)}”</p>
-    <div class="m-actions"><button class="btn btn-ghost" onclick="answerReq('${r.id}',false)">Decline</button><button class="btn btn-primary" onclick="answerReq('${r.id}',true)">Accept</button></div></div>`;
+function setTab(tab){
+  state.tab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  $('appBody').scrollTop = 0;
+  $('notifPanel').classList.remove('open');
+  renderHeader(); renderBody();
 }
-function msessHTML(x){
-  const s = sById(x.sid), up = isUpcoming(x);
-  return `<div class="m-card"><div class="m-card-top">${sRowHTML(s, friendlyDate(x.date)+' · '+bookingTimeLabel(x))}</div>
-    ${up ? `<div class="m-actions"><button class="btn btn-ghost" onclick="askCancelMSess('${x.id}')">Cancel</button><button class="btn btn-primary" onclick="openMChat(${x.sid})">${ic.msg}Message</button></div>` : ''}</div>`;
+
+function openOverlay(id){ const el = $(id); el.style.zIndex = ++overlayZ; el.classList.add('open'); el.setAttribute('aria-hidden', 'false'); }
+function closeOverlay(id){
+  const el = $(id); el.classList.remove('open'); el.setAttribute('aria-hidden', 'true');
+  if (id === 'chatOverlay') { state.openChat = null; renderBody(); updateBadges(); }
+  if (id === 'detailOverlay') state.detailId = null;
 }
-function mUpcoming(){ return MSESS.filter(isUpcoming).sort(byWhen); }
-function renderMHome(b){
-  const up = mUpcoming();
-  b.innerHTML = `
-    <div class="stat-row" style="border:none;padding-top:6px">
-      <div class="stat"><strong>${MREQS.length}</strong><span>Pending</span></div>
-      <div class="stat"><strong>${up.length}</strong><span>Upcoming</span></div>
-      <div class="stat"><strong>${new Set(MSESS.map(x=>x.sid)).size}</strong><span>Students</span></div>
-    </div>
-    <div class="section-label"><b>New requests</b></div>
-    ${MREQS.length ? MREQS.map(reqHTML).join('') : `<div class="empty-note">No pending requests right now.</div>`}
-    <div class="section-label" style="margin-top:20px"><b>Next up</b></div>
-    ${up.length ? up.slice(0,2).map(msessHTML).join('') : `<div class="empty-note">No sessions scheduled yet.</div>`}`;
-}
-function renderMSched(b){
-  const up = mUpcoming(), past = MSESS.filter(x=>!isUpcoming(x)).sort((a,c)=>byWhen(c,a));
-  b.innerHTML = `<div class="section-label"><b>Upcoming</b></div>
-    ${up.length ? up.map(msessHTML).join('') : `<div class="empty-note">Nothing scheduled — accept a request to fill your calendar.</div>`}
-    ${past.length ? `<div class="section-label" style="margin-top:22px"><b>Past</b></div>${past.map(msessHTML).join('')}` : ''}`;
-}
-function answerReq(id, ok){
-  const r = MREQS.find(x=>x.id===id); if(!r) return;
-  const s = sById(r.sid), start = toMin(r.start), end = start + r.dur;
-  if(ok){
-    const clash = MSESS.some(x=>x.date===r.date && start < toMin(x.start)+x.dur && toMin(x.start) < end);
-    if(clash){ showToast('That time clashes with another session'); return; }
-    MSESS.push({id:'s'+Date.now(), sid:r.sid, date:r.date, start:r.start, dur:r.dur, place:r.place});
+
+function renderHeader(){
+  const h = $('appHeader');
+  const bell = `<button class="icon-btn" id="bellBtn" onclick="toggleNotifPanel(event)" aria-label="Notifications">${ic.bell}${state.hasNotif ? '<span class="dot-flag"></span>' : ''}</button>`;
+  const gear = `<button class="icon-btn" onclick="openSettings()" aria-label="Settings">${ic.gear}</button>`;
+  const simple = (title, sub, act = '') => `<div class="header-top"><div class="h1" style="margin:2px 0 0">${title}</div>${act}</div>${sub ? `<p class="h1-sub">${sub}</p>` : ''}`;
+  let html = '';
+  switch (state.tab) {
+    case 'discover':
+      html = `
+        <div class="header-top"><div class="place-pill">${ic.user}<span>Hi, ${esc(first(state.me?.full_name))}</span></div>${bell}</div>
+        <div class="h1">Find a class to join</div>
+        <div class="search-bar">${ic.search}<input id="searchInput" type="text" aria-label="Search classes" placeholder="Course code, competition, topic, host" value="${esc(state.query)}" oninput="setQuery(this.value)" autocomplete="off"><button id="clearSearch" onclick="clearSearch()" aria-label="Clear search" ${state.query ? '' : 'hidden'}>${ic.x}</button></div>
+        <div class="chip-row" id="chipRow"></div>`;
+      break;
+    case 'chats': {
+      const n = joinedClasses().filter(c => isUnread(c.id)).length;
+      html = simple('Chats', `${n ? `${n} with new messages. ` : ''}Each class you join has its own group chat.`); break;
+    }
+    case 'bookings': html = simple('Bookings', 'Classes you’ve joined. Tap a date to see what’s on.'); break;
+    case 'm-home': html = simple('My classes', 'Create a class. Students who join land in its group chat.', bell); break;
+    case 'm-chats': {
+      const n = hostedClasses().filter(c => isUnread(c.id)).length;
+      html = simple('Groups', `${n ? `${n} with new messages. ` : ''}One group chat per class you host.`); break;
+    }
+    case 'm-sched': html = simple('Schedule', 'Classes where you are the mentor.'); break;
+    default: html = simple('Profile', '', gear);
   }
-  MREQS = MREQS.filter(x=>x.id!==id);
-  (MTHREADS[r.sid] = MTHREADS[r.sid] || []).push({who:'me', text: ok ? `Accepted — see you ${friendlyDate(r.date)} at ${r.start}.` : "Sorry, I can't make that time. Could you suggest another?"});
-  persist(); showToast(ok ? `Accepted ${s.name.split(' ')[0]}'s request` : 'Request declined');
-  renderBody();
+  h.innerHTML = roleBarHTML() + html;
+  if (state.tab === 'discover') renderChips();
+  updateBadges();
 }
-function askCancelMSess(id){
-  const x = MSESS.find(v=>v.id===id); if(!x) return;
-  openDialog({title:'Cancel this session?', body:`${sById(x.sid).name} will be told you cancelled.`, confirmLabel:'Cancel session', danger:true}, ()=>{
-    MSESS = MSESS.filter(v=>v.id!==id); persist(); showToast('Session cancelled'); renderBody();
-  });
-}
-function renderMChats(b){
-  b.innerHTML = MCHATS.length ? MCHATS.map(c=>{
-    const s = sById(c.sid), t = MTHREADS[c.sid] || [], last = t[t.length-1];
-    return `<button class="chat-row" onclick="openMChat(${c.sid})"><div class="avatar sm" style="background:${s.color}">${initials(s.name)}</div>
-      <div class="chat-text"><div class="chat-top"><strong>${escapeHTML(s.name)}</strong><time>${relTime(c.ts)}</time></div>
-      <p class="chat-preview">${last && last.who==='me' ? 'You: ' : ''}${escapeHTML(last ? last.text : 'Say hi 👋')}</p></div>${c.unread ? '<span class="unread" aria-label="Unread"></span>' : ''}</button>`;
-  }).join('') : `<div class="empty-note">No student conversations yet.<br>They'll show up here when someone requests a session.</div>`;
-}
-function drawMThread(){
-  const el = document.getElementById('threadBody'); if(!el) return;
-  el.innerHTML = (MTHREADS[state.openChatStudent] || []).map(msgHTML).join('');
-  const sc = document.getElementById('threadScroll'); sc.scrollTop = sc.scrollHeight;
-}
-function openMChat(sid){
-  const c = MCHATS.find(x=>x.sid===sid); if(c) c.unread = false;
-  persist(); state.openChatStudent = sid;
-  const s = sById(sid);
-  document.getElementById('chatOverlay').innerHTML = `
-    <div class="overlay-header"><button class="back-btn" onclick="closeMChat()" aria-label="Back">${ic.chevronLeft}</button>
-      <div class="avatar sm" style="background:${s.color}">${initials(s.name)}</div>
-      <div><div class="overlay-title">${escapeHTML(s.name)}</div><div class="role-tag">Your student</div></div></div>
-    <div class="overlay-body" id="threadScroll"><div class="thread" id="threadBody"></div></div>
-    <div class="composer"><input type="text" id="chatInput" placeholder="Message ${escapeHTML(s.name.split(' ')[0])}..." aria-label="Message" autocomplete="off" onkeydown="if(event.key==='Enter')sendMMsg(${sid})"><button class="send-btn" onclick="sendMMsg(${sid})" aria-label="Send">${ic.send}</button></div>`;
-  document.getElementById('chatOverlay').classList.add('open');
-  drawMThread(); updateBadges();
-}
-function closeMChat(){
-  state.openChatStudent = null; closeOverlay('chatOverlay');
-  if(state.tab==='m-chats') renderBody(); else updateBadges();
-}
-function sendMMsg(sid){
-  const input = document.getElementById('chatInput'), text = input.value.trim();
-  if(!text) return;
-  (MTHREADS[sid] = MTHREADS[sid] || []).push({who:'me', text});
-  input.value = ''; touchMChat(sid); drawMThread(); persist(); input.focus();
-  setTimeout(()=>{
-    (MTHREADS[sid] = MTHREADS[sid] || []).push({who:'them', text:STUDENT_REPLIES[Math.floor(Math.random()*STUDENT_REPLIES.length)]});
-    const c = touchMChat(sid);
-    if(state.openChatStudent===sid) drawMThread();
-    else { c.unread = true; if(state.notifMessages) pushNotif('New message', `${sById(sid).name} replied.`, 'mentor'); }
-    persist();
-    if(state.tab==='m-chats') renderMChats(document.getElementById('appBody'));
-    updateBadges();
-  }, 1200 + Math.random()*800);
-}
-function touchMChat(sid){
-  let i = MCHATS.findIndex(x=>x.sid===sid), c = i>=0 ? MCHATS.splice(i,1)[0] : {sid, unread:false};
-  c.ts = Date.now(); MCHATS.unshift(c); return c;
+
+function renderBody(){
+  const b = $('appBody'); if (!b) return;
+  if (!state.loaded) { b.innerHTML = '<div class="loading">Loading…</div>'; return; }
+  ({ discover: renderDiscover, chats: renderStudentChats, bookings: renderBookings,
+     'm-home': renderMentorHome, 'm-chats': renderMentorChats, 'm-sched': renderMentorSched,
+     profile: renderProfile })[state.tab](b);
 }
 
 /* ============================================================
-   INIT
+   STUDENT — DISCOVER
    ============================================================ */
-loadPersisted();
-checkReminders();
-document.getElementById('screen').dataset.role = state.role;
-renderTabbar();
-setTab(state.role==='mentor' ? 'm-home' : 'discover');
+const FILTERS = [['all','All'], ['course','Courses'], ['competition','Competitions'], ['free','Free']];
+const SORTS = [['soonest','Soonest'], ['cheapest','Lowest price'], ['seats','Most seats left']];
+function renderChips(){
+  const row = $('chipRow'); if (!row) return;
+  row.innerHTML = FILTERS.map(([id, l]) => `<button class="chip ${state.filter === id ? 'active' : ''}" onclick="setFilter('${id}')">${l}</button>`).join('');
+}
+function setFilter(f){ state.filter = f; renderChips(); renderBody(); }
+function setSort(s){ state.sort = s; renderBody(); }
+function setQuery(v){ state.query = v; const c = $('clearSearch'); if (c) c.hidden = !v; renderBody(); }
+function clearSearch(){ state.query = ''; const i = $('searchInput'); if (i) { i.value = ''; i.focus(); } setQuery(''); }
 
-// Close the notification dropdown on any tap outside it
-document.getElementById('screen').addEventListener('click', function(e){
-  const panel = document.getElementById('notifPanel');
-  const bell = document.getElementById('bellBtn');
-  if(panel.classList.contains('open') && !panel.contains(e.target) && (!bell || !bell.contains(e.target))){
-    panel.classList.remove('open');
+function renderDiscover(b){
+  const q = state.query.trim().toLowerCase();
+  let list = state.classes.filter(c => !hasStarted(c) && !isHost(c));
+  if (state.filter === 'course' || state.filter === 'competition') list = list.filter(c => c.category === state.filter);
+  if (state.filter === 'free') list = list.filter(c => c.price === 0);
+  if (q) list = list.filter(c => [c.title, c.subject, c.location, c.description, c.host?.full_name, c.host?.campus].some(v => (v || '').toLowerCase().includes(q)));
+  const left = c => c.capacity - c.members.length;
+  if (state.sort === 'cheapest') list.sort((a, z) => a.price - z.price || a.starts_at.localeCompare(z.starts_at));
+  else if (state.sort === 'seats') list.sort((a, z) => left(z) - left(a) || a.starts_at.localeCompare(z.starts_at));
+  if (!list.length) {
+    b.innerHTML = `<div class="empty-note">${q || state.filter !== 'all' ? 'No upcoming classes match this search.' : 'No upcoming classes from other mentors yet.'}<br>Want to teach something? Switch to <b>Mentor</b> and create a class.</div>`;
+    return;
   }
-});
-// Backdrop tap closes the confirm dialog
-document.getElementById('dialog').addEventListener('click', function(e){ if(e.target===this) closeDialog(false); });
+  b.innerHTML = `
+    <div class="section-row">
+      <div class="section-label"><b>${list.length}</b> upcoming class${list.length === 1 ? '' : 'es'}</div>
+      <select class="sort-select" aria-label="Sort classes" onchange="setSort(this.value)">${SORTS.map(([v, l]) => `<option value="${v}" ${state.sort === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
+    </div>
+    ${list.map(classCardHTML).join('')}`;
+}
 
-// Escape closes whatever is on top: dialog → settings → booking → chat → mentor profile → notifications
-document.addEventListener('keydown', function(e){
-  if(e.key!=='Escape') return;
-  if(!document.getElementById('dialog').hidden){ closeDialog(false); return; }
-  const open = id => document.getElementById(id).classList.contains('open');
-  if(open('settingsOverlay')){ closeSettings(); return; }
-  if(open('bookingOverlay')){ closeOverlay('bookingOverlay'); return; }
-  if(open('chatOverlay')){ closeChatOverlay(); return; }
-  if(open('profileOverlay')){ closeOverlay('profileOverlay'); return; }
-  document.getElementById('notifPanel').classList.remove('open');
+function classCardHTML(c){
+  const taken = c.members.length, full = taken >= c.capacity, pct = Math.min(100, Math.round(taken / c.capacity * 100));
+  const tag = isHost(c) ? ' <span class="mine-tag">· You host</span>' : isMember(c) ? ' <span class="mine-tag">· Joined</span>' : '';
+  return `
+    <button class="class-card" onclick="openClass('${c.id}')">
+      <div class="date-block ${c.category === 'competition' ? 'competition' : ''}">
+        <strong>${fmtDate(c.starts_at, { day:'numeric' })}</strong><span>${fmtDate(c.starts_at, { month:'short' })}</span><em>${fmtTime(c.starts_at)}</em>
+      </div>
+      <div class="class-main">
+        <p class="class-title">${esc(c.title)}</p>
+        <span class="kind-badge ${c.category}">${esc(badgeText(c))}</span>
+        <div class="class-meta">
+          <span>${ic.user}<b>${esc(c.host?.full_name || 'Mentor')}</b></span>
+          <span>${ic.pin}<b>${esc(c.location)}</b></span>
+        </div>
+        <div class="class-foot">
+          <div class="seats">
+            <div class="seats-bar ${full ? 'full' : ''}"><i style="width:${pct}%"></i></div>
+            <small>${full ? 'Full' : `${taken} of ${c.capacity} seats taken`}${tag}</small>
+          </div>
+          <span class="price">${rupiah(c.price)}</span>
+        </div>
+      </div>
+    </button>`;
+}
+
+/* ============================================================
+   CLASS DETAIL · JOIN · LEAVE · DELETE
+   ============================================================ */
+function openClass(id){ state.detailId = id; renderDetail(); openOverlay('detailOverlay'); }
+
+function renderDetail(){
+  const c = classById(state.detailId), el = $('detailOverlay');
+  const head = (t) => `<div class="overlay-header"><button class="back-btn" onclick="closeOverlay('detailOverlay')" aria-label="Back">${ic.back}</button><div class="overlay-title">${t}</div></div>`;
+  if (!c) { el.innerHTML = head('Class') + `<div class="empty-note">This class was deleted by its mentor.</div>`; return; }
+  const taken = c.members.length, full = taken >= c.capacity, host = isHost(c), member = isMember(c), started = hasStarted(c);
+  let cta;
+  if (host) cta = `<button class="btn btn-outline-danger" style="flex:0 0 36%" onclick="askDeleteClass('${c.id}')">Delete</button><button class="btn btn-brand" onclick="openChat('${c.id}')">${ic.msg}Group chat</button>`;
+  else if (member) cta = `${started ? '' : `<button class="btn btn-ghost" style="flex:0 0 36%" onclick="askLeaveClass('${c.id}')">Leave</button>`}<button class="btn btn-brand" onclick="openChat('${c.id}')">${ic.msg}Group chat</button>`;
+  else if (started) cta = `<button class="btn btn-ghost" disabled>This class has started</button>`;
+  else if (full) cta = `<button class="btn btn-ghost" disabled>Class is full</button>`;
+  else cta = `<button class="btn btn-primary" id="joinBtn" onclick="joinClass('${c.id}')">${c.price ? `Join for ${rupiah(c.price)}` : 'Join for free'}</button>`;
+
+  el.innerHTML = head(host ? 'Your class' : 'Class details') + `
+    <div class="overlay-body">
+      <div class="detail-hero"><span class="kind-badge ${c.category}">${esc(badgeText(c))}</span><h2>${esc(c.title)}</h2></div>
+      <div class="facts">
+        <div class="fact"><span>Date</span><strong>${fmtDate(c.starts_at, { weekday:'short', day:'numeric', month:'short', year:'numeric' })}</strong></div>
+        <div class="fact"><span>Time</span><strong>${fmtTime(c.starts_at)}–${fmtTime(endTime(c))} (${durLabel(c.duration_min)})</strong></div>
+        <div class="fact"><span>Place</span><strong>${esc(c.location)}</strong></div>
+        <div class="fact"><span>Price per person</span><strong>${rupiah(c.price)}</strong></div>
+        <div class="fact"><span>Seats taken</span><strong>${taken} of ${c.capacity}</strong></div>
+        <div class="fact"><span>Seats left</span><strong>${Math.max(0, c.capacity - taken)}</strong></div>
+      </div>
+      ${c.description ? `<div class="block"><h4>About this class</h4><p class="pre">${esc(c.description)}</p></div>` : ''}
+      ${c.price && !host ? `<div class="block"><h4>Payment</h4><p>Pay the mentor directly (cash or transfer). Sort out the details in the group chat after you join.</p></div>` : ''}
+      <div class="block">
+        <h4>Mentor</h4>
+        <div class="person-row">${avatar(c.host_id, c.host?.full_name)}<div><strong>${esc(c.host?.full_name || 'Mentor')}${host ? ' (you)' : ''}</strong><span>${esc([c.host?.campus, c.host?.major].filter(Boolean).join(', '))}</span></div></div>
+        ${c.host?.bio ? `<p class="pre" style="margin-top:8px;font-size:12.5px;color:var(--ink-soft)">${esc(c.host.bio)}</p>` : ''}
+      </div>
+      <div class="block" style="border-bottom:none">
+        <h4>Students joined (${taken})</h4>
+        ${taken ? c.members.map(m => `<div class="person-row">${avatar(m.user_id, m.profile?.full_name, 'xs')}<div><strong>${esc(m.profile?.full_name || 'Student')}${m.user_id === uid() ? ' (you)' : ''}</strong></div></div>`).join('')
+          : `<p style="color:var(--ink-faint)">No one has joined yet.</p>`}
+      </div>
+    </div>
+    <div class="cta-row">${cta}</div>`;
+}
+
+async function joinClass(id){
+  const btn = $('joinBtn'); if (btn) btn.disabled = true;
+  const { error } = await sb.rpc('join_class', { cid: id });
+  if (error) { showToast(friendlyError(error), true); await reloadAll().catch(() => {}); renderDetail(); renderBody(); return; }
+  await reloadAll(); renderDetail(); renderBody(); updateBadges();
+  showToast('You joined. Say hi to the group!');
+  openChat(id);
+}
+function askLeaveClass(id){
+  const c = classById(id);
+  openDialog({ title:'Leave this class?', body:`Your seat in “${c?.title}” goes back to the pool and you’ll leave its group chat.`, confirmLabel:'Leave class', danger:true }, async () => {
+    const { error } = await sb.rpc('leave_class', { cid: id });
+    if (error) return showToast(friendlyError(error), true);
+    await reloadAll(); renderDetail(); renderBody(); updateBadges();
+    showToast('You left the class');
+  });
+}
+function askDeleteClass(id){
+  const c = classById(id);
+  openDialog({ title:'Delete this class?', body:`Everyone who joined “${c?.title}” loses their seat and the group chat is deleted.`, confirmLabel:'Delete class', danger:true }, async () => {
+    const { error } = await sb.from('classes').delete().eq('id', id);
+    if (error) return showToast(friendlyError(error), true);
+    closeOverlay('detailOverlay');
+    await reloadAll(); renderBody(); updateBadges();
+    showToast('Class deleted');
+  });
+}
+
+/* ============================================================
+   STUDENT — BOOKINGS · MENTOR — SCHEDULE (shared calendar)
+   ============================================================ */
+function calendarHTML(list){
+  const byDay = {};
+  list.forEach(c => (byDay[ymd(c.starts_at)] = byDay[ymd(c.starts_at)] || []).push(c));
+  const y = state.calY, m = state.calM, today = ymd(new Date());
+  const firstDow = new Date(y, m, 1).getDay(), n = new Date(y, m + 1, 0).getDate();
+  let cells = '';
+  for (let i = 0; i < firstDow; i++) cells += `<span class="cal-day pad"></span>`;
+  for (let d = 1; d <= n; d++) {
+    const ds = `${y}-${String(m + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const cls = ['cal-day', ds === today && 'today', ds === state.selectedDate && 'selected', byDay[ds] && ds < today && 'past-dot'].filter(Boolean).join(' ');
+    cells += `<button class="${cls}" onclick="selectDay('${ds}')" aria-label="${ds}${byDay[ds] ? ', has classes' : ''}">${d}${byDay[ds] ? '<span class="cal-dot"></span>' : ''}</button>`;
+  }
+  const label = new Date(y, m, 1).toLocaleDateString('en-GB', { month:'long', year:'numeric' });
+  const agenda = state.selectedDate ? `<div class="cal-agenda"><h5>${fmtDate(state.selectedDate + 'T00:00:00', { weekday:'long', day:'numeric', month:'long' })}</h5>
+      ${(byDay[state.selectedDate] || []).map(classCardHTML).join('') || `<div class="empty-note" style="padding:10px 0">Nothing on this day.</div>`}</div>` : '';
+  return `<div class="cal-card">
+    <div class="cal-head"><strong>${label}</strong><div class="cal-nav">
+      <button class="cal-nav-btn" onclick="calNav(-1)" aria-label="Previous month">${ic.back}</button>
+      <button class="cal-nav-btn" onclick="calNav(1)" aria-label="Next month">${ic.next}</button></div></div>
+    <div class="cal-dow">${['S','M','T','W','T','F','S'].map(x => `<span>${x}</span>`).join('')}</div>
+    <div class="cal-grid">${cells}</div>${agenda}</div>`;
+}
+function selectDay(ds){ state.selectedDate = state.selectedDate === ds ? null : ds; renderBody(); }
+function calNav(d){ state.calM += d; if (state.calM < 0) { state.calM = 11; state.calY--; } if (state.calM > 11) { state.calM = 0; state.calY++; } state.selectedDate = null; renderBody(); }
+
+function listsHTML(list, emptyUpcoming){
+  const up = list.filter(c => !hasEnded(c)), past = list.filter(hasEnded).reverse();
+  return `<div class="section-label"><b>Upcoming</b></div>
+    ${up.length ? up.map(classCardHTML).join('') : `<div class="empty-note">${emptyUpcoming}</div>`}
+    ${past.length ? `<div class="section-label" style="margin-top:22px"><b>Past</b></div>${past.map(classCardHTML).join('')}` : ''}`;
+}
+function renderBookings(b){
+  const list = joinedClasses();
+  b.innerHTML = calendarHTML(list) + (state.selectedDate ? '' : listsHTML(list, `Nothing booked yet.<br><button class="link-btn" onclick="setTab('discover')">Find a class on Discover</button>`));
+}
+function renderMentorSched(b){
+  const list = hostedClasses();
+  b.innerHTML = calendarHTML(list) + (state.selectedDate ? '' : listsHTML(list, `No classes yet.<br><button class="link-btn" onclick="openCreateForm()">Create your first class</button>`));
+}
+
+/* ============================================================
+   MENTOR — MY CLASSES + CREATE A CLASS
+   ============================================================ */
+function renderMentorHome(b){
+  const mine = hostedClasses(), up = mine.filter(c => !hasEnded(c));
+  const students = new Set(mine.flatMap(c => c.members.map(m => m.user_id))).size;
+  const seats = up.reduce((s, c) => s + c.capacity, 0), filled = up.reduce((s, c) => s + c.members.length, 0);
+  b.innerHTML = `
+    <div class="stat-row" style="border:none;padding-top:6px">
+      <div class="stat"><strong>${up.length}</strong><span>Upcoming</span></div>
+      <div class="stat"><strong>${students}</strong><span>Students</span></div>
+      <div class="stat"><strong>${seats ? Math.round(filled / seats * 100) : 0}%</strong><span>Seats filled</span></div>
+    </div>
+    <button class="create-cta" onclick="openCreateForm()"><span class="plus">${ic.plus}</span><div><strong>Create a class</strong><span>Set seats, price, date and place.</span></div></button>
+    <div class="section-label" style="margin-top:18px"><b>Upcoming</b></div>
+    ${up.length ? up.map(classCardHTML).join('') : `<div class="empty-note">You haven’t got any upcoming classes.<br>Create one and it shows up on Discover for every student.</div>`}`;
+}
+
+let formKind = 'course';
+const KIND_COPY = {
+  course: { label:'Course', ph:'e.g. ACCT6174 Intermediate Accounting', title:'e.g. Midterm prep: consolidation & leases' },
+  competition: { label:'Competition', ph:'e.g. CFA Research Challenge 2026', title:'e.g. Valuation model clinic for ER teams' },
+};
+function openCreateForm(){
+  formKind = 'course';
+  const min = new Date(Date.now() + 15 * 60000), def = new Date(); def.setDate(def.getDate() + 2); def.setHours(19, 0, 0, 0);
+  $('formOverlay').innerHTML = `
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay('formOverlay')" aria-label="Back">${ic.back}</button><div class="overlay-title">Create a class</div></div>
+    <form class="overlay-body" id="classForm" novalidate><div class="pad">
+      <div class="field"><label>What is it for?</label>
+        <div class="seg" id="kindSeg"><button type="button" data-kind="course" class="active">Course</button><button type="button" data-kind="competition">Competition</button></div></div>
+      <div class="field"><label for="fSubject" id="fSubjectLabel">Course</label><input class="input" id="fSubject" maxlength="80" placeholder="${KIND_COPY.course.ph}"></div>
+      <div class="field"><label for="fTitle">Class title</label><input class="input" id="fTitle" maxlength="90" placeholder="${KIND_COPY.course.title}"></div>
+      <div class="field"><label for="fDesc">What you’ll cover</label><textarea class="input" id="fDesc" maxlength="1500" placeholder="Topics, what to bring, who it’s for."></textarea></div>
+      <div class="row-2">
+        <div class="field"><label for="fStart">Date &amp; time</label><input class="input" id="fStart" type="datetime-local" min="${localInput(min)}" value="${localInput(def)}"></div>
+        <div class="field"><label for="fDur">Duration</label><select class="input" id="fDur">${[30,45,60,90,120,180,240].map(m => `<option value="${m}" ${m === 90 ? 'selected' : ''}>${durLabel(m)}</option>`).join('')}</select></div>
+      </div>
+      <div class="row-2">
+        <div class="field"><label for="fCap">Seats</label><input class="input" id="fCap" type="number" inputmode="numeric" min="1" max="200" value="8"></div>
+        <div class="field"><label for="fPrice">Price per person (Rp)</label><input class="input" id="fPrice" type="number" inputmode="numeric" min="0" step="1000" value="50000"><span class="sub" id="fPriceHint">Rp50.000. Use 0 for free.</span></div>
+      </div>
+      <div class="field"><label for="fLoc">Place</label><input class="input" id="fLoc" maxlength="120" placeholder="e.g. BINUS Anggrek, Library L3, or a Zoom link"></div>
+      <div class="form-error" id="formError" role="alert"></div>
+      <button class="btn btn-brand" type="submit" id="formSubmit">Publish class</button>
+    </div></form>`;
+  $('kindSeg').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    formKind = b.dataset.kind;
+    $('kindSeg').querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b));
+    $('fSubjectLabel').textContent = KIND_COPY[formKind].label;
+    $('fSubject').placeholder = KIND_COPY[formKind].ph;
+    $('fTitle').placeholder = KIND_COPY[formKind].title;
+  }));
+  $('fPrice').addEventListener('input', e => { const v = parseInt(e.target.value, 10); $('fPriceHint').textContent = v > 0 ? `${rupiah(v)} per person.` : 'Free class.'; });
+  $('classForm').addEventListener('submit', submitClass);
+  openOverlay('formOverlay');
+}
+async function submitClass(e){
+  e.preventDefault();
+  const err = $('formError'); err.textContent = '';
+  const title = $('fTitle').value.trim(), startVal = $('fStart').value, location = $('fLoc').value.trim();
+  const capacity = parseInt($('fCap').value, 10), price = parseInt($('fPrice').value || '0', 10);
+  const starts = startVal ? new Date(startVal) : null;
+  if (title.length < 3) return void (err.textContent = 'Give the class a title (at least 3 characters).');
+  if (!starts || isNaN(starts)) return void (err.textContent = 'Pick a date and time.');
+  if (starts <= new Date()) return void (err.textContent = 'Pick a time in the future.');
+  if (!(capacity >= 1 && capacity <= 200)) return void (err.textContent = 'Seats must be between 1 and 200.');
+  if (!(price >= 0)) return void (err.textContent = 'Price can’t be negative.');
+  if (location.length < 2) return void (err.textContent = 'Say where the class happens.');
+  const btn = $('formSubmit'); btn.disabled = true;
+  const { data, error } = await sb.from('classes').insert({
+    title, category: formKind, subject: $('fSubject').value.trim() || null, description: $('fDesc').value.trim() || null,
+    starts_at: starts.toISOString(), duration_min: parseInt($('fDur').value, 10), capacity, price, location,
+  }).select('id').single();
+  btn.disabled = false;
+  if (error) return void (err.textContent = friendlyError(error));
+  closeOverlay('formOverlay');
+  await reloadAll();
+  if (state.role !== 'mentor') setRole('mentor'); else renderBody();
+  openClass(data.id);
+  showToast('Class published');
+}
+
+/* ============================================================
+   GROUP CHATS (student: joined classes · mentor: hosted classes)
+   ============================================================ */
+function groupListHTML(list, empty){
+  if (!list.length) return `<div class="empty-note">${empty}</div>`;
+  const when = c => state.lastMsg[c.id]?.created_at || c.created_at;
+  return [...list].sort((a, z) => when(z).localeCompare(when(a))).map(c => {
+    const last = state.lastMsg[c.id];
+    let preview = 'No messages yet';
+    if (last) preview = last.kind === 'system' ? last.body : `${last.user_id === uid() ? 'You' : first(names.get(last.user_id) || 'Someone')}: ${last.body}`;
+    return `<button class="chat-row" onclick="openChat('${c.id}')">
+      <div class="group-icon" style="background:${colorFor(c.id)}">${esc(initials(c.subject || c.title))}</div>
+      <div class="chat-text"><div class="chat-top"><strong>${esc(c.title)}</strong><time>${last ? relTime(last.created_at) : ''}</time></div>
+      <p class="chat-preview">${esc(preview)}</p></div>
+      ${isUnread(c.id) ? '<span class="unread" aria-label="New messages"></span>' : ''}</button>`;
+  }).join('');
+}
+function renderStudentChats(b){ b.innerHTML = groupListHTML(joinedClasses(), `Join a class and its group chat shows up here.<br><button class="link-btn" onclick="setTab('discover')">Browse classes</button>`); }
+function renderMentorChats(b){ b.innerHTML = groupListHTML(hostedClasses(), `Create a class and its group chat shows up here.<br><button class="link-btn" onclick="openCreateForm()">Create a class</button>`); }
+
+async function openChat(id){
+  const c = classById(id); if (!c) return;
+  state.openChat = id; state.chatMsgs = [];
+  const el = $('chatOverlay');
+  el.innerHTML = `
+    <div class="overlay-header">
+      <button class="back-btn" onclick="closeOverlay('chatOverlay')" aria-label="Back">${ic.back}</button>
+      <div class="group-icon sm" style="background:${colorFor(c.id)}">${esc(initials(c.subject || c.title))}</div>
+      <button class="head-btn" onclick="openClass('${c.id}')" aria-label="Class details">
+        <div class="overlay-title">${esc(c.title)}</div>
+        <div class="overlay-sub">${c.members.length + 1} people, ${fmtDate(c.starts_at, { day:'numeric', month:'short' })} at ${fmtTime(c.starts_at)}</div>
+      </button>
+    </div>
+    <div class="overlay-body" id="threadScroll"><div class="thread" id="threadBody"><div class="loading">Loading messages…</div></div></div>
+    <form class="composer" id="composer">
+      <textarea id="chatInput" rows="1" maxlength="2000" placeholder="Message the group" aria-label="Message"></textarea>
+      <button class="send-btn" type="submit" aria-label="Send">${ic.send}</button>
+    </form>`;
+  openOverlay('chatOverlay');
+  const input = $('chatInput');
+  input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendMessage(); } });
+  input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 110) + 'px'; });
+  $('composer').addEventListener('submit', e => { e.preventDefault(); sendMessage(); });
+
+  const { data, error } = await sb.from('messages').select('id, class_id, user_id, kind, body, created_at')
+    .eq('class_id', id).order('created_at', { ascending: false }).limit(300);
+  if (state.openChat !== id) return;
+  if (error) { $('threadBody').innerHTML = `<div class="empty-note">${esc(friendlyError(error))}</div>`; return; }
+  const fresh = data.reverse(), ids = new Set(fresh.map(m => m.id));
+  state.chatMsgs = fresh.concat(state.chatMsgs.filter(m => !ids.has(m.id)));
+  await ensureNames(state.chatMsgs.map(m => m.user_id));
+  drawThread(); markSeen(id); updateBadges(); renderBody();
+}
+
+function drawThread(){
+  const t = $('threadBody'); if (!t) return;
+  const msgs = state.chatMsgs, c = classById(state.openChat);
+  if (!msgs.length) { t.innerHTML = `<div class="empty-note">No messages yet. Start the conversation.</div>`; return; }
+  let html = '', lastDay = '';
+  msgs.forEach((m, i) => {
+    const day = ymd(m.created_at);
+    if (day !== lastDay) { lastDay = day; html += `<div class="day-sep">${day === ymd(new Date()) ? 'Today' : fmtDate(m.created_at, { weekday:'short', day:'numeric', month:'short' })}</div>`; }
+    if (m.kind === 'system') { html += `<div class="sys-msg">${esc(m.body)}</div>`; return; }
+    const prev = msgs[i - 1], next = msgs[i + 1], mine = m.user_id === uid();
+    const same = (a, b) => a && b && a.user_id === b.user_id && a.kind !== 'system' && b.kind !== 'system' && ymd(a.created_at) === ymd(b.created_at);
+    const startRun = !same(prev, m);
+    const endRun = !same(m, next) || (new Date(next.created_at) - new Date(m.created_at)) > 5 * 60000;
+    html += `<div class="bubble-wrap ${mine ? 'me' : 'them'}${startRun ? '' : ' cont'}">
+      ${!mine && startRun ? `<div class="bubble-author">${esc(names.get(m.user_id) || 'Member')}${c && m.user_id === c.host_id ? ' (mentor)' : ''}</div>` : ''}
+      <div class="bubble">${esc(m.body)}</div>
+      ${endRun ? `<div class="bubble-time">${fmtTime(m.created_at)}</div>` : ''}</div>`;
+  });
+  t.innerHTML = html;
+  const sc = $('threadScroll'); if (sc) sc.scrollTop = sc.scrollHeight;
+}
+
+async function sendMessage(){
+  const input = $('chatInput'), id = state.openChat, body = input.value.trim();
+  if (!body || !id) return;
+  input.value = ''; input.style.height = 'auto';
+  const { data, error } = await sb.from('messages').insert({ class_id: id, body }).select('id, class_id, user_id, kind, body, created_at').single();
+  if (error) { input.value = body; return showToast(friendlyError(error), true); }
+  addMessage(data); input.focus();
+}
+function addMessage(m){
+  const prev = state.lastMsg[m.class_id];
+  if (!prev || prev.created_at <= m.created_at) state.lastMsg[m.class_id] = m;
+  if (state.openChat === m.class_id && !state.chatMsgs.some(x => x.id === m.id)) { state.chatMsgs.push(m); drawThread(); markSeen(m.class_id); }
+}
+
+/* ============================================================
+   PROFILE + SETTINGS
+   ============================================================ */
+function renderProfile(b){
+  const me = state.me || {}, mentor = state.role === 'mentor';
+  b.innerHTML = `
+    <div class="profile-top">
+      ${avatar(me.id, me.full_name, 'lg')}
+      <h3>${esc(me.full_name)}</h3>
+      <p>${esc([me.campus, me.major].filter(Boolean).join(', ') || state.session.user.email)}</p>
+      <span class="role-pill">${mentor ? 'Mentor view' : 'Student view'}</span>
+    </div>
+    <div class="stat-row" style="border:none">
+      <div class="stat"><strong>${joinedClasses().length}</strong><span>Joined</span></div>
+      <div class="stat"><strong>${hostedClasses().length}</strong><span>Hosting</span></div>
+    </div>
+    <div class="field-label">${mentor ? 'About you (shown on your classes)' : 'About you'}</div>
+    <div class="field-box" style="white-space:pre-wrap">${me.bio ? esc(me.bio) : 'Add a short bio: what you’re good at, courses you aced, competitions you’ve won.'}</div>
+    <button class="btn btn-ghost" style="margin-top:14px;width:100%" onclick="openEditProfile()">Edit profile</button>
+    <p class="role-hint">Switch between Student and Mentor at the top. Same account, two views.</p>`;
+}
+
+function openEditProfile(){
+  const me = state.me;
+  $('formOverlay').innerHTML = `
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay('formOverlay')" aria-label="Back">${ic.back}</button><div class="overlay-title">Edit profile</div></div>
+    <form class="overlay-body" id="profileForm" novalidate><div class="pad">
+      <div class="field"><label for="pName">Full name</label><input class="input" id="pName" maxlength="60" value="${esc(me.full_name)}"></div>
+      <div class="row-2">
+        <div class="field"><label for="pCampus">Campus</label><input class="input" id="pCampus" maxlength="80" value="${esc(me.campus || '')}"></div>
+        <div class="field"><label for="pMajor">Major</label><input class="input" id="pMajor" maxlength="80" value="${esc(me.major || '')}"></div>
+      </div>
+      <div class="field"><label for="pBio">About you</label><textarea class="input" id="pBio" maxlength="400">${esc(me.bio || '')}</textarea><span class="sub">Students see this on the classes you host.</span></div>
+      <div class="form-error" id="profileError" role="alert"></div>
+      <button class="btn btn-brand" type="submit" style="width:100%">Save profile</button>
+    </div></form>`;
+  $('profileForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const full_name = $('pName').value.trim();
+    if (!full_name) { $('profileError').textContent = 'Your name can’t be empty.'; return; }
+    const { data, error } = await sb.from('profiles').update({ full_name,
+      campus: $('pCampus').value.trim() || null, major: $('pMajor').value.trim() || null, bio: $('pBio').value.trim() || null,
+    }).eq('id', uid()).select('*').single();
+    if (error) { $('profileError').textContent = friendlyError(error); return; }
+    state.me = data; names.set(data.id, data.full_name);
+    closeOverlay('formOverlay');
+    await loadClasses().catch(() => {});
+    renderHeader(); renderBody(); showToast('Profile saved');
+  });
+  openOverlay('formOverlay');
+}
+
+function openSettings(){ renderSettings(); openOverlay('settingsOverlay'); }
+function renderSettings(){
+  const el = $('settingsOverlay'); if (!el) return;
+  el.innerHTML = `
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay('settingsOverlay')" aria-label="Back">${ic.back}</button><div class="overlay-title">Settings</div></div>
+    <div class="overlay-body">
+      <div class="block"><h4>Appearance</h4>
+        <div class="settings-row" style="border-bottom:none;padding-left:0">
+          <div class="settings-label"><strong>Theme</strong><span>Match your device, or pick one</span></div>
+          <div class="theme-row">
+            <button class="theme-opt ${state.theme === 'light' ? 'active' : ''}" onclick="setTheme('light')" aria-label="Light">${ic.sun}</button>
+            <button class="theme-opt ${state.theme === 'dark' ? 'active' : ''}" onclick="setTheme('dark')" aria-label="Dark">${ic.moon}</button>
+            <button class="theme-opt ${state.theme === 'system' ? 'active' : ''}" onclick="setTheme('system')">Auto</button>
+          </div>
+        </div>
+      </div>
+      <div class="block"><h4>Notifications</h4>
+        <div class="settings-row" style="border-bottom:none;padding-left:0">
+          <div class="settings-label"><strong>Message pop-ups</strong><span>Show a pop-up when a group gets a new message</span></div>
+          <button class="switch ${state.notifMessages ? '' : 'off'}" onclick="toggleMsgNotif()" aria-label="Toggle message pop-ups"></button>
+        </div>
+      </div>
+      <div class="block" style="border-bottom:none"><h4>Account</h4>
+        <div class="settings-row" style="padding-left:0"><div class="settings-label"><strong>Email</strong><span>${esc(state.session?.user?.email)}</span></div></div>
+        <button class="btn btn-outline-danger" style="width:100%;margin-top:14px" onclick="askLogout()">Log out</button>
+      </div>
+    </div>`;
+}
+function toggleMsgNotif(){ state.notifMessages = !state.notifMessages; lsSet('cc_notif_msgs', state.notifMessages); renderSettings(); }
+
+/* ============================================================
+   REALTIME — RLS only delivers messages from your own groups
+   ============================================================ */
+function subscribeRealtime(){
+  sb.removeAllChannels();
+  sb.channel('cc-live')
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'messages' }, async ({ new: m }) => {
+      await ensureNames([m.user_id]);
+      addMessage(m);
+      const c = classById(m.class_id);
+      if (c && m.user_id !== uid() && state.openChat !== m.class_id) {
+        const who = first(names.get(m.user_id) || 'Someone');
+        if (m.kind === 'text') {
+          pushNotif(`New message in ${c.title}`, `${who}: ${m.body.slice(0, 80)}`);
+          if (state.notifMessages) showToast(`${who} in ${c.title}: ${m.body.slice(0, 40)}`);
+        } else if (isHost(c) && /joined/.test(m.body)) {
+          pushNotif('New student', `${m.body} “${c.title}”.`);
+          showToast(`${who} joined ${c.title}`);
+        }
+      }
+      updateBadges();
+      if (['chats','m-chats'].includes(state.tab)) { renderHeader(); renderBody(); }
+      if (m.kind === 'system') scheduleReload();
+    })
+    .on('postgres_changes', { event:'*', schema:'public', table:'class_members' }, scheduleReload)
+    .on('postgres_changes', { event:'*', schema:'public', table:'classes' }, scheduleReload)
+    .subscribe();
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+function showBoot(html){ screenEl.innerHTML = `<div class="boot"><img src="${LOGO}" alt=""><span>${html}</span></div>`; }
+function configured(){ return !SUPABASE_URL.includes('YOUR-PROJECT') && !SUPABASE_ANON_KEY.startsWith('YOUR-'); }
+
+async function start(session){
+  state.session = session; started = true; state.loaded = false;
+  state.role = lsGet('cc_role', 'student') === 'mentor' ? 'mentor' : 'student';
+  state.notifMessages = lsGet('cc_notif_msgs', true);
+  state.notifs = lsGet('cc_notifs_' + session.user.id, []);
+  state.hasNotif = false;
+  renderShell();
+  setTab(state.role === 'mentor' ? 'm-home' : 'discover');
+  try { await loadMe(); await reloadAll(); }
+  catch (e) {
+    $('appBody').innerHTML = `<div class="empty-note">${esc(friendlyError(e))}<br>If this is a new Supabase project, run <b>supabase/schema.sql</b> first.<br><br><button class="btn btn-brand" onclick="location.reload()">Try again</button></div>`;
+    return;
+  }
+  state.loaded = true;
+  renderHeader(); renderBody(); updateBadges();
+  subscribeRealtime();
+}
+
+function boot(){
+  applyTheme();
+  if (!window.supabase) return showBoot('Couldn’t load the Supabase library. Check your connection and reload.');
+  if (!configured()) return showBoot('Paste your Supabase URL and key into the <code>CONFIG</code> section at the top of the script in <code>index.html</code>. Setup steps are in README.md.');
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  sb.auth.onAuthStateChange((event, session) => {
+    // Supabase advises not awaiting its own calls inside this callback, so defer.
+    setTimeout(() => {
+      if (event === 'PASSWORD_RECOVERY' || (recovering && session)) { recovering = true; state.session = session; return renderNewPassword(); }
+      if (event === 'SIGNED_OUT' || !session) {
+        started = false; state.loaded = false; state.session = null; state.me = null; state.classes = []; state.lastMsg = {};
+        sb.removeAllChannels(); authMode = 'login'; return renderAuth();
+      }
+      const switched = state.session && state.session.user.id !== session.user.id;
+      state.session = session;
+      if (!started || switched) start(session);
+    }, 0);
+  });
+}
+
+// Escape closes whatever is on top: dialog → notifications → top overlay
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  const dlg = $('dialog');
+  if (dlg && !dlg.hidden) return closeDialog(false);
+  const panel = $('notifPanel');
+  if (panel && panel.classList.contains('open')) return panel.classList.remove('open');
+  const open = [...document.querySelectorAll('.overlay.open')].sort((a, b) => (+b.style.zIndex || 0) - (+a.style.zIndex || 0))[0];
+  if (open) closeOverlay(open.id);
 });
+
+boot();
 
 </script>
 </body>
