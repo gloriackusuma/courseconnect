@@ -1000,6 +1000,87 @@
     .auth-hero .hp-art{ width:280px; height:280px; right:-30px; bottom:-30px; }
     .auth-body{ flex:1; max-width:540px; padding:64px 56px; align-self:center; }
   }
+
+  /* ============================================================
+     ROUND 4 — desktop polish (min-width 900px only; phone layout untouched)
+     One shared content column for header + body, consistent left
+     alignment, tidier home panel, calendar, scrims and toast.
+     ============================================================ */
+  @media (min-width: 900px){
+    .screen:has(> .app-header){ grid-template-columns:240px minmax(0,1fr); }
+    .screen > .app-header{ padding:28px max(36px, calc((100% - 1040px) / 2)) 16px; }
+    .screen > .app-body{
+      padding:8px max(36px, calc((100% - 1040px) / 2)) 48px;
+      grid-template-columns:repeat(auto-fill,minmax(360px,1fr));
+      column-gap:16px;
+    }
+
+    /* sidebar */
+    .screen > .tabbar{ overflow-y:auto; padding:26px 14px; }
+    .side-brand{ padding:2px 12px 24px; }
+    .tab-btn{ position:relative; }
+    .tab-btn.active{ box-shadow:0 6px 16px -8px color-mix(in srgb,var(--brand) 70%,transparent); }
+
+    /* header controls */
+    .role-bar{ max-width:360px; margin-bottom:14px; }
+    .search-bar{ max-width:560px; }
+    .h1{ margin-top:6px; }
+
+    /* every focused page shares the header's left edge */
+    .app-body[data-tab="chats"] > *, .app-body[data-tab="m-chats"] > *, .app-body[data-tab="bookings"] > *, .app-body[data-tab="m-sched"] > *,
+    .app-body[data-tab="profile"] > *, .app-body[data-tab="a-pay"] > *, .app-body[data-tab="a-payout"] > *, .app-body[data-tab="a-history"] > *{
+      justify-self:start; width:100%; max-width:720px;
+    }
+    .app-body[data-tab="dashboard"] > *, .app-body[data-tab="m-dash"] > *{ max-width:none; justify-self:stretch; }
+
+    /* discover grid */
+    .class-card{ margin-bottom:0; align-self:stretch; cursor:pointer; transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease; }
+    .class-card:hover{ border-color:color-mix(in srgb,var(--brand) 40%,var(--border)); box-shadow:var(--shadow); transform:translateY(-1px); }
+    .app-body[data-tab="discover"]{ row-gap:14px; }
+    .app-body[data-tab="discover"] > .section-label,
+    .app-body[data-tab="discover"] > .section-row{ margin:10px 2px 0; }
+
+    /* home panel: text left, stats right */
+    .home-panel{ display:grid; grid-template-columns:1fr auto; column-gap:32px; align-items:center; padding:26px 32px; }
+    .home-panel > .hp-label, .home-panel > h3, .home-panel > p{ grid-column:1; }
+    .home-panel h3{ font-size:21px; padding-right:0; }
+    .home-panel .hp-row{ grid-column:2; grid-row:1 / span 3; margin:0; padding:0 0 0 32px; border-top:none; border-left:1px solid rgba(255,255,255,.28); gap:32px; align-self:stretch; }
+    .home-panel .hp-row strong{ font-size:28px; }
+    .home-panel .hp-art{ right:auto; left:46%; top:-8px; width:120px; height:120px; opacity:.12; }
+
+    /* mentor home / admin stat blocks stop stretching across the page */
+    .app-body[data-tab="m-home"] > .stat-row,
+    .app-body[data-tab="m-home"] > .earn-row,
+    .app-body[data-tab="m-home"] > .create-cta,
+    .app-body[data-tab="m-home"] > .hint{ max-width:560px; justify-self:start; width:100%; }
+    .app-body[data-tab="m-home"] > .stat-row,
+    .app-body[data-tab="a-pay"] > .stat-row,
+    .app-body[data-tab="a-payout"] > .stat-row{ justify-content:flex-start; gap:40px; padding-left:2px; }
+    .app-body[data-tab="m-home"] > .m-card{ max-width:720px; justify-self:start; width:100%; }
+
+    /* calendar: compact cells instead of huge squares */
+    .cal-card{ max-width:520px !important; }
+    .cal-day{ aspect-ratio:auto; height:42px; }
+    .app-body[data-tab="bookings"] > .cal-card, .app-body[data-tab="m-sched"] > .cal-card{ max-width:520px; }
+    .cal-agenda .class-card{ margin-bottom:10px; }
+
+    /* dashboards */
+    .dash-grid{ margin-top:8px; }
+    .dash-cols{ align-items:start; }
+    .dash > section{ margin-bottom:12px; }
+    .bars{ height:170px; }
+
+    /* side panels get a scrim, and the toast centres on the content area */
+    .overlay.open{ box-shadow:0 0 0 100vmax rgba(15,16,32,.4), -24px 0 50px -24px rgba(15,16,32,.35); }
+    .overlay-body{ padding-bottom:8px; }
+    .toast{ left:calc(240px + (100% - 240px) / 2); bottom:32px; max-width:min(520px, 60%); }
+    .notif-panel{ right:36px; width:300px; }
+    .onboard{ box-shadow:0 0 0 100vmax rgba(15,16,32,.5), 0 30px 80px -20px rgba(15,16,32,.5); }
+
+    /* sign-in */
+    .auth-body{ max-width:520px; }
+    .auth-hero{ min-height:100%; }
+  }
 </style>
 </head>
 <body>
