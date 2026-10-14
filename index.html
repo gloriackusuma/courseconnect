@@ -24,10 +24,10 @@
     --ink-faint:#7B7F9E;
     --paper:#F3F1EC;
     --surface:#FFFFFF;
-    --surface-alt:#E9EEF9;
+    --surface-alt:#E2EAF9;
     --brand:#3459D0;
     --brand-deep:#1E3A9F;
-    --brand-soft:#E3ECFC;
+    --brand-soft:#D8E5FC;
     --accent:#FF6B45;
     --gold:#F0A020;
     --border:#E6E3DB;
@@ -58,7 +58,7 @@
       --surface-alt:#22253D;
       --brand:#6C8CFF;
       --brand-deep:#AEB6FF;
-      --brand-soft:#1F2D52;
+      --brand-soft:#20325E;
       --accent:#FF8B66;
       --gold:#F3B34A;
       --border:#2C2E48;
@@ -80,7 +80,7 @@
     color-scheme: dark;
     --ink:#F1F0EC; --ink-soft:#B4B6D2; --ink-faint:#71749A;
     --paper:#0E0F1B; --surface:#181A2C; --surface-alt:#22253D;
-    --brand:#6C8CFF; --brand-deep:#AEB6FF; --brand-soft:#1F2D52;
+    --brand:#6C8CFF; --brand-deep:#AEB6FF; --brand-soft:#20325E;
     --accent:#FF8B66; --gold:#F3B34A; --border:#2C2E48;
     --danger:#FF7373; --good:#4FC26B;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 14px 30px -14px rgba(0,0,0,.6);
@@ -888,6 +888,118 @@
   .person-row .grow{ flex:1; min-width:0; }
   .person-row .grow span{ display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .mini-tag{ font-size:11px; font-weight:800; color:var(--brand); margin-left:6px; }
+  /* ============================================================
+     ROUND 3 — richer colour, dashboards, credentials, desktop layout
+     ============================================================ */
+  :root{
+    --brand-2:#1F93E8;
+    --hero:linear-gradient(135deg,#1E3A9F 0%,#3459D0 45%,#1F93E8 100%);
+    --page-bg:linear-gradient(160deg,#DCE8FB 0%,#EEF1F7 45%,#F3F1EC 100%);
+  }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --page-bg:linear-gradient(160deg,#16204A 0%,#0E0F1B 55%); } }
+  :root[data-theme="dark"]{ --page-bg:linear-gradient(160deg,#16204A 0%,#0E0F1B 55%); }
+  .screen[data-role="mentor"]{ --hero:linear-gradient(135deg,#0A5C50 0%,#0E8272 45%,#22A98F 100%); }
+  .screen[data-role="admin"]{ --hero:linear-gradient(135deg,#4A1F7D 0%,#6B2FB3 45%,#9358D6 100%); }
+  body{ background:var(--page-bg); background-attachment:fixed; }
+
+  .app-header{ background:linear-gradient(180deg,color-mix(in srgb,var(--brand) 17%,var(--surface)) 0%,var(--surface) 92%); }
+  .app-body{ background:linear-gradient(180deg,color-mix(in srgb,var(--brand-2) 7%,var(--surface)) 0,var(--surface) 260px); }
+  .tabbar{ background:linear-gradient(180deg,var(--surface),color-mix(in srgb,var(--brand) 9%,var(--surface))); }
+  .tab-btn.active::before{ content:''; position:absolute; top:-10px; left:50%; width:28px; height:3px; margin-left:-14px; border-radius:3px; background:var(--grad); }
+  .class-card{ background:linear-gradient(135deg,var(--surface) 50%,color-mix(in srgb,var(--brand-2) 10%,var(--surface))); }
+  .chip{ background:color-mix(in srgb,var(--brand) 8%,var(--surface)); border-color:color-mix(in srgb,var(--brand) 20%,var(--border)); color:var(--brand-deep); }
+  .chip.active{ background:var(--grad); border-color:transparent; color:#fff; }
+  .search-bar{ background:color-mix(in srgb,var(--brand) 11%,var(--surface)); }
+  .role-bar{ background:color-mix(in srgb,var(--brand) 14%,var(--surface)); }
+  .side-brand{ display:none; }
+
+  /* Dashboard */
+  .dash-grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px 12px; background:var(--hero); color:#fff; border-radius:var(--radius-lg); padding:20px 20px; margin:6px 0 4px; }
+  .dash-stat strong{ display:block; font-size:24px; font-weight:800; letter-spacing:-0.02em; line-height:1.1; }
+  .dash-stat span{ display:block; margin-top:3px; font-size:12px; font-weight:600; opacity:.94; }
+  .dash-cols{ display:grid; grid-template-columns:1fr; gap:0; }
+  .bars{ display:grid; grid-template-columns:repeat(6,1fr); gap:8px; align-items:end; height:150px; padding-top:6px; }
+  .bar{ display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:4px; height:100%; }
+  .bar i{ display:block; width:100%; max-width:38px; min-height:4px; border-radius:9px 9px 3px 3px; background:var(--grad); }
+  .bar small{ font-size:10.5px; font-weight:700; color:var(--ink-faint); }
+  .bar-v{ font-size:10.5px; font-weight:800; color:var(--ink); }
+  .skill-tag{ background:linear-gradient(135deg,var(--brand-soft),color-mix(in srgb,var(--brand-2) 18%,var(--surface))); color:var(--brand-deep); }
+  .mini-count{ font-weight:800; opacity:.7; }
+  .cm-row{ display:flex; align-items:center; gap:11px; padding:10px 0; border-bottom:1px solid var(--border); }
+  .cm-row:last-child{ border-bottom:none; }
+  .cm-t{ flex:1; min-width:0; }
+  .cm-t strong{ display:block; font-size:13.5px; font-weight:800; }
+  .cm-t span{ display:block; font-size:12px; color:var(--ink-soft); font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cm-row em{ font-style:normal; font-size:11.5px; font-weight:700; color:var(--ink-faint); text-align:right; }
+
+  /* Credentials */
+  .cred-row{ display:flex; gap:12px; align-items:flex-start; padding:12px 0; border-bottom:1px solid var(--border); }
+  .cred-row:last-child{ border-bottom:none; }
+  .cred-ico{ width:38px; height:38px; flex:none; border-radius:12px; background:var(--grad); color:#fff; display:flex; align-items:center; justify-content:center; }
+  .cred-ico svg{ width:19px; height:19px; }
+  .cred-main{ flex:1; min-width:0; }
+  .cred-main strong{ display:block; font-size:13.5px; font-weight:800; overflow-wrap:anywhere; }
+  .cred-main span{ display:block; font-size:12px; color:var(--ink-soft); font-weight:600; margin-top:2px; }
+  .cred-skill{ display:inline-block; font-style:normal; font-size:11px; font-weight:800; margin-top:6px; padding:3px 9px; border-radius:100px; background:var(--brand-soft); color:var(--brand-deep); }
+  .cred-link{ display:block; margin-top:6px; font-size:12px; font-weight:800; color:var(--brand); }
+  .cred-list{ margin-top:6px; }
+
+  /* ---------- Desktop: a real app layout, not a phone in a window ---------- */
+  @media (min-width: 900px){
+    .scene-header{ display:none; }
+    .stage{ padding:24px; justify-content:center; }
+    .device{ width:min(1240px,100%); height:calc(100dvh - 48px); min-height:620px; padding:0; border-radius:26px; background:var(--surface); border:1px solid var(--border); box-shadow:0 24px 60px -24px rgba(15,16,32,.35); }
+    .notch{ display:none; }
+    .screen{ border-radius:26px; }
+    .screen:has(> .app-header){ display:grid; grid-template-columns:252px minmax(0,1fr); grid-template-rows:auto minmax(0,1fr); }
+    .screen > .app-header{ grid-column:2; grid-row:1; padding:26px 36px 14px; }
+    .screen > .app-body{ grid-column:2; grid-row:2; padding:6px 36px 40px; display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); column-gap:16px; align-content:start; }
+    .app-body > *{ grid-column:1 / -1; }
+    .app-body > .class-card{ grid-column:auto; }
+    .search-bar{ max-width:520px; }
+    .role-bar{ max-width:340px; }
+    .h1{ font-size:28px; }
+    .chip-row{ padding-left:0; padding-right:0; margin:0; }
+
+    /* nav becomes a sidebar */
+    .screen > .tabbar{ grid-column:1; grid-row:1 / span 2; flex-direction:column; justify-content:flex-start; gap:4px; padding:24px 14px; border-top:none; border-right:1px solid var(--border); background:linear-gradient(180deg,color-mix(in srgb,var(--brand) 13%,var(--surface)) 0%,var(--surface) 70%); }
+    .screen[data-role="mentor"] > .tabbar, .screen[data-role="admin"] > .tabbar{ background:linear-gradient(180deg,var(--brand-soft) 0%,var(--surface) 70%); }
+    .side-brand{ display:flex; align-items:center; gap:10px; padding:2px 12px 22px; font-weight:800; font-size:17px; letter-spacing:-0.01em; }
+    .side-brand img{ width:34px; height:34px; object-fit:contain; }
+    .tab-btn{ flex:none; flex-direction:row; justify-content:flex-start; gap:12px; padding:12px 14px; border-radius:13px; font-size:14px; }
+    .tab-btn svg{ width:20px; height:20px; }
+    .tab-btn.active{ background:var(--grad); color:#fff; }
+    .tab-btn.active::before{ display:none; }
+    .tab-btn:not(.active):hover{ background:var(--brand-soft); }
+    .tab-dot{ top:50%; right:14px; transform:translateY(-50%); }
+
+    /* detail, chat, forms and payment open as a side panel */
+    .overlay{ inset:0 0 0 auto; width:min(500px,100%); border-left:1px solid var(--border); box-shadow:-24px 0 50px -24px rgba(15,16,32,.35); }
+    .overlay-header{ padding:22px 22px 12px; }
+
+    /* focused pages keep a readable width */
+    .app-body[data-tab="chats"] > *, .app-body[data-tab="m-chats"] > *, .app-body[data-tab="bookings"] > *, .app-body[data-tab="m-sched"] > *,
+    .app-body[data-tab="profile"] > *, .app-body[data-tab="a-pay"] > *, .app-body[data-tab="a-payout"] > *, .app-body[data-tab="a-history"] > *{
+      grid-column:1 / -1; width:100%; max-width:720px; justify-self:center; }
+    .app-body[data-tab="dashboard"] > *, .app-body[data-tab="m-dash"] > *{ max-width:1000px; width:100%; justify-self:center; }
+    .dash-grid{ grid-template-columns:repeat(4,1fr); padding:24px 28px; }
+    .dash-grid.six{ grid-template-columns:repeat(3,1fr); }
+    .dash-stat strong{ font-size:30px; }
+    .dash-cols{ grid-template-columns:1.3fr 1fr; gap:36px; }
+    .create-cta{ max-width:520px; }
+
+    /* first-run guide becomes a centred dialog */
+    .onboard{ inset:auto; top:50%; left:50%; transform:translate(-50%,-50%); width:min(520px,92%); max-height:88%; border-radius:26px; overflow:hidden; border:1px solid var(--border); box-shadow:0 30px 80px -20px rgba(15,16,32,.5); }
+    .ob-hero{ padding-top:40px; }
+
+    /* sign-in is split: brand on the left, form on the right */
+    .screen .auth{ flex-direction:row; }
+    .auth-hero{ flex:1.1; border-radius:0; padding:64px 56px; display:flex; flex-direction:column; justify-content:center; }
+    .auth-hero h1{ font-size:36px; }
+    .auth-hero .lead{ font-size:16px; max-width:400px; }
+    .auth-hero .hp-art{ width:280px; height:280px; right:-30px; bottom:-30px; }
+    .auth-body{ flex:1; max-width:540px; padding:64px 56px; align-self:center; }
+  }
 </style>
 </head>
 <body>
@@ -957,6 +1069,8 @@ const ic = {
   shield: sv('<path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>'),
   wallet: sv('<path d="M3 7.5A2.5 2.5 0 015.5 5H18v4"/><rect x="3" y="7.5" width="18" height="12" rx="2.5"/><circle cx="16.5" cy="13.5" r="1.3"/>'),
   history: sv('<path d="M3 12a9 9 0 103-6.7L3 8"/><path d="M3 3v5h5M12 7.5V12l3 2"/>'),
+  chart: sv('<path d="M3 20h18"/><rect x="5" y="11" width="3.5" height="9" rx="1"/><rect x="10.3" y="5" width="3.5" height="15" rx="1"/><rect x="15.6" y="9" width="3.5" height="11" rx="1"/>'),
+  award: sv('<circle cx="12" cy="9" r="5.5"/><path d="M8.7 13.6L7.5 21l4.5-2.5 4.5 2.5-1.2-7.4"/>'),
   cap: sv('<path d="M2.5 9.5L12 5l9.5 4.5L12 14 2.5 9.5z"/><path d="M6.5 11.8V16c0 1.4 2.5 2.8 5.5 2.8s5.5-1.4 5.5-2.8v-4.2"/><path d="M21.5 9.5V15"/>'),
   people: sv('<circle cx="9" cy="8.5" r="3.2"/><path d="M3 19.5c.9-3.3 3.2-5 6-5s5.1 1.7 6 5"/><circle cx="17.5" cy="9.5" r="2.5"/><path d="M17.5 14.5c2 .2 3.4 1.6 4 4"/>'),
   copy: sv('<rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V6a2.5 2.5 0 00-2.5-2.5H6A2.5 2.5 0 003.5 6v7A2.5 2.5 0 006 15.5h2.5"/>'),
@@ -1196,7 +1310,7 @@ function askLogout(){
    ============================================================ */
 const CLASS_SELECT = `
   id, host_id, title, category, subject, description, capacity, price, starts_at, duration_min, location, created_at, mentor_confirmed_at,
-  host:profiles!classes_host_id_fkey ( id, full_name, campus, major, bio ),
+  host:profiles!classes_host_id_fkey ( id, full_name, campus, major, bio, credentials ),
   members:class_members ( user_id, joined_at, profile:profiles ( id, full_name, campus, major ) )`;
 
 async function loadMe(){
@@ -1214,7 +1328,9 @@ async function loadMe(){
 }
 async function loadClasses(){
   const since = new Date(Date.now() - 90 * 864e5).toISOString();
-  const { data, error } = await sb.from('classes').select(CLASS_SELECT).gte('starts_at', since).order('starts_at', { ascending: true }).limit(500);
+  const run = sel => sb.from('classes').select(sel).gte('starts_at', since).order('starts_at', { ascending: true }).limit(500);
+  let { data, error } = await run(CLASS_SELECT);
+  if (error && /credentials/i.test(error.message || '')) ({ data, error } = await run(CLASS_SELECT.replace(', credentials', '')));   // column not added yet
   if (error) throw error;
   state.classes = data || [];
   for (const c of state.classes) {
@@ -1294,8 +1410,8 @@ function refreshVisible(){
    Student and Mentor are separate spaces with their own tabs.
    ============================================================ */
 const TABS = {
-  student: [['discover','Discover',ic.compass], ['community','Community',ic.people], ['chats','Chats',ic.msg,'chatDot'], ['bookings','Bookings',ic.calendar,'bookDot'], ['profile','Profile',ic.user]],
-  mentor:  [['m-home','My classes',ic.board,'mHomeDot'], ['m-chats','Groups',ic.msg,'mChatDot'], ['m-sched','Schedule',ic.calendar], ['profile','Profile',ic.user]],
+  student: [['discover','Discover',ic.compass], ['dashboard','Dashboard',ic.chart], ['chats','Chats',ic.msg,'chatDot'], ['bookings','Bookings',ic.calendar,'bookDot'], ['profile','Profile',ic.user]],
+  mentor:  [['m-home','My classes',ic.board,'mHomeDot'], ['m-dash','Dashboard',ic.chart], ['m-chats','Groups',ic.msg,'mChatDot'], ['m-sched','Schedule',ic.calendar], ['profile','Profile',ic.user]],
   admin:   [['a-pay','Payments',ic.card,'aPayDot'], ['a-payout','Payouts',ic.wallet,'aOutDot'], ['a-history','History',ic.history], ['profile','Profile',ic.user]],
 };
 const HOME_TAB = { student:'discover', mentor:'m-home', admin:'a-pay' };
@@ -1334,7 +1450,7 @@ function renderShell(){
 function renderTabbar(){
   const nav = $('tabbar');
   nav.setAttribute('aria-label', { student:'Student', mentor:'Mentor', admin:'Admin' }[state.role] + ' navigation');
-  nav.innerHTML = TABS[state.role].map(t => `<button class="tab-btn" data-tab="${t[0]}" onclick="setTab('${t[0]}')">${t[2]}${t[1]}${t[3] ? `<span class="tab-dot" id="${t[3]}" hidden></span>` : ''}</button>`).join('');
+  nav.innerHTML = `<div class="side-brand"><img src="${LOGO}" alt=""><span>CourseConnect</span></div>` + TABS[state.role].map(t => `<button class="tab-btn" data-tab="${t[0]}" onclick="setTab('${t[0]}')">${t[2]}${t[1]}${t[3] ? `<span class="tab-dot" id="${t[3]}" hidden></span>` : ''}</button>`).join('');
 }
 function setRole(r){
   if (r === state.role) return;
@@ -1399,7 +1515,8 @@ function renderHeader(){
         <div class="search-bar">${ic.search}<input id="searchInput" type="text" aria-label="Search classes" placeholder="Course code, competition, topic, host" value="${esc(state.query)}" oninput="setQuery(this.value)" autocomplete="off"><button id="clearSearch" onclick="clearSearch()" aria-label="Clear search" ${state.query ? '' : 'hidden'}>${ic.x}</button></div>
         <div class="chip-row" id="chipRow"></div>`;
       break;
-    case 'community': html = simple('Community', 'People and subjects around your classes.'); break;
+    case 'dashboard': html = simple('Dashboard', 'What you have learned so far.'); break;
+    case 'm-dash': html = simple('Dashboard', 'Your teaching and earnings.'); break;
     case 'chats': {
       const n = joinedClasses().filter(c => isUnread(c.id)).length;
       html = simple('Chats', `${n ? `${n} with new messages. ` : ''}Each class you join has its own group chat.`); break;
@@ -1423,8 +1540,9 @@ function renderHeader(){
 
 function renderBody(){
   const b = $('appBody'); if (!b) return;
+  b.dataset.tab = state.tab;
   if (!state.loaded) { b.innerHTML = '<div class="loading">Loading…</div>'; return; }
-  ({ discover: renderDiscover, community: renderCommunity, chats: renderStudentChats, bookings: renderBookings,
+  ({ discover: renderDiscover, dashboard: renderStudentDash, 'm-dash': renderMentorDash, chats: renderStudentChats, bookings: renderBookings,
      'm-home': renderMentorHome, 'm-chats': renderMentorChats, 'm-sched': renderMentorSched,
      'a-pay': renderAdminPayments, 'a-payout': renderAdminPayouts, 'a-history': renderAdminHistory,
      profile: renderProfile })[state.tab](b);
@@ -1476,7 +1594,7 @@ function studentHomeHTML(){
     ? `<p class="hp-label">Your next class</p><h3>${esc(next.title)}</h3><p>${whenLabel(next.starts_at)}, ${esc(next.location)}</p>`
     : `<p class="hp-label">Your week</p><h3>No class booked yet</h3><p>Pick one below to get started.</p>`;
   return `<div class="home-panel">${ic.cap.replace('<svg', '<svg class="hp-art"')}${body}
-    <div class="hp-row"><div><strong>${joined.length}</strong>Joined</div><div><strong>${todo}</strong>To do</div><button class="hp-link" onclick="openOnboarding()">How it works</button></div></div>`;
+    <div class="hp-row"><div><strong>${joined.length}</strong>Joined</div><div><strong>${todo}</strong>To do</div></div></div>`;
 }
 function majorPicks(list){
   const words = String(state.me?.major || '').toLowerCase().split(/[^a-z]+/).filter(w => w.length >= 4);
@@ -1485,37 +1603,133 @@ function majorPicks(list){
 }
 
 /* ============================================================
-   STUDENT — COMMUNITY
-   Built from existing data: people who share a class with you,
-   and subjects that have classes running.
+   DASHBOARDS — student learning stats, mentor teaching stats
    ============================================================ */
-let subjectList = [];
-function browseSubject(i){ state.query = subjectList[i] || ''; state.filter = 'all'; setTab('discover'); }
-function renderCommunity(b){
+function monthKey(d){ d = new Date(d); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
+function lastMonths(n){
+  const out = [], now = new Date();
+  for (let i = n - 1; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); out.push({ key: monthKey(d), label: d.toLocaleDateString('en-GB', { month:'short' }), v: 0 }); }
+  return out;
+}
+function barsHTML(series, fmt){
+  const max = Math.max(1, ...series.map(x => x.v));
+  return `<div class="bars">${series.map(x => `<div class="bar"><span class="bar-v">${x.v ? fmt(x.v) : ''}</span><i style="height:${Math.round(4 + x.v / max * 84)}px"></i><small>${x.label}</small></div>`).join('')}</div>`;
+}
+function skillsOf(list){
+  const m = new Map();
+  list.forEach(c => { const k = String(c.subject || c.title).trim(); m.set(k, (m.get(k) || 0) + 1); });
+  return [...m.entries()].sort((a, z) => z[1] - a[1]);
+}
+const shortRp = v => 'Rp' + (v >= 1e6 ? (v / 1e6).toFixed(1).replace(/\.0$/, '') + 'M' : Math.round(v / 1000) + 'K');
+const statTile = (v, l) => `<div class="dash-stat"><strong>${v}</strong><span>${l}</span></div>`;
+const hoursOf = list => Math.round(list.reduce((s, c) => s + c.duration_min, 0) / 6) / 10;
+function skillTags(entries, empty){
+  return entries.length ? `<div class="tag-row">${entries.map(([k, n]) => `<span class="tag skill-tag">${esc(k)}${n > 1 ? `<b class="mini-count">x${n}</b>` : ''}</span>`).join('')}</div>` : `<div class="empty-note" style="padding:14px 0">${empty}</div>`;
+}
+function classmatesHTML(){
   const people = new Map();
   for (const c of joinedClasses()) {
-    const add = (id, p, isMentor) => {
+    const add = (id, p, mentor) => {
       if (!id || id === uid()) return;
-      const e = people.get(id) || { id, name: p?.full_name || names.get(id) || 'Member', sub: [p?.campus, p?.major].filter(Boolean).join(', '), shared: [], mentor: false };
-      e.shared.push(c.title); if (isMentor) e.mentor = true; people.set(id, e);
+      const e = people.get(id) || { id, name: p?.full_name || names.get(id) || 'Member', sub: [p?.campus, p?.major].filter(Boolean).join(', '), n: 0, mentor: false };
+      e.n++; if (mentor) e.mentor = true; people.set(id, e);
     };
     add(c.host_id, c.host, true);
     c.members.forEach(m => add(m.user_id, m.profile, false));
   }
-  const bySubject = new Map();
-  for (const c of state.classes.filter(x => !hasEnded(x) && x.subject)) {
-    const e = bySubject.get(c.subject) || { name: c.subject, classes: 0, students: 0 };
-    e.classes++; e.students += seatsTaken(c); bySubject.set(c.subject, e);
-  }
-  subjectList = [...bySubject.values()].sort((a, z) => z.students - a.students);
-  const peopleHTML = people.size
-    ? [...people.values()].map(p => `<div class="person-row" style="border-bottom:1px solid var(--border);padding:11px 0">${avatar(p.id, p.name)}<div class="grow"><strong>${esc(p.name)}${p.mentor ? '<span class="mini-tag">Mentor</span>' : ''}</strong><span>${esc(p.sub || 'In ' + p.shared[0] + (p.shared.length > 1 ? ' and ' + (p.shared.length - 1) + ' more' : ''))}</span></div></div>`).join('')
-    : `<div class="empty-note">Join a class and the people in it show up here.<br><button class="link-btn" onclick="setTab('discover')">Browse classes</button></div>`;
-  const subjHTML = subjectList.length
-    ? subjectList.map((s, i) => `<button class="person-row link" onclick="browseSubject(${i})"><div class="group-icon sm" style="background:${colorFor(s.name)}">${esc(initials(s.name))}</div><div class="grow"><strong>${esc(s.name)}</strong><span>${s.classes} upcoming class${s.classes === 1 ? '' : 'es'}, ${s.students} student${s.students === 1 ? '' : 's'} joined</span></div>${ic.next.replace('<svg', '<svg style="width:16px;height:16px;color:var(--ink-faint)"')}</button>`).join('')
-    : `<div class="empty-note">No subjects have upcoming classes yet.</div>`;
-  b.innerHTML = `<div class="section-label"><b>People in your classes</b></div>${peopleHTML}
-    <div class="section-label" style="margin-top:22px"><b>Subjects with classes running</b></div>${subjHTML}`;
+  const list = [...people.values()].sort((a, z) => z.n - a.n).slice(0, 8);
+  if (!list.length) return `<div class="empty-note" style="padding:14px 0">People from your classes show up here once you join one.</div>`;
+  return list.map(p => `<div class="cm-row">${avatar(p.id, p.name)}<div class="cm-t"><strong>${esc(p.name)}</strong><span>${esc(p.sub || (p.mentor ? 'Mentor' : 'Student'))}</span></div><em>${p.n} class${p.n === 1 ? '' : 'es'} together</em></div>`).join('');
+}
+function renderStudentDash(b){
+  const joined = joinedClasses(), done = joined.filter(hasEnded), upcoming = joined.length - done.length;
+  const spent = state.bookings.filter(x => x.user_id === uid() && ['paid','released'].includes(x.status)).reduce((s, x) => s + x.amount, 0);
+  const months = lastMonths(6);
+  done.forEach(c => { const m = months.find(x => x.key === monthKey(c.starts_at)); if (m) m.v++; });
+  b.innerHTML = `<div class="dash">
+    <div class="dash-grid">${statTile(done.length, 'Classes attended')}${statTile(hoursOf(done), 'Hours learned')}${statTile(upcoming, 'Coming up')}${statTile(spent ? shortRp(spent) : 'Rp0', 'Spent on classes')}</div>
+    <div class="dash-cols">
+      <section><div class="section-label"><b>Classes attended per month</b></div>${barsHTML(months, v => v)}</section>
+      <section><div class="section-label"><b>Skills you have gained</b></div>${skillTags(skillsOf(done), 'Finish a class and its subject shows up here.')}</section>
+    </div>
+    <section><div class="section-label"><b>People you share classes with</b></div>${classmatesHTML()}</section>
+  </div>`;
+}
+function renderMentorDash(b){
+  const mine = hostedClasses(), done = mine.filter(hasEnded);
+  const students = new Set(done.flatMap(c => c.members.map(m => m.user_id))).size;
+  const seats = done.reduce((s, c) => s + c.capacity, 0), filled = done.reduce((s, c) => s + seatsTaken(c), 0);
+  const mineB = state.bookings.filter(x => x.class?.host_id === uid());
+  const earned = mineB.filter(x => x.status === 'released').reduce((s, x) => s + x.amount, 0);
+  const held = mineB.filter(x => x.status === 'paid').reduce((s, x) => s + x.amount, 0);
+  const months = lastMonths(6);
+  mineB.filter(x => x.status === 'released' && x.class?.starts_at).forEach(x => { const m = months.find(y => y.key === monthKey(x.class.starts_at)); if (m) m.v += x.amount; });
+  const creds = credsOf(state.me);
+  b.innerHTML = `<div class="dash">
+    <div class="dash-grid six">${statTile(done.length, 'Classes taught')}${statTile(students, 'Students taught')}${statTile(hoursOf(done), 'Hours taught')}${statTile(earned ? shortRp(earned) : 'Rp0', 'Earned')}${statTile(held ? shortRp(held) : 'Rp0', 'Held until payout')}${statTile((seats ? Math.round(filled / seats * 100) : 0) + '%', 'Seats filled')}</div>
+    <div class="dash-cols">
+      <section><div class="section-label"><b>Earnings per month</b></div>${barsHTML(months, shortRp)}</section>
+      <section><div class="section-label"><b>Skills you teach</b></div>${skillTags(skillsOf(mine), 'Create a class and its subject shows up here.')}</section>
+    </div>
+    <section><div class="section-label"><b>Credentials</b></div>
+      ${creds.length ? creds.map((c, i) => credRowHTML(c, i, false)).join('') : `<div class="empty-note" style="padding:14px 0">No credentials yet.</div>`}
+      <button class="btn btn-ghost" style="margin-top:10px;width:100%;max-width:360px" onclick="setTab('profile')">${ic.award}Manage in Profile</button></section>
+  </div>`;
+}
+
+/* ============================================================
+   MENTOR CREDENTIALS (stored in profiles.credentials, see credentials.sql)
+   ============================================================ */
+function credsOf(p){ return Array.isArray(p?.credentials) ? p.credentials : []; }
+function credRowHTML(c, i, editable){
+  const meta = [c.issuer, c.year].filter(Boolean).join(' · ');
+  const link = c.url && /^https?:\/\//i.test(c.url) ? `<a class="cred-link" href="${esc(c.url)}" target="_blank" rel="noopener noreferrer">View certificate</a>` : '';
+  return `<div class="cred-row"><span class="cred-ico">${ic.award}</span><div class="cred-main"><strong>${esc(c.title)}</strong>${meta ? `<span>${esc(meta)}</span>` : ''}${c.skill ? `<em class="cred-skill">${esc(c.skill)}</em>` : ''}${link}</div>${editable ? `<button class="icon-btn" onclick="askRemoveCredential(${i})" aria-label="Remove credential">${ic.x}</button>` : ''}</div>`;
+}
+function credBlockHTML(){
+  const list = credsOf(state.me);
+  return `<div class="field-label">Credentials and certificates</div>
+    ${list.length ? list.map((c, i) => credRowHTML(c, i, true)).join('') : `<div class="field-box">Add certificates that show you can teach a skill. Students see them on your classes.</div>`}
+    <button class="btn btn-ghost" style="margin-top:10px;width:100%" onclick="openCredentialForm()">${ic.award}Add a credential</button>`;
+}
+async function saveCredentials(list){
+  const { data, error } = await sb.from('profiles').update({ credentials: list }).eq('id', uid()).select('*').single();
+  if (error) { showToast(/credentials/i.test(error.message || '') ? 'Run credentials.sql in Supabase first to turn this on.' : friendlyError(error), true); return false; }
+  state.me = data; await loadClasses().catch(() => {});
+  return true;
+}
+function openCredentialForm(){
+  if (credsOf(state.me).length >= 8) return showToast('You can add up to 8 credentials.', true);
+  $('formOverlay').innerHTML = `
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay('formOverlay')" aria-label="Back">${ic.back}</button><div class="overlay-title">Add a credential</div></div>
+    <form class="overlay-body" id="credForm" novalidate><div class="pad">
+      <div class="field"><label for="crTitle">Certificate or credential</label><input class="input" id="crTitle" maxlength="90" placeholder="e.g. Google Data Analytics Certificate"></div>
+      <div class="field"><label for="crIssuer">Issued by</label><input class="input" id="crIssuer" maxlength="80" placeholder="e.g. Coursera, BINUS, CFA Institute"></div>
+      <div class="row-2">
+        <div class="field"><label for="crYear">Year</label><input class="input" id="crYear" type="number" inputmode="numeric" min="1990" max="${new Date().getFullYear()}" placeholder="${new Date().getFullYear()}"></div>
+        <div class="field"><label for="crSkill">Skill it covers</label><input class="input" id="crSkill" maxlength="50" placeholder="e.g. Excel"></div>
+      </div>
+      <div class="field"><label for="crUrl">Link to the certificate</label><input class="input" id="crUrl" type="url" maxlength="300" placeholder="https://"><span class="sub">Optional. Students can open it from your class page.</span></div>
+      <div class="form-error" id="credError" role="alert"></div>
+      <button class="btn btn-brand" type="submit" style="width:100%">Save credential</button>
+    </div></form>`;
+  $('credForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const title = $('crTitle').value.trim(), issuer = $('crIssuer').value.trim(), skill = $('crSkill').value.trim(), url = $('crUrl').value.trim();
+    const year = parseInt($('crYear').value, 10), err = $('credError');
+    if (title.length < 3) return void (err.textContent = 'Give the credential a name.');
+    if (url && !/^https?:\/\/\S+$/i.test(url)) return void (err.textContent = 'The link should start with http:// or https://');
+    if ($('crYear').value && !(year >= 1990 && year <= new Date().getFullYear())) return void (err.textContent = 'Enter a valid year.');
+    const item = { title, issuer: issuer || null, skill: skill || null, url: url || null, year: year || null };
+    if (await saveCredentials([...credsOf(state.me), item])) { closeOverlay('formOverlay'); renderBody(); showToast('Credential added'); }
+  });
+  openOverlay('formOverlay');
+}
+function askRemoveCredential(i){
+  openDialog({ title:'Remove this credential?', body:'Students will no longer see it on your classes.', confirmLabel:'Remove', danger:true }, async () => {
+    const list = [...credsOf(state.me)]; list.splice(i, 1);
+    if (await saveCredentials(list)) { renderBody(); showToast('Credential removed'); }
+  });
 }
 
 /* ============================================================
@@ -1548,7 +1762,10 @@ function drawOnboarding(){
       <button class="btn btn-brand" onclick="${last ? 'closeOnboarding()' : 'nextOnboarding()'}">${last ? 'Get started' : 'Next'}</button></div>`;
 }
 function nextOnboarding(){ obStep++; drawOnboarding(); }
-function closeOnboarding(){ lsSet('cc_onboarded_' + uid(), true); $('onboard').hidden = true; }
+function closeOnboarding(){
+  lsSet('cc_onboarded_' + uid(), true); $('onboard').hidden = true;
+  if (!state.session?.user?.user_metadata?.onboarded) { try { sb.auth.updateUser({ data: { onboarded: true } }).catch(() => {}); } catch (e) {} }
+}
 
 function classCardHTML(c){
   const taken = seatsTaken(c), full = taken >= c.capacity, pct = Math.min(100, Math.round(taken / c.capacity * 100));
@@ -1638,6 +1855,7 @@ function renderDetail(){
         <h4>Mentor</h4>
         <div class="person-row">${avatar(c.host_id, c.host?.full_name)}<div><strong>${esc(c.host?.full_name || 'Mentor')}${host ? ' (you)' : ''}</strong><span>${esc([c.host?.campus, c.host?.major].filter(Boolean).join(', '))}</span></div></div>
         ${c.host?.bio ? `<p class="pre" style="margin-top:8px;font-size:12.5px;color:var(--ink-soft)">${esc(c.host.bio)}</p>` : ''}
+        ${credsOf(c.host).length ? `<div class="cred-list">${credsOf(c.host).map((x, i) => credRowHTML(x, i, false)).join('')}</div>` : ''}
       </div>
       <div class="block" style="border-bottom:none">
         <h4>Students joined (${c.members.length})</h4>
@@ -2191,6 +2409,7 @@ function renderProfile(b){
     <div class="field-box" style="white-space:pre-wrap">${me.bio ? esc(me.bio) : 'Add a short bio: what you’re good at, courses you aced, competitions you’ve won.'}</div>
     <button class="btn btn-ghost" style="margin-top:14px;width:100%" onclick="openEditProfile()">Edit profile</button>
     <button class="btn btn-ghost" style="margin-top:10px;width:100%" onclick="openOnboarding()">${ic.cap}How CourseConnect works</button>
+    ${mentor ? credBlockHTML() : ''}
     ${bankBlockHTML()}
     <p class="role-hint">Switch between Student and Mentor at the top. Same account, two views.</p>`;
 }
@@ -2405,7 +2624,7 @@ async function start(session){
   state.loaded = true;
   setTab(state.tab);
   subscribeRealtime();
-  if (!lsGet('cc_onboarded_' + uid(), false)) openOnboarding();
+  if (!(lsGet('cc_onboarded_' + uid(), false) || state.session.user.user_metadata?.onboarded)) openOnboarding();
 }
 
 function boot(){
