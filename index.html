@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>CourseConnect — Classes for courses and competitions</title>
 <meta name="description" content="Join study classes for your courses and competition mentoring, or host your own. Every class gets its own group chat.">
-<meta name="theme-color" content="#3547E0">
+<meta name="theme-color" content="#3459D0">
 <meta property="og:type" content="website">
 <meta property="og:title" content="CourseConnect">
 <meta property="og:description" content="Join a class, land in its group chat, learn together.">
@@ -24,10 +24,10 @@
     --ink-faint:#7B7F9E;
     --paper:#F3F1EC;
     --surface:#FFFFFF;
-    --surface-alt:#EDEBFA;
-    --brand:#3547E0;
-    --brand-deep:#1F2C99;
-    --brand-soft:#E4E7FC;
+    --surface-alt:#E9EEF9;
+    --brand:#3459D0;
+    --brand-deep:#1E3A9F;
+    --brand-soft:#E3ECFC;
     --accent:#FF6B45;
     --gold:#F0A020;
     --border:#E6E3DB;
@@ -38,7 +38,7 @@
     --radius-md: 16px;
     --radius-sm: 11px;
 
-    --cat-coding:#3547E0;
+    --cat-coding:#3459D0;
     --cat-languages:#0E8272;
     --cat-music:#D9481C;
     --cat-design:#7A2FC0;
@@ -56,9 +56,9 @@
       --paper:#0E0F1B;
       --surface:#181A2C;
       --surface-alt:#22253D;
-      --brand:#6C79FF;
+      --brand:#6C8CFF;
       --brand-deep:#AEB6FF;
-      --brand-soft:#262A50;
+      --brand-soft:#1F2D52;
       --accent:#FF8B66;
       --gold:#F3B34A;
       --border:#2C2E48;
@@ -80,7 +80,7 @@
     color-scheme: dark;
     --ink:#F1F0EC; --ink-soft:#B4B6D2; --ink-faint:#71749A;
     --paper:#0E0F1B; --surface:#181A2C; --surface-alt:#22253D;
-    --brand:#6C79FF; --brand-deep:#AEB6FF; --brand-soft:#262A50;
+    --brand:#6C8CFF; --brand-deep:#AEB6FF; --brand-soft:#1F2D52;
     --accent:#FF8B66; --gold:#F3B34A; --border:#2C2E48;
     --danger:#FF7373; --good:#4FC26B;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 14px 30px -14px rgba(0,0,0,.6);
@@ -782,6 +782,112 @@
   .dialog-backdrop{ z-index:1000; }
   .toast{ z-index:1001; }
   .notif-panel{ z-index:900; }
+  /* ============================================================
+     ROUND 2 — fixes from the 2 Oct usability test
+     Flat visuals -> light gradients, clearer roles, onboarding,
+     personal home panel, community tab, fewer nested boxes.
+     ============================================================ */
+  :root{
+    --brand-2:#2F8CE0;
+    --hero:linear-gradient(145deg,#1E3A9F 0%,#3459D0 55%,#2F7FD8 100%);
+    --grad:linear-gradient(135deg,var(--brand) 0%,var(--brand-2) 100%);
+  }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --brand-2:#4F8DF5; } }
+  :root[data-theme="dark"]{ --brand-2:#4F8DF5; }
+  .screen[data-role="mentor"]{ --brand-2:#2DB596; --hero:linear-gradient(145deg,#0A5C50 0%,#0E8272 55%,#2AA88E 100%); }
+  .screen[data-role="admin"]{ --brand-2:#9358D6; --hero:linear-gradient(145deg,#4A1F7D 0%,#6B2FB3 55%,#8A4FCB 100%); }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) .screen[data-role="mentor"]{ --brand-2:#6FD8C4; }
+    :root:not([data-theme="light"]) .screen[data-role="admin"]{ --brand-2:#D2B0F5; }
+  }
+  :root[data-theme="dark"] .screen[data-role="mentor"]{ --brand-2:#6FD8C4; }
+  :root[data-theme="dark"] .screen[data-role="admin"]{ --brand-2:#D2B0F5; }
+
+  /* Gradients: kept to one soft shift so colours stop looking flat */
+  .app-header{ background:linear-gradient(180deg,var(--brand-soft) 0%,var(--surface) 88%); }
+  .btn-brand,
+  .screen[data-role="mentor"] .btn-brand,
+  .screen[data-role="mentor"] .btn-primary{ background:var(--grad); }
+  .btn-primary{ background:linear-gradient(135deg,var(--accent),#FF8F4D); }
+  .role-bar button.on{ background:var(--grad); }
+  .send-btn,
+  .bubble-wrap.me .bubble,
+  .profile-hero .rate-tag{ background:var(--grad); }
+  .slot-btn.active{ background:var(--grad); border-color:transparent; }
+  .seats-bar i{ background:var(--grad); }
+  .cal-day.selected{ background:var(--grad); color:#fff; }
+  .date-block{ background:linear-gradient(160deg,var(--brand-soft),color-mix(in srgb,var(--brand-2) 20%,var(--surface))); }
+  .date-block.competition{ background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 14%,var(--surface)),color-mix(in srgb,var(--gold) 22%,var(--surface))); }
+  .avatar,.group-icon{ background-image:linear-gradient(160deg,rgba(255,255,255,.24),rgba(255,255,255,0) 60%) !important; }
+
+  /* Role switch with a plain-language sub-label */
+  .role-bar button{ min-height:46px; }
+  .rb-text{ display:flex; flex-direction:column; align-items:center; line-height:1.15; }
+  .rb-text b{ font-weight:800; font-size:12.5px; }
+  .rb-text small{ font-size:10.5px; font-weight:600; opacity:.8; }
+
+  /* Fewer boxes inside boxes */
+  .cal-card{ border:none; background:none; padding:0 0 4px; margin-bottom:14px; }
+  .cal-agenda{ border-top:none; padding-top:8px; }
+  .earn-row{ gap:0; background:var(--surface-alt); border-radius:14px; }
+  .earn-row div{ background:none; border-radius:0; padding:12px 14px; }
+  .earn-row div + div{ border-left:1px solid var(--border); }
+  .create-cta{ background:var(--grad); color:#fff; border:none; }
+  .create-cta .plus{ background:none; width:28px; height:28px; border-radius:0; }
+  .create-cta .plus svg{ width:24px; height:24px; }
+  .block h4{ font-size:14px; color:var(--ink); }
+  .booking-date span{ text-transform:none; }
+
+  /* Education motif (one per screen, faint) */
+  .hp-art{ position:absolute; width:64px; height:64px; right:14px; top:14px; opacity:.18; color:#fff; pointer-events:none; }
+
+  /* Personal home panel on Discover */
+  .home-panel{ position:relative; overflow:hidden; background:var(--hero); color:#fff; border-radius:var(--radius-lg); padding:18px; margin:6px 0 6px; }
+  .home-panel .hp-label{ margin:0; font-size:12.5px; font-weight:700; opacity:.9; }
+  .home-panel h3{ margin:4px 0 2px; font-size:17px; font-weight:800; letter-spacing:-0.01em; line-height:1.3; padding-right:56px; }
+  .home-panel p{ margin:0; font-size:12.5px; font-weight:600; opacity:.95; }
+  .hp-row{ display:flex; align-items:center; gap:20px; margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,.25); }
+  .hp-row div{ font-size:11.5px; font-weight:600; }
+  .hp-row strong{ display:block; font-size:19px; font-weight:800; line-height:1.1; }
+  .hp-link{ margin-left:auto; background:rgba(255,255,255,.18); color:#fff; border:none; border-radius:100px; padding:8px 13px; font-size:12px; font-weight:800; }
+
+  /* Sign-in screen */
+  .screen .auth{ padding:0; }
+  .auth-hero{ flex:none; position:relative; overflow:hidden; background:var(--hero); color:#fff; padding:calc(48px + env(safe-area-inset-top,0px)) 24px 28px; border-radius:0 0 30px 30px; }
+  .auth-hero .hp-art{ top:auto; bottom:-16px; right:-12px; width:140px; height:140px; }
+  .auth-mark{ position:relative; width:60px; height:60px; border-radius:18px; background:#fff; display:flex; align-items:center; justify-content:center; }
+  .auth-mark img.auth-logo{ width:40px; height:40px; }
+  .auth-hero h1{ position:relative; color:#fff; margin:16px 0 6px; }
+  .auth-hero .lead{ position:relative; color:rgba(255,255,255,.92); margin:0; max-width:290px; }
+  .auth-body{ padding:22px 24px 28px; }
+
+  /* First-run guide */
+  .onboard{ position:absolute; inset:0; z-index:1200; background:var(--surface); display:flex; flex-direction:column; }
+  .onboard[hidden]{ display:none; }
+  .ob-hero{ flex:none; position:relative; overflow:hidden; background:var(--hero); color:#fff; padding:calc(52px + env(safe-area-inset-top,0px)) 24px 26px; border-radius:0 0 28px 28px; }
+  .ob-hero .hp-art{ top:auto; bottom:-18px; right:-14px; width:130px; height:130px; }
+  .ob-hero h2{ position:relative; margin:0 0 6px; font-size:23px; font-weight:800; letter-spacing:-0.02em; line-height:1.2; }
+  .ob-hero p{ position:relative; margin:0; font-size:13.5px; line-height:1.55; opacity:.94; max-width:270px; }
+  .ob-body{ flex:1; overflow-y:auto; padding:22px 24px; scrollbar-width:none; }
+  .ob-body::-webkit-scrollbar{ display:none; }
+  .ob-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:18px; }
+  .ob-list li{ display:flex; gap:13px; align-items:flex-start; }
+  .ob-ico{ width:36px; height:36px; flex:none; border-radius:11px; background:var(--brand-soft); color:var(--brand); display:flex; align-items:center; justify-content:center; }
+  .ob-ico svg{ width:18px; height:18px; }
+  .ob-list strong{ display:block; font-size:14px; font-weight:800; margin-bottom:2px; }
+  .ob-list li span.ob-txt{ font-size:13px; line-height:1.5; color:var(--ink-soft); }
+  .ob-foot{ flex:none; display:flex; align-items:center; gap:10px; padding:14px 24px calc(20px + env(safe-area-inset-bottom,0px)); border-top:1px solid var(--border); }
+  .ob-dots{ display:flex; gap:6px; flex:1; }
+  .ob-dots i{ width:7px; height:7px; border-radius:50%; background:var(--border); }
+  .ob-dots i.on{ width:20px; border-radius:6px; background:var(--brand); }
+  .ob-foot .btn{ flex:none; padding:12px 24px; }
+  .ob-skip{ background:none; border:none; color:var(--ink-soft); font-weight:700; font-size:13px; padding:10px; }
+
+  /* Community */
+  .person-row.link{ width:100%; background:none; border:none; text-align:left; font-family:inherit; color:var(--ink); border-bottom:1px solid var(--border); padding:11px 0; }
+  .person-row .grow{ flex:1; min-width:0; }
+  .person-row .grow span{ display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .mini-tag{ font-size:11px; font-weight:800; color:var(--brand); margin-left:6px; }
 </style>
 </head>
 <body>
@@ -851,6 +957,8 @@ const ic = {
   shield: sv('<path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>'),
   wallet: sv('<path d="M3 7.5A2.5 2.5 0 015.5 5H18v4"/><rect x="3" y="7.5" width="18" height="12" rx="2.5"/><circle cx="16.5" cy="13.5" r="1.3"/>'),
   history: sv('<path d="M3 12a9 9 0 103-6.7L3 8"/><path d="M3 3v5h5M12 7.5V12l3 2"/>'),
+  cap: sv('<path d="M2.5 9.5L12 5l9.5 4.5L12 14 2.5 9.5z"/><path d="M6.5 11.8V16c0 1.4 2.5 2.8 5.5 2.8s5.5-1.4 5.5-2.8v-4.2"/><path d="M21.5 9.5V15"/>'),
+  people: sv('<circle cx="9" cy="8.5" r="3.2"/><path d="M3 19.5c.9-3.3 3.2-5 6-5s5.1 1.7 6 5"/><circle cx="17.5" cy="9.5" r="2.5"/><path d="M17.5 14.5c2 .2 3.4 1.6 4 4"/>'),
   copy: sv('<rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V6a2.5 2.5 0 00-2.5-2.5H6A2.5 2.5 0 003.5 6v7A2.5 2.5 0 006 15.5h2.5"/>'),
 };
 
@@ -885,7 +993,7 @@ let recovering = /type=recovery/.test(location.hash);
    ============================================================ */
 function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function initials(n){ return String(n || '?').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() || '?'; }
-const COLORS = ['#3547E0','#0E8272','#D9481C','#7A2FC0','#B9760A','#0E7FA8','#C22A6D','#1F8A3B'];
+const COLORS = ['#3459D0','#0E8272','#D9481C','#7A2FC0','#B9760A','#0E7FA8','#C22A6D','#1F8A3B'];
 function colorFor(id){ let h = 0; for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return COLORS[h % COLORS.length]; }
 function avatar(id, name, size = 'sm'){ return `<div class="avatar ${size}" style="background:${colorFor(id)}">${esc(initials(name))}</div>`; }
 const rpFmt = new Intl.NumberFormat('id-ID');
@@ -990,11 +1098,15 @@ function renderAuth(note = ''){
   screenEl.dataset.role = 'student';
   screenEl.innerHTML = `
     <div class="auth">
-      <img class="auth-logo" src="${LOGO}" alt="CourseConnect">
-      <h1>${su ? 'Create your account' : rs ? 'Reset your password' : 'Welcome back'}</h1>
-      <p class="lead">${su ? 'Join classes for your courses and competitions, or host one yourself.'
-        : rs ? 'Enter your email and we’ll send you a link to set a new password.'
-        : 'Log in to see classes, your bookings and your group chats.'}</p>
+      <div class="auth-hero">
+        ${ic.cap.replace('<svg','<svg class="hp-art"')}
+        <span class="auth-mark"><img class="auth-logo" src="${LOGO}" alt="CourseConnect"></span>
+        <h1>${su ? 'Create your account' : rs ? 'Reset your password' : 'Welcome back'}</h1>
+        <p class="lead">${su ? 'Join classes for your courses and competitions, or host one yourself.'
+          : rs ? 'Enter your email and we’ll send you a link to set a new password.'
+          : 'Log in to see classes, your bookings and your group chats.'}</p>
+      </div>
+      <div class="auth-body">
       ${note ? `<div class="form-note">${note}</div>` : ''}
       <form id="authForm" novalidate>
         ${su ? `
@@ -1012,6 +1124,7 @@ function renderAuth(note = ''){
         ${su ? `Already have an account? <button class="link-btn" data-mode="login">Log in</button>`
           : rs ? `<button class="link-btn" data-mode="login">Back to log in</button>`
           : `New here? <button class="link-btn" data-mode="signup">Create an account</button><br><button class="link-btn" data-mode="reset">Forgot password?</button>`}
+      </div>
       </div>
     </div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>`;
@@ -1181,7 +1294,7 @@ function refreshVisible(){
    Student and Mentor are separate spaces with their own tabs.
    ============================================================ */
 const TABS = {
-  student: [['discover','Discover',ic.compass], ['chats','Chats',ic.msg,'chatDot'], ['bookings','Bookings',ic.calendar,'bookDot'], ['profile','Profile',ic.user]],
+  student: [['discover','Discover',ic.compass], ['community','Community',ic.people], ['chats','Chats',ic.msg,'chatDot'], ['bookings','Bookings',ic.calendar,'bookDot'], ['profile','Profile',ic.user]],
   mentor:  [['m-home','My classes',ic.board,'mHomeDot'], ['m-chats','Groups',ic.msg,'mChatDot'], ['m-sched','Schedule',ic.calendar], ['profile','Profile',ic.user]],
   admin:   [['a-pay','Payments',ic.card,'aPayDot'], ['a-payout','Payouts',ic.wallet,'aOutDot'], ['a-history','History',ic.history], ['profile','Profile',ic.user]],
 };
@@ -1199,6 +1312,7 @@ function renderShell(){
     <div class="overlay" id="payOverlay" aria-hidden="true"></div>
     <div class="notif-panel" id="notifPanel"></div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="onboard" id="onboard" hidden></div>
     <div class="dialog-backdrop" id="dialog" hidden>
       <div class="dialog-card" role="alertdialog" aria-modal="true" aria-labelledby="dialogTitle" aria-describedby="dialogBody">
         <h4 id="dialogTitle"></h4><p id="dialogBody"></p>
@@ -1233,10 +1347,10 @@ function setRole(r){
   showToast({ student:'Student view: classes you join', mentor:'Mentor view: classes you host', admin:'Admin view: payments and payouts' }[r]);
 }
 function roleBarHTML(){
-  const roles = [['student','Student','rbS'], ['mentor','Mentor','rbM']];
-  if (isAdmin()) roles.push(['admin','Admin','rbA']);
+  const roles = [['student','Student','Join classes','rbS'], ['mentor','Mentor','Host classes','rbM']];
+  if (isAdmin()) roles.push(['admin','Admin','Payments','rbA']);
   return `<div class="role-bar" role="tablist" aria-label="Switch view">
-    ${roles.map(([r, l, id]) => `<button role="tab" class="${state.role === r ? 'on' : ''}" aria-selected="${state.role === r}" onclick="setRole('${r}')">${l}<i id="${id}" hidden></i></button>`).join('')}
+    ${roles.map(([r, l, sub, id]) => `<button role="tab" class="${state.role === r ? 'on' : ''}" aria-selected="${state.role === r}" onclick="setRole('${r}')"><span class="rb-text"><b>${l}</b><small>${sub}</small></span><i id="${id}" hidden></i></button>`).join('')}
   </div>`;
 }
 function updateBadges(){
@@ -1285,6 +1399,7 @@ function renderHeader(){
         <div class="search-bar">${ic.search}<input id="searchInput" type="text" aria-label="Search classes" placeholder="Course code, competition, topic, host" value="${esc(state.query)}" oninput="setQuery(this.value)" autocomplete="off"><button id="clearSearch" onclick="clearSearch()" aria-label="Clear search" ${state.query ? '' : 'hidden'}>${ic.x}</button></div>
         <div class="chip-row" id="chipRow"></div>`;
       break;
+    case 'community': html = simple('Community', 'People and subjects around your classes.'); break;
     case 'chats': {
       const n = joinedClasses().filter(c => isUnread(c.id)).length;
       html = simple('Chats', `${n ? `${n} with new messages. ` : ''}Each class you join has its own group chat.`); break;
@@ -1309,7 +1424,7 @@ function renderHeader(){
 function renderBody(){
   const b = $('appBody'); if (!b) return;
   if (!state.loaded) { b.innerHTML = '<div class="loading">Loading…</div>'; return; }
-  ({ discover: renderDiscover, chats: renderStudentChats, bookings: renderBookings,
+  ({ discover: renderDiscover, community: renderCommunity, chats: renderStudentChats, bookings: renderBookings,
      'm-home': renderMentorHome, 'm-chats': renderMentorChats, 'm-sched': renderMentorSched,
      'a-pay': renderAdminPayments, 'a-payout': renderAdminPayouts, 'a-history': renderAdminHistory,
      profile: renderProfile })[state.tab](b);
@@ -1338,17 +1453,102 @@ function renderDiscover(b){
   const left = c => c.capacity - seatsTaken(c);
   if (state.sort === 'cheapest') list.sort((a, z) => a.price - z.price || a.starts_at.localeCompare(z.starts_at));
   else if (state.sort === 'seats') list.sort((a, z) => left(z) - left(a) || a.starts_at.localeCompare(z.starts_at));
+  const home = (!q && state.filter === 'all') ? studentHomeHTML() : '';
   if (!list.length) {
-    b.innerHTML = `<div class="empty-note">${q || state.filter !== 'all' ? 'No upcoming classes match this search.' : 'No upcoming classes from other mentors yet.'}<br>Want to teach something? Switch to <b>Mentor</b> and create a class.</div>`;
+    b.innerHTML = home + `<div class="empty-note">${q || state.filter !== 'all' ? 'No upcoming classes match this search.' : 'No upcoming classes from other mentors yet.'}<br>Want to teach something? Switch to <b>Mentor</b> and create a class.</div>`;
     return;
   }
-  b.innerHTML = `
+  const picks = home ? majorPicks(list) : [];
+  const picksHTML = picks.length ? `<div class="section-label"><b>Picked for ${esc(state.me.major)}</b></div>${picks.map(classCardHTML).join('')}` : '';
+  b.innerHTML = home + picksHTML + `
     <div class="section-row">
       <div class="section-label"><b>${list.length}</b> upcoming class${list.length === 1 ? '' : 'es'}</div>
       <select class="sort-select" aria-label="Sort classes" onchange="setSort(this.value)">${SORTS.map(([v, l]) => `<option value="${v}" ${state.sort === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
     </div>
     ${list.map(classCardHTML).join('')}`;
 }
+
+/* ---------- Personal home panel + picks for your major ---------- */
+function studentHomeHTML(){
+  const joined = joinedClasses(), upcoming = joined.filter(c => !hasEnded(c)).sort((a, z) => a.starts_at.localeCompare(z.starts_at));
+  const next = upcoming[0], todo = studentTodo().length;
+  const body = next
+    ? `<p class="hp-label">Your next class</p><h3>${esc(next.title)}</h3><p>${whenLabel(next.starts_at)}, ${esc(next.location)}</p>`
+    : `<p class="hp-label">Your week</p><h3>No class booked yet</h3><p>Pick one below to get started.</p>`;
+  return `<div class="home-panel">${ic.cap.replace('<svg', '<svg class="hp-art"')}${body}
+    <div class="hp-row"><div><strong>${joined.length}</strong>Joined</div><div><strong>${todo}</strong>To do</div><button class="hp-link" onclick="openOnboarding()">How it works</button></div></div>`;
+}
+function majorPicks(list){
+  const words = String(state.me?.major || '').toLowerCase().split(/[^a-z]+/).filter(w => w.length >= 4);
+  if (!words.length) return [];
+  return list.filter(c => !isMember(c) && words.some(w => [c.title, c.subject, c.description].some(v => (v || '').toLowerCase().includes(w)))).slice(0, 3);
+}
+
+/* ============================================================
+   STUDENT — COMMUNITY
+   Built from existing data: people who share a class with you,
+   and subjects that have classes running.
+   ============================================================ */
+let subjectList = [];
+function browseSubject(i){ state.query = subjectList[i] || ''; state.filter = 'all'; setTab('discover'); }
+function renderCommunity(b){
+  const people = new Map();
+  for (const c of joinedClasses()) {
+    const add = (id, p, isMentor) => {
+      if (!id || id === uid()) return;
+      const e = people.get(id) || { id, name: p?.full_name || names.get(id) || 'Member', sub: [p?.campus, p?.major].filter(Boolean).join(', '), shared: [], mentor: false };
+      e.shared.push(c.title); if (isMentor) e.mentor = true; people.set(id, e);
+    };
+    add(c.host_id, c.host, true);
+    c.members.forEach(m => add(m.user_id, m.profile, false));
+  }
+  const bySubject = new Map();
+  for (const c of state.classes.filter(x => !hasEnded(x) && x.subject)) {
+    const e = bySubject.get(c.subject) || { name: c.subject, classes: 0, students: 0 };
+    e.classes++; e.students += seatsTaken(c); bySubject.set(c.subject, e);
+  }
+  subjectList = [...bySubject.values()].sort((a, z) => z.students - a.students);
+  const peopleHTML = people.size
+    ? [...people.values()].map(p => `<div class="person-row" style="border-bottom:1px solid var(--border);padding:11px 0">${avatar(p.id, p.name)}<div class="grow"><strong>${esc(p.name)}${p.mentor ? '<span class="mini-tag">Mentor</span>' : ''}</strong><span>${esc(p.sub || 'In ' + p.shared[0] + (p.shared.length > 1 ? ' and ' + (p.shared.length - 1) + ' more' : ''))}</span></div></div>`).join('')
+    : `<div class="empty-note">Join a class and the people in it show up here.<br><button class="link-btn" onclick="setTab('discover')">Browse classes</button></div>`;
+  const subjHTML = subjectList.length
+    ? subjectList.map((s, i) => `<button class="person-row link" onclick="browseSubject(${i})"><div class="group-icon sm" style="background:${colorFor(s.name)}">${esc(initials(s.name))}</div><div class="grow"><strong>${esc(s.name)}</strong><span>${s.classes} upcoming class${s.classes === 1 ? '' : 'es'}, ${s.students} student${s.students === 1 ? '' : 's'} joined</span></div>${ic.next.replace('<svg', '<svg style="width:16px;height:16px;color:var(--ink-faint)"')}</button>`).join('')
+    : `<div class="empty-note">No subjects have upcoming classes yet.</div>`;
+  b.innerHTML = `<div class="section-label"><b>People in your classes</b></div>${peopleHTML}
+    <div class="section-label" style="margin-top:22px"><b>Subjects with classes running</b></div>${subjHTML}`;
+}
+
+/* ============================================================
+   FIRST-RUN GUIDE (also reachable from Profile and Discover)
+   ============================================================ */
+const OB = [
+  { title:'One account, two views', lead:'You can learn in one course and teach another. The tabs at the top switch between the two.',
+    items:[['compass','Student','Find a class for your course or competition, book a seat, and join its group chat.'],
+           ['board','Mentor','Create a class with seats, price, date and place. You get paid after the class takes place.'],
+           ['user','Switch any time','Student and Mentor change the whole screen. Your account and chats stay the same.']] },
+  { title:'Joining a class', lead:'From search to group chat in four steps.',
+    items:[['search','Search','Type a course code, a competition or a topic. Filter by Courses, Competitions or Free.'],
+           ['calendar','Compare','Each class shows its mentor, price, seats left, date and place.'],
+           ['card','Book and pay','Paid classes give you a virtual account to transfer to. Once it is verified you are in.'],
+           ['msg','Learn together','Every class has a group chat. After the class, confirm that it happened.']] },
+  { title:'Hosting a class', lead:'Set it up once and students can find it on Discover.',
+    items:[['plus','Create','Pick Course or Competition, set seats and price, then choose a date and place.'],
+           ['msg','Teach','Students who join land in the class group chat.'],
+           ['wallet','Get paid','Add your bank account in Profile. After the class, confirm it happened and the admin releases your payout.']] },
+];
+let obStep = 0;
+function openOnboarding(){ obStep = 0; drawOnboarding(); $('onboard').hidden = false; }
+function drawOnboarding(){
+  const s = OB[obStep], last = obStep === OB.length - 1;
+  $('onboard').innerHTML = `
+    <div class="ob-hero">${ic.cap.replace('<svg', '<svg class="hp-art"')}<h2>${s.title}</h2><p>${s.lead}</p></div>
+    <div class="ob-body"><ul class="ob-list">${s.items.map(([i, t, d]) => `<li><span class="ob-ico">${ic[i]}</span><div><strong>${t}</strong><span class="ob-txt">${d}</span></div></li>`).join('')}</ul></div>
+    <div class="ob-foot"><div class="ob-dots">${OB.map((_, i) => `<i class="${i === obStep ? 'on' : ''}"></i>`).join('')}</div>
+      ${last ? '' : '<button class="ob-skip" onclick="closeOnboarding()">Skip</button>'}
+      <button class="btn btn-brand" onclick="${last ? 'closeOnboarding()' : 'nextOnboarding()'}">${last ? 'Get started' : 'Next'}</button></div>`;
+}
+function nextOnboarding(){ obStep++; drawOnboarding(); }
+function closeOnboarding(){ lsSet('cc_onboarded_' + uid(), true); $('onboard').hidden = true; }
 
 function classCardHTML(c){
   const taken = seatsTaken(c), full = taken >= c.capacity, pct = Math.min(100, Math.round(taken / c.capacity * 100));
@@ -1990,6 +2190,7 @@ function renderProfile(b){
     <div class="field-label">${mentor ? 'About you (shown on your classes)' : 'About you'}</div>
     <div class="field-box" style="white-space:pre-wrap">${me.bio ? esc(me.bio) : 'Add a short bio: what you’re good at, courses you aced, competitions you’ve won.'}</div>
     <button class="btn btn-ghost" style="margin-top:14px;width:100%" onclick="openEditProfile()">Edit profile</button>
+    <button class="btn btn-ghost" style="margin-top:10px;width:100%" onclick="openOnboarding()">${ic.cap}How CourseConnect works</button>
     ${bankBlockHTML()}
     <p class="role-hint">Switch between Student and Mentor at the top. Same account, two views.</p>`;
 }
@@ -2204,6 +2405,7 @@ async function start(session){
   state.loaded = true;
   setTab(state.tab);
   subscribeRealtime();
+  if (!lsGet('cc_onboarded_' + uid(), false)) openOnboarding();
 }
 
 function boot(){
@@ -2230,6 +2432,8 @@ function boot(){
 // Escape closes whatever is on top: dialog → notifications → top overlay
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
+  const ob = $('onboard');
+  if (ob && !ob.hidden) return closeOnboarding();
   const dlg = $('dialog');
   if (dlg && !dlg.hidden) return closeDialog(false);
   const panel = $('notifPanel');
