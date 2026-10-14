@@ -1058,11 +1058,6 @@
     .app-body[data-tab="a-payout"] > .stat-row{ justify-content:flex-start; gap:40px; padding-left:2px; }
     .app-body[data-tab="m-home"] > .m-card{ max-width:720px; justify-self:start; width:100%; }
 
-    /* calendar: compact cells instead of huge squares */
-    .cal-card{ max-width:520px !important; }
-    .cal-day{ aspect-ratio:auto; height:42px; }
-    .app-body[data-tab="bookings"] > .cal-card, .app-body[data-tab="m-sched"] > .cal-card{ max-width:520px; }
-    .cal-agenda .class-card{ margin-bottom:10px; }
 
     /* dashboards */
     .dash-grid{ margin-top:8px; }
@@ -1080,6 +1075,104 @@
     /* sign-in */
     .auth-body{ max-width:520px; }
     .auth-hero{ min-height:100%; }
+  }
+
+  /* ============================================================
+     ROUND 5 — role-aware gradients, calendar card, full-screen desktop
+     ============================================================ */
+  /* Bug fix: --grad was resolved at :root, so Mentor/Admin gradients stayed blue. Re-resolve per screen. */
+  .screen{ --grad:linear-gradient(135deg,var(--brand) 0%,var(--brand-2) 100%); }
+
+  /* Calendar as a proper card (phone + desktop) */
+  .cal-card{ position:relative; overflow:hidden; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px 14px 12px; margin-bottom:16px; box-shadow:var(--shadow); }
+  .cal-card::before{ content:''; position:absolute; left:0; right:0; top:0; height:5px; background:var(--grad); }
+  .cal-head{ margin-bottom:12px; }
+  .cal-head strong{ font-size:15.5px; letter-spacing:-0.01em; }
+  .cal-nav-btn{ width:32px; height:32px; border:none; background:var(--brand-soft); color:var(--brand); }
+  .cal-nav-btn:not(:disabled):hover{ background:var(--brand); color:#fff; }
+  .cal-dow{ margin-bottom:6px; }
+  .cal-dow span:first-child, .cal-dow span:last-child{ color:var(--accent); }
+  .cal-grid{ row-gap:6px; }
+  .cal-day{ width:100%; max-width:44px; margin:0 auto; border-radius:50%; font-size:12.5px; transition:background .15s ease, transform .15s ease; }
+  .cal-day.has{ background:color-mix(in srgb,var(--brand) 14%,var(--surface)); color:var(--brand-deep); }
+  .cal-day.today{ box-shadow:inset 0 0 0 2px var(--accent); color:var(--ink); }
+  .cal-day.selected{ background:var(--grad); color:#fff; box-shadow:0 6px 14px -6px color-mix(in srgb,var(--brand) 80%,transparent); }
+  .cal-day .cal-dot{ bottom:5px; width:5px; height:5px; background:var(--accent); }
+  .cal-day.has:not(.selected) .cal-dot{ background:var(--brand); }
+  .cal-day.past-dot:not(.selected){ opacity:.7; }
+  .cal-agenda{ border-top:1px dashed var(--border); margin-top:12px; padding-top:12px; }
+  .cal-agenda .class-card{ margin-bottom:10px; }
+  .split-cal, .split-list{ min-width:0; }
+
+  @media (min-width: 900px){
+    /* True full screen: the window is the app, whatever the monitor size */
+    .stage{ padding:0; gap:0; min-height:100dvh; justify-content:flex-start; }
+    .device{ width:100%; max-width:none; height:100dvh; min-height:0; padding:0; border:none; border-radius:0; box-shadow:none; background:var(--surface); }
+    .screen{ border-radius:0; --side:clamp(216px,17vw,280px); }
+    .screen:has(> .app-header){
+      grid-template-columns:var(--side) minmax(0,1fr);
+      background:
+        radial-gradient(900px 420px at 100% 0%, color-mix(in srgb,var(--accent) 13%,transparent), transparent 70%),
+        radial-gradient(900px 480px at 15% 0%, color-mix(in srgb,var(--brand-2) 16%,transparent), transparent 70%),
+        radial-gradient(700px 500px at 100% 100%, color-mix(in srgb,var(--brand) 10%,transparent), transparent 70%),
+        var(--surface);
+    }
+    .screen > .app-header{ background:transparent; padding:30px max(40px, calc((100% - 1440px) / 2)) 14px; }
+    .screen > .app-body{ background:transparent; padding:8px max(40px, calc((100% - 1440px) / 2)) 56px; grid-template-columns:repeat(auto-fill,minmax(380px,1fr)); column-gap:18px; }
+    .h1{ font-size:34px; letter-spacing:-0.025em; background:linear-gradient(90deg,var(--ink) 30%,var(--brand)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .h1-sub{ font-size:14.5px; }
+
+    /* Bold, role-coloured sidebar */
+    .screen[data-role] > .tabbar{
+      background:radial-gradient(120% 55% at 0% 100%, rgba(255,255,255,.20), transparent 60%), radial-gradient(90% 40% at 100% 0%, rgba(255,255,255,.14), transparent 70%), var(--hero);
+      border-right:none; padding:28px 16px; box-shadow:6px 0 30px -18px rgba(15,16,32,.5);
+    }
+    .side-brand{ color:#fff; padding:2px 10px 28px; }
+    .side-brand img{ background:#fff; border-radius:11px; padding:4px; width:38px; height:38px; }
+    .tab-btn{ color:rgba(255,255,255,.82); padding:13px 15px; font-size:14.5px; }
+    .tab-btn:not(.active):hover{ background:rgba(255,255,255,.14); color:#fff; }
+    .tab-btn.active{ background:#fff; color:#161829; box-shadow:0 10px 22px -10px rgba(0,0,0,.45); }
+    .tab-btn.active svg{ color:var(--accent); }
+    .tab-dot{ border-color:transparent; right:16px; }
+
+    .role-bar{ background:color-mix(in srgb,var(--brand) 12%,var(--surface)); border:1px solid color-mix(in srgb,var(--brand) 20%,var(--border)); }
+    .role-bar button.on{ box-shadow:0 8px 18px -8px color-mix(in srgb,var(--brand) 80%,transparent); }
+    .chip{ padding:9px 16px; font-size:13px; }
+    .chip:not(.active):hover{ background:var(--brand-soft); }
+
+    /* Cards with a coloured spine */
+    .class-card{ position:relative; overflow:hidden; padding:16px 16px 16px 20px; border-radius:var(--radius-lg); }
+    .class-card::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:5px; background:var(--grad); }
+    .class-card:has(.kind-badge.competition)::before{ background:linear-gradient(180deg,var(--accent),var(--gold)); }
+    .date-block{ width:58px; }
+    .m-card{ box-shadow:var(--shadow); }
+    .chat-row{ padding:14px 18px; margin-bottom:10px; border:1px solid var(--border); border-radius:var(--radius-md); background:var(--surface); box-shadow:var(--shadow); transition:border-color .15s ease, transform .15s ease; }
+    .chat-row:last-child{ border-bottom:1px solid var(--border); }
+    .chat-row:hover{ border-color:color-mix(in srgb,var(--brand) 45%,var(--border)); transform:translateY(-1px); }
+
+    /* Hero panels with a soft light */
+    .home-panel, .dash-grid{ background:radial-gradient(60% 140% at 100% 0%, rgba(255,255,255,.24), transparent 60%), var(--hero); box-shadow:0 18px 40px -22px color-mix(in srgb,var(--brand) 80%,transparent); }
+    .create-cta{ box-shadow:0 14px 30px -16px color-mix(in srgb,var(--brand) 85%,transparent); }
+
+    /* Calendar + list side by side */
+    .app-body[data-tab="bookings"] > .split, .app-body[data-tab="m-sched"] > .split{
+      display:grid; grid-template-columns:minmax(360px,440px) minmax(0,1fr); gap:32px; align-items:start; max-width:none; width:100%; justify-self:stretch;
+    }
+    .split-cal{ position:sticky; top:4px; }
+    .split-list{ display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:14px; align-content:start; }
+    .split-list > .section-label, .split-list > .empty-note{ grid-column:1 / -1; margin:6px 2px 0; }
+    .split-list .class-card{ margin:0; }
+    .cal-card{ margin-bottom:0; padding:22px 20px 16px; }
+    .cal-day{ max-width:46px; font-size:13.5px; }
+
+    .app-body[data-tab="chats"] > *, .app-body[data-tab="m-chats"] > *, .app-body[data-tab="profile"] > *,
+    .app-body[data-tab="a-pay"] > *, .app-body[data-tab="a-payout"] > *, .app-body[data-tab="a-history"] > *{ max-width:860px; }
+    .app-body[data-tab="bookings"] > .m-card, .app-body[data-tab="bookings"] > .section-label{ max-width:860px; }
+
+    .overlay{ width:clamp(440px,34vw,580px); }
+    .toast{ left:calc(var(--side) + (100% - var(--side)) / 2); }
+
+    .auth-hero{ background:radial-gradient(70% 90% at 100% 0%, rgba(255,255,255,.22), transparent 60%), var(--hero); }
   }
 </style>
 </head>
@@ -1989,7 +2082,7 @@ function calendarHTML(list){
   for (let i = 0; i < firstDow; i++) cells += `<span class="cal-day pad"></span>`;
   for (let d = 1; d <= n; d++) {
     const ds = `${y}-${String(m + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const cls = ['cal-day', ds === today && 'today', ds === state.selectedDate && 'selected', byDay[ds] && ds < today && 'past-dot'].filter(Boolean).join(' ');
+    const cls = ['cal-day', ds === today && 'today', ds === state.selectedDate && 'selected', byDay[ds] && 'has', byDay[ds] && ds < today && 'past-dot'].filter(Boolean).join(' ');
     cells += `<button class="${cls}" onclick="selectDay('${ds}')" aria-label="${ds}${byDay[ds] ? ', has classes' : ''}">${d}${byDay[ds] ? '<span class="cal-dot"></span>' : ''}</button>`;
   }
   const label = new Date(y, m, 1).toLocaleDateString('en-GB', { month:'long', year:'numeric' });
@@ -2017,11 +2110,11 @@ function renderBookings(b){
   const recent = state.bookings.filter(x => x.user_id === uid() && !todo.includes(x) && (bStatus(x) === 'awaiting_payment' || (['rejected','expired'].includes(bStatus(x)) && x.class && !hasStarted(x.class))));
   const top = (todo.length ? `<div class="section-label"><b>Needs your action</b></div>${todo.map(myBookingRowHTML).join('')}` : '')
     + (recent.length ? `<div class="section-label"><b>Payments</b></div>${recent.map(myBookingRowHTML).join('')}` : '');
-  b.innerHTML = top + calendarHTML(list) + (state.selectedDate ? '' : listsHTML(list, `Nothing booked yet.<br><button class="link-btn" onclick="setTab('discover')">Find a class on Discover</button>`));
+  b.innerHTML = top + `<div class="split"><div class="split-cal">${calendarHTML(list)}</div><div class="split-list">${state.selectedDate ? '' : listsHTML(list, `Nothing booked yet.<br><button class="link-btn" onclick="setTab('discover')">Find a class on Discover</button>`)}</div></div>`;
 }
 function renderMentorSched(b){
   const list = hostedClasses();
-  b.innerHTML = calendarHTML(list) + (state.selectedDate ? '' : listsHTML(list, `No classes yet.<br><button class="link-btn" onclick="openCreateForm()">Create your first class</button>`));
+  b.innerHTML = `<div class="split"><div class="split-cal">${calendarHTML(list)}</div><div class="split-list">${state.selectedDate ? '' : listsHTML(list, `No classes yet.<br><button class="link-btn" onclick="openCreateForm()">Create your first class</button>`)}</div></div>`;
 }
 
 /* ============================================================
