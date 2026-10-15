@@ -1169,6 +1169,101 @@
 
     .auth-hero{ background:var(--hero); }
   }
+  /* ============================================================
+     ROUND 6 — fuller desktop: messenger-style chats, split profile,
+     mentor home grid. All inside the desktop query; phone untouched.
+     ============================================================ */
+  .pf, .pf-side, .pf-main, .pf-card, .pf-actions{ display:block; }
+  @media (min-width: 900px){
+    .screen > .app-header{ padding-left:max(36px, calc((100% - 1800px) / 2)); padding-right:max(36px, calc((100% - 1800px) / 2)); }
+    .screen > .app-body{ padding-left:max(36px, calc((100% - 1800px) / 2)); padding-right:max(36px, calc((100% - 1800px) / 2)); }
+    .screen .app-body[data-tab] > *{ max-width:none; }
+    .screen .app-body[data-tab="dashboard"] > *, .screen .app-body[data-tab="m-dash"] > *,
+    .screen .app-body[data-tab="a-pay"] > *, .screen .app-body[data-tab="a-payout"] > *, .screen .app-body[data-tab="a-history"] > *{ grid-column:1 / -1; justify-self:stretch; width:100%; }
+    .screen .app-body[data-tab="a-pay"], .screen .app-body[data-tab="a-payout"], .screen .app-body[data-tab="a-history"]{ grid-template-columns:repeat(auto-fill,minmax(480px,1fr)); }
+
+    /* ---- Chats: list grid, or messenger split once a chat is open ---- */
+    .screen .app-body[data-tab="chats"], .screen .app-body[data-tab="m-chats"]{ grid-template-columns:repeat(auto-fill,minmax(440px,1fr)); row-gap:12px; }
+    .screen .app-body[data-tab="chats"] > .chat-row, .screen .app-body[data-tab="m-chats"] > .chat-row{ margin:0; padding:16px 20px; grid-column:auto; }
+    .screen .app-body[data-tab="chats"] > .empty-note, .screen .app-body[data-tab="m-chats"] > .empty-note{ grid-column:1 / -1; }
+    .chat-row .group-icon{ width:48px; height:48px; border-radius:15px; }
+    .chat-top strong{ font-size:14.5px; }
+    .chat-preview{ font-size:13px; }
+
+    .screen:has(.app-body[data-tab$="chats"] ~ #chatOverlay.open), .screen{ --chatw:max(520px, calc(100vw - var(--side) - 440px)); }
+    .screen:has(#chatOverlay.open):has(.app-body[data-tab$="chats"]) > .app-header,
+    .screen:has(#chatOverlay.open):has(.app-body[data-tab$="chats"]) > .app-body{ padding-right:calc(var(--chatw) + 28px); padding-left:28px; }
+    .screen:has(#chatOverlay.open):has(.app-body[data-tab$="chats"]) .app-body[data-tab$="chats"]{ grid-template-columns:minmax(0,1fr); }
+    .screen:has(.app-body[data-tab$="chats"]) #chatOverlay{ width:var(--chatw); }
+    .screen:has(.app-body[data-tab$="chats"]) #chatOverlay.open{ box-shadow:none; border-left:1px solid var(--border); }
+    .screen:has(#chatOverlay.open):has(.app-body[data-tab$="chats"]) .role-bar{ max-width:none; }
+
+    /* ---- Message UI ---- */
+    #chatOverlay .overlay-header{ padding:16px 26px; gap:14px; background:var(--surface); }
+    #chatOverlay .overlay-title{ font-size:16.5px; }
+    #chatOverlay .overlay-sub{ font-size:12.5px; }
+    #chatOverlay .overlay-body{ background:var(--surface-alt); }
+    #chatOverlay .thread{ padding:26px clamp(24px,4vw,72px) 18px; gap:3px; min-height:100%; justify-content:flex-end; }
+    #chatOverlay .bubble-wrap{ max-width:min(620px,68%); margin-top:10px; }
+    #chatOverlay .bubble-wrap.cont{ margin-top:2px; }
+    #chatOverlay .bubble{ font-size:14.5px; line-height:1.5; padding:10px 15px; border-radius:18px; }
+    #chatOverlay .bubble-wrap.them .bubble{ background:var(--surface); border:1px solid var(--border); }
+    #chatOverlay .bubble-wrap.them:not(.cont) .bubble{ border-top-left-radius:5px; }
+    #chatOverlay .bubble-wrap.me:not(.cont) .bubble{ border-top-right-radius:5px; }
+    #chatOverlay .bubble-wrap.me .bubble{ border-bottom-right-radius:18px; }
+    #chatOverlay .bubble-wrap.them .bubble{ border-bottom-left-radius:18px; }
+    #chatOverlay .bubble-author{ font-size:12px; color:var(--brand); margin-left:6px; }
+    #chatOverlay .bubble-time{ font-size:11px; }
+    #chatOverlay .day-sep{ background:var(--surface); border:1px solid var(--border); padding:4px 12px; border-radius:100px; margin:18px 0 8px; }
+    #chatOverlay .sys-msg{ background:var(--surface); border:1px solid var(--border); }
+    #chatOverlay .composer{ padding:14px 26px 18px; gap:12px; background:var(--surface); align-items:flex-end; }
+    #chatOverlay .composer textarea{ font-size:14.5px; padding:13px 20px; border-radius:26px; background:var(--surface-alt); }
+    #chatOverlay .send-btn{ width:46px; height:46px; background:var(--grad); }
+    #chatOverlay .send-btn svg{ width:18px; height:18px; }
+
+    /* ---- Profile: side card + content cards ---- */
+    .screen .app-body[data-tab="profile"]{ display:block; }
+    .pf{ display:grid; grid-template-columns:minmax(300px,400px) minmax(0,1fr); gap:24px; align-items:start; }
+    .pf-side{ position:sticky; top:4px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:32px 24px 26px; box-shadow:var(--shadow); }
+    .pf-side .profile-top{ padding:0 0 6px; }
+    .pf-side .profile-top h3{ font-size:21px; }
+    .pf-side .stat-row{ border-top:1px solid var(--border) !important; margin-top:18px; padding:20px 0 0; gap:56px; }
+    .pf-side .stat strong{ font-size:26px; }
+    .pf-main{ display:grid; grid-template-columns:repeat(auto-fit,minmax(380px,1fr)); gap:16px; align-items:start; }
+    .pf-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px 22px 22px; box-shadow:var(--shadow); }
+    .pf-card .field-label{ margin:0 0 10px; font-size:12.5px; }
+    .pf-card .field-box{ background:var(--surface-alt); border:none; }
+    .pf-wide{ grid-column:1 / -1; }
+    .pf-actions{ grid-column:1 / -1; display:flex; gap:14px; order:0; }
+    .pf-actions .btn{ margin:0 !important; flex:1; width:auto !important; padding-top:15px; padding-bottom:15px; }
+    .pf-main > .role-hint{ text-align:left; margin:0 4px; }
+    .pf-card .role-hint{ text-align:left; }
+
+    /* ---- Mentor home: 12-col grid ---- */
+    .screen .app-body[data-tab="m-home"]{ grid-template-columns:repeat(12,minmax(0,1fr)); row-gap:14px; }
+    .screen .app-body[data-tab="m-home"] > *{ grid-column:1 / -1; max-width:none; width:100%; justify-self:stretch; }
+    .screen .app-body[data-tab="m-home"] > .stat-row{ grid-column:span 5; background:var(--surface); border:1px solid var(--border) !important; border-radius:var(--radius-lg); padding:22px 28px !important; justify-content:space-around; gap:20px; box-shadow:var(--shadow); align-items:center; }
+    .screen .app-body[data-tab="m-home"] > .stat-row .stat strong{ font-size:32px; }
+    .screen .app-body[data-tab="m-home"] > .earn-row{ grid-column:span 7; margin:0; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow); align-items:center; }
+    .screen .app-body[data-tab="m-home"] > .earn-row div{ padding:22px 28px; }
+    .screen .app-body[data-tab="m-home"] > .earn-row strong{ font-size:28px; margin-top:6px; }
+    .screen .app-body[data-tab="m-home"] > .earn-row span{ font-size:12.5px; }
+    .screen .app-body[data-tab="m-home"] > .hint{ margin:0 4px; text-align:left; }
+    .screen .app-body[data-tab="m-home"] > .create-cta{ padding:22px 28px; border-radius:var(--radius-lg); }
+    .screen .app-body[data-tab="m-home"] > .create-cta strong{ font-size:17px; }
+    .screen .app-body[data-tab="m-home"] > .create-cta span{ font-size:13.5px; }
+    .screen .app-body[data-tab="m-home"] > .class-card, .screen .app-body[data-tab="m-home"] > .m-card{ grid-column:span 6; margin:0; }
+    .screen .app-body[data-tab="m-home"] > .section-label{ margin:10px 2px 0; }
+    .screen .app-body[data-tab="m-home"] > .empty-note{ background:var(--surface); border:1px dashed var(--border); border-radius:var(--radius-lg); padding:44px 20px; }
+  }
+  @media (min-width: 1500px){
+    .screen .app-body[data-tab="m-home"] > .class-card, .screen .app-body[data-tab="m-home"] > .m-card{ grid-column:span 4; }
+  }
+  @media (min-width: 900px) and (max-width: 1199px){
+    .screen .app-body[data-tab="m-home"] > .stat-row, .screen .app-body[data-tab="m-home"] > .earn-row{ grid-column:1 / -1; }
+    .pf{ grid-template-columns:1fr; }
+    .pf-side{ position:static; }
+  }
 </style>
 </head>
 <body>
@@ -2564,23 +2659,31 @@ function renderAdminHistory(el){
 function renderProfile(b){
   const me = state.me || {}, mentor = state.role === 'mentor';
   b.innerHTML = `
-    <div class="profile-top">
-      ${avatar(me.id, me.full_name, 'lg')}
-      <h3>${esc(me.full_name)}</h3>
-      <p>${esc([me.campus, me.major].filter(Boolean).join(', ') || state.session.user.email)}</p>
-      <span class="role-pill">${state.role === 'admin' ? 'Admin view' : mentor ? 'Mentor view' : 'Student view'}</span>
+    <div class="pf">
+    <div class="pf-side">
+      <div class="profile-top">
+        ${avatar(me.id, me.full_name, 'lg')}
+        <h3>${esc(me.full_name)}</h3>
+        <p>${esc([me.campus, me.major].filter(Boolean).join(', ') || state.session.user.email)}</p>
+        <span class="role-pill">${state.role === 'admin' ? 'Admin view' : mentor ? 'Mentor view' : 'Student view'}</span>
+      </div>
+      <div class="stat-row" style="border:none">
+        <div class="stat"><strong>${joinedClasses().length}</strong><span>Joined</span></div>
+        <div class="stat"><strong>${hostedClasses().length}</strong><span>Hosting</span></div>
+      </div>
     </div>
-    <div class="stat-row" style="border:none">
-      <div class="stat"><strong>${joinedClasses().length}</strong><span>Joined</span></div>
-      <div class="stat"><strong>${hostedClasses().length}</strong><span>Hosting</span></div>
+    <div class="pf-main">
+      <div class="pf-card pf-wide"><div class="field-label">${mentor ? 'About you (shown on your classes)' : 'About you'}</div>
+      <div class="field-box" style="white-space:pre-wrap">${me.bio ? esc(me.bio) : 'Add a short bio: what you’re good at, courses you aced, competitions you’ve won.'}</div></div>
+      <div class="pf-actions">
+        <button class="btn btn-ghost" style="margin-top:14px;width:100%" onclick="openEditProfile()">Edit profile</button>
+        <button class="btn btn-ghost" style="margin-top:10px;width:100%" onclick="openOnboarding()">${ic.cap}How CourseConnect works</button>
+      </div>
+      ${mentor ? `<div class="pf-card">${credBlockHTML()}</div>` : ''}
+      <div class="pf-card">${bankBlockHTML()}</div>
+      <p class="role-hint pf-wide">Switch between Student and Mentor at the top. Same account, two views.</p>
     </div>
-    <div class="field-label">${mentor ? 'About you (shown on your classes)' : 'About you'}</div>
-    <div class="field-box" style="white-space:pre-wrap">${me.bio ? esc(me.bio) : 'Add a short bio: what you’re good at, courses you aced, competitions you’ve won.'}</div>
-    <button class="btn btn-ghost" style="margin-top:14px;width:100%" onclick="openEditProfile()">Edit profile</button>
-    <button class="btn btn-ghost" style="margin-top:10px;width:100%" onclick="openOnboarding()">${ic.cap}How CourseConnect works</button>
-    ${mentor ? credBlockHTML() : ''}
-    ${bankBlockHTML()}
-    <p class="role-hint">Switch between Student and Mentor at the top. Same account, two views.</p>`;
+    </div>`;
 }
 
 function openEditProfile(){
