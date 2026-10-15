@@ -942,6 +942,18 @@
   .cred-skill{ display:inline-block; font-style:normal; font-size:11px; font-weight:800; margin-top:6px; padding:3px 9px; border-radius:100px; background:var(--brand-soft); color:var(--brand-deep); }
   .cred-link{ display:block; margin-top:6px; font-size:12px; font-weight:800; color:var(--brand); }
   .cred-list{ margin-top:6px; }
+  .cred-actions{ display:flex; gap:6px; flex:none; }
+  .cred-actions .icon-btn{ width:32px; height:32px; }
+  .profile-progress{ background:linear-gradient(135deg,var(--brand-soft),color-mix(in srgb,var(--brand-2) 12%,var(--surface))); border:1px solid color-mix(in srgb,var(--brand) 20%,var(--border)); border-radius:var(--radius-lg); padding:17px 18px; }
+  .profile-progress-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .profile-progress-top strong{ font-size:14px; font-weight:800; }
+  .profile-progress-top span{ color:var(--brand-deep); font-size:13px; font-weight:800; }
+  .profile-progress-bar{ height:8px; border-radius:100px; overflow:hidden; background:color-mix(in srgb,var(--surface) 62%,transparent); margin:10px 0 8px; }
+  .profile-progress-bar i{ display:block; height:100%; border-radius:inherit; background:var(--grad); }
+  .profile-progress p{ margin:0; color:var(--ink-soft); font-size:12px; line-height:1.5; font-weight:600; }
+  .profile-preview-meta{ text-align:center; color:var(--ink-soft); font-size:12.5px; font-weight:600; margin:3px 0 0; }
+  .manual-review-note{ display:flex; gap:9px; align-items:flex-start; background:color-mix(in srgb,var(--gold) 14%,var(--surface)); color:var(--ink-soft); border-radius:12px; padding:11px 12px; margin:0 0 14px; font-size:12px; line-height:1.5; font-weight:650; }
+  .manual-review-note svg{ width:17px; height:17px; flex:none; color:var(--gold); margin-top:1px; }
 
   /* ---------- Desktop: a real app layout, not a phone in a window ---------- */
   @media (min-width: 900px){
@@ -1338,6 +1350,8 @@ const ic = {
   cap: sv('<path d="M2.5 9.5L12 5l9.5 4.5L12 14 2.5 9.5z"/><path d="M6.5 11.8V16c0 1.4 2.5 2.8 5.5 2.8s5.5-1.4 5.5-2.8v-4.2"/><path d="M21.5 9.5V15"/>'),
   people: sv('<circle cx="9" cy="8.5" r="3.2"/><path d="M3 19.5c.9-3.3 3.2-5 6-5s5.1 1.7 6 5"/><circle cx="17.5" cy="9.5" r="2.5"/><path d="M17.5 14.5c2 .2 3.4 1.6 4 4"/>'),
   copy: sv('<rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V6a2.5 2.5 0 00-2.5-2.5H6A2.5 2.5 0 003.5 6v7A2.5 2.5 0 006 15.5h2.5"/>'),
+  edit: sv('<path d="M4 20h4l11-11a2.8 2.8 0 00-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/>'),
+  eye: sv('<path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"/><circle cx="12" cy="12" r="2.7"/>'),
 };
 
 /* ============================================================
@@ -1948,13 +1962,14 @@ function credsOf(p){ return Array.isArray(p?.credentials) ? p.credentials : []; 
 function credRowHTML(c, i, editable){
   const meta = [c.issuer, c.year].filter(Boolean).join(' · ');
   const link = c.url && /^https?:\/\//i.test(c.url) ? `<a class="cred-link" href="${esc(c.url)}" target="_blank" rel="noopener noreferrer">View certificate</a>` : '';
-  return `<div class="cred-row"><span class="cred-ico">${ic.award}</span><div class="cred-main"><strong>${esc(c.title)}</strong>${meta ? `<span>${esc(meta)}</span>` : ''}${c.skill ? `<em class="cred-skill">${esc(c.skill)}</em>` : ''}${link}</div>${editable ? `<button class="icon-btn" onclick="askRemoveCredential(${i})" aria-label="Remove credential">${ic.x}</button>` : ''}</div>`;
+  return `<div class="cred-row"><span class="cred-ico">${ic.award}</span><div class="cred-main"><strong>${esc(c.title)}</strong>${meta ? `<span>${esc(meta)}</span>` : ''}${c.skill ? `<em class="cred-skill">${esc(c.skill)}</em>` : ''}${link}</div>${editable ? `<div class="cred-actions"><button class="icon-btn" onclick="openCredentialForm(${i})" aria-label="Edit credential" title="Edit">${ic.edit}</button><button class="icon-btn" onclick="askRemoveCredential(${i})" aria-label="Remove credential" title="Remove">${ic.x}</button></div>` : ''}</div>`;
 }
 function credBlockHTML(){
   const list = credsOf(state.me);
   return `<div class="field-label">Credentials and certificates</div>
     ${list.length ? list.map((c, i) => credRowHTML(c, i, true)).join('') : `<div class="field-box">Add certificates that show you can teach a skill. Students see them on your classes.</div>`}
-    <button class="btn btn-ghost" style="margin-top:10px;width:100%" onclick="openCredentialForm()">${ic.award}Add a credential</button>`;
+    <button class="btn btn-ghost" style="margin-top:10px;width:100%" onclick="openCredentialForm()">${ic.award}Add a credential</button>
+    <p class="role-hint">Credentials are shown to students on every class you host.</p>`;
 }
 async function saveCredentials(list){
   const { data, error } = await sb.from('profiles').update({ credentials: list }).eq('id', uid()).select('*').single();
@@ -1962,20 +1977,22 @@ async function saveCredentials(list){
   state.me = data; await loadClasses().catch(() => {});
   return true;
 }
-function openCredentialForm(){
-  if (credsOf(state.me).length >= 8) return showToast('You can add up to 8 credentials.', true);
+function openCredentialForm(editIndex = null){
+  const editing = Number.isInteger(editIndex), current = editing ? credsOf(state.me)[editIndex] : null;
+  if (editing && !current) return showToast('That credential no longer exists.', true);
+  if (!editing && credsOf(state.me).length >= 8) return showToast('You can add up to 8 credentials.', true);
   $('formOverlay').innerHTML = `
-    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay('formOverlay')" aria-label="Back">${ic.back}</button><div class="overlay-title">Add a credential</div></div>
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay('formOverlay')" aria-label="Back">${ic.back}</button><div class="overlay-title">${editing ? 'Edit credential' : 'Add a credential'}</div></div>
     <form class="overlay-body" id="credForm" novalidate><div class="pad">
-      <div class="field"><label for="crTitle">Certificate or credential</label><input class="input" id="crTitle" maxlength="90" placeholder="e.g. Google Data Analytics Certificate"></div>
-      <div class="field"><label for="crIssuer">Issued by</label><input class="input" id="crIssuer" maxlength="80" placeholder="e.g. Coursera, BINUS, CFA Institute"></div>
+      <div class="field"><label for="crTitle">Certificate or credential</label><input class="input" id="crTitle" maxlength="90" placeholder="e.g. Google Data Analytics Certificate" value="${esc(current?.title || '')}"></div>
+      <div class="field"><label for="crIssuer">Issued by</label><input class="input" id="crIssuer" maxlength="80" placeholder="e.g. Coursera, BINUS, CFA Institute" value="${esc(current?.issuer || '')}"></div>
       <div class="row-2">
-        <div class="field"><label for="crYear">Year</label><input class="input" id="crYear" type="number" inputmode="numeric" min="1990" max="${new Date().getFullYear()}" placeholder="${new Date().getFullYear()}"></div>
-        <div class="field"><label for="crSkill">Skill it covers</label><input class="input" id="crSkill" maxlength="50" placeholder="e.g. Excel"></div>
+        <div class="field"><label for="crYear">Year</label><input class="input" id="crYear" type="number" inputmode="numeric" min="1990" max="${new Date().getFullYear()}" placeholder="${new Date().getFullYear()}" value="${esc(current?.year || '')}"></div>
+        <div class="field"><label for="crSkill">Skill it covers</label><input class="input" id="crSkill" maxlength="50" placeholder="e.g. Excel" value="${esc(current?.skill || '')}"></div>
       </div>
-      <div class="field"><label for="crUrl">Link to the certificate</label><input class="input" id="crUrl" type="url" maxlength="300" placeholder="https://"><span class="sub">Optional. Students can open it from your class page.</span></div>
+      <div class="field"><label for="crUrl">Link to the certificate</label><input class="input" id="crUrl" type="url" maxlength="300" placeholder="https://" value="${esc(current?.url || '')}"><span class="sub">Optional. Students can open it from your class page.</span></div>
       <div class="form-error" id="credError" role="alert"></div>
-      <button class="btn btn-brand" type="submit" style="width:100%">Save credential</button>
+      <button class="btn btn-brand" type="submit" style="width:100%">${editing ? 'Save changes' : 'Save credential'}</button>
     </div></form>`;
   $('credForm').addEventListener('submit', async e => {
     e.preventDefault();
@@ -1985,7 +2002,9 @@ function openCredentialForm(){
     if (url && !/^https?:\/\/\S+$/i.test(url)) return void (err.textContent = 'The link should start with http:// or https://');
     if ($('crYear').value && !(year >= 1990 && year <= new Date().getFullYear())) return void (err.textContent = 'Enter a valid year.');
     const item = { title, issuer: issuer || null, skill: skill || null, url: url || null, year: year || null };
-    if (await saveCredentials([...credsOf(state.me), item])) { closeOverlay('formOverlay'); renderBody(); showToast('Credential added'); }
+    const list = [...credsOf(state.me)];
+    if (editing) list[editIndex] = item; else list.push(item);
+    if (await saveCredentials(list)) { closeOverlay('formOverlay'); renderBody(); showToast(editing ? 'Credential updated' : 'Credential added'); }
   });
   openOverlay('formOverlay');
 }
@@ -2462,6 +2481,7 @@ function renderPayment(){
       </div>
       <div class="pay-meta">${statusPill(st, b.claimed_at)}<span>${st === 'awaiting_payment' ? `Pay before ${whenLabel(b.expires_at)} (${timeLeft(b.expires_at)})` : `Booked ${whenLabel(b.created_at)}`}</span></div>
       ${note}
+      ${st === 'awaiting_payment' ? `<div class="manual-review-note">${ic.shield}<span><b>Manual verification:</b> after you tap “I’ve paid”, a CourseConnect admin checks the transfer before your seat is confirmed.</span></div>` : ''}
       <ol class="pay-steps">${steps.map((t, i) => `<li class="${i + 1 < step ? 'done' : i + 1 === step ? 'now' : ''}">${t}</li>`).join('')}</ol>
       <p class="hint">Prototype: the virtual account number is random and no real money moves. The money is held by CourseConnect and only paid to the mentor after you confirm the class happened.</p>
     </div></div>
@@ -2579,6 +2599,7 @@ const kv = (k, v) => `<span>${k}</span><b>${v}</b>`;
 function renderAdminPayments(el){
   const q = adminPayQueue(), claimed = q.filter(b => b.claimed_at);
   el.innerHTML = `
+    <div class="manual-review-note">${ic.shield}<span>This prototype uses manual payment approval. Verify the transfer in the receiving bank account before approving a booking.</span></div>
     <div class="stat-row" style="border:none;padding-top:6px">
       <div class="stat"><strong>${claimed.length}</strong><span>To verify</span></div>
       <div class="stat"><strong>${q.length - claimed.length}</strong><span>Not paid yet</span></div>
@@ -2656,8 +2677,29 @@ function renderAdminHistory(el){
 /* ============================================================
    PROFILE + SETTINGS
    ============================================================ */
+function profileProgress(me){
+  const checks = [
+    [me.full_name, 'full name'], [me.campus, 'campus'], [me.major, 'major'],
+    [me.bio && me.bio.trim().length >= 20, 'bio'], [credsOf(me).length, 'credential']
+  ];
+  const done = checks.filter(([ok]) => !!ok).length;
+  return { pct: Math.round(done / checks.length * 100), missing: checks.filter(([ok]) => !ok).map(([, label]) => label) };
+}
+function openPublicProfile(){
+  const me = state.me || {}, creds = credsOf(me), taught = hostedClasses().filter(hasEnded).length;
+  $('formOverlay').innerHTML = `
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay('formOverlay')" aria-label="Back">${ic.back}</button><div class="overlay-title">Public profile preview</div></div>
+    <div class="overlay-body">
+      <div class="profile-hero">${avatar(me.id, me.full_name, 'lg')}<h2 style="margin:12px 0 0;font-size:21px">${esc(me.full_name || 'Your name')}</h2><p class="profile-preview-meta">${esc([me.campus, me.major].filter(Boolean).join(' · ') || 'Campus and major not added')}</p><span class="rate-tag">${ic.eye}<span>What students see</span></span></div>
+      <div class="stat-row"><div class="stat"><strong>${hostedClasses().length}</strong><span>Classes</span></div><div class="stat"><strong>${taught}</strong><span>Completed</span></div><div class="stat"><strong>${creds.length}</strong><span>Credentials</span></div></div>
+      <div class="block"><h4>About</h4><p class="pre">${esc(me.bio || 'No bio added yet.')}</p></div>
+      <div class="block" style="border-bottom:none"><h4>Credentials</h4>${creds.length ? creds.map((c, i) => credRowHTML(c, i, false)).join('') : '<p style="color:var(--ink-faint)">No credentials added yet.</p>'}</div>
+    </div>
+    <div class="cta-row"><button class="btn btn-brand" onclick="closeOverlay('formOverlay');openEditProfile()">${ic.edit}Edit profile</button></div>`;
+  openOverlay('formOverlay');
+}
 function renderProfile(b){
-  const me = state.me || {}, mentor = state.role === 'mentor';
+  const me = state.me || {}, mentor = state.role === 'mentor', progress = profileProgress(me);
   b.innerHTML = `
     <div class="pf">
     <div class="pf-side">
@@ -2673,13 +2715,19 @@ function renderProfile(b){
       </div>
     </div>
     <div class="pf-main">
+      <div class="profile-progress pf-wide">
+        <div class="profile-progress-top"><strong>Profile completeness</strong><span>${progress.pct}%</span></div>
+        <div class="profile-progress-bar"><i style="width:${progress.pct}%"></i></div>
+        <p>${progress.missing.length ? `Add ${esc(progress.missing.join(', '))} to strengthen trust when you host a class.` : 'Your profile is ready to show to students.'}</p>
+      </div>
       <div class="pf-card pf-wide"><div class="field-label">${mentor ? 'About you (shown on your classes)' : 'About you'}</div>
       <div class="field-box" style="white-space:pre-wrap">${me.bio ? esc(me.bio) : 'Add a short bio: what you’re good at, courses you aced, competitions you’ve won.'}</div></div>
       <div class="pf-actions">
         <button class="btn btn-ghost" style="margin-top:14px;width:100%" onclick="openEditProfile()">Edit profile</button>
+        <button class="btn btn-ghost" style="margin-top:10px;width:100%" onclick="openPublicProfile()">${ic.eye}Preview public profile</button>
         <button class="btn btn-ghost" style="margin-top:10px;width:100%" onclick="openOnboarding()">${ic.cap}How CourseConnect works</button>
       </div>
-      ${mentor ? `<div class="pf-card">${credBlockHTML()}</div>` : ''}
+      <div class="pf-card">${credBlockHTML()}</div>
       <div class="pf-card">${bankBlockHTML()}</div>
       <p class="role-hint pf-wide">Switch between Student and Mentor at the top. Same account, two views.</p>
     </div>
