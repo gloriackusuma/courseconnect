@@ -2983,7 +2983,12 @@ async function loadFocus(){
   if (error) { state.featOn = false; return; }
   state.featOn = true; state.focus = data || [];
 }
-async function loadBoard(){ const { data, error } = await sb.rpc('friend_board'); if (!error) state.board = data || []; }
+async function loadBoard(){
+  const { data, error } = await sb.rpc('friend_board'); if (error) return;
+  const prev = new Set(state.board.filter(x => x.relation === 'incoming').map(x => x.id)), seen = state.boardLoaded;
+  state.board = data || []; state.boardLoaded = true;
+  if (seen) state.board.filter(x => x.relation === 'incoming' && !prev.has(x.id)).forEach(x => { pushNotif('Friend request', `${x.full_name} wants to be friends. Open Lock In to accept.`); showToast(`${first(x.full_name)} sent you a friend request`); });
+}
 async function loadReviews(){
   const { data } = await sb.from('class_reviews').select('class_id, user_id, rating, comment, created_at').order('created_at').limit(2000);
   state.reviews = data || []; await ensureNames(state.reviews.map(r => r.user_id));
@@ -3069,7 +3074,7 @@ function renderLockIn(b){
       ${subs.length ? `<div class="tag-row" style="margin-top:12px">${subs.map(([k, ms]) => `<span class="tag skill-tag">${esc(k)} <b class="mini-count">${fmtHM(ms)}</b></span>`).join('')}</div>` : ''}</div>
     <div class="li-card"><h4>Friends this week</h4>
       <div class="friend-add"><input class="input" id="fCode" maxlength="12" placeholder="Friend code" aria-label="Friend code" autocomplete="off"><button class="btn btn-brand" onclick="addFriend()">Add</button></div>
-      <p class="hint">Your code: <b>${esc(code) || '-'}</b> ${code ? `<button class="link-btn" onclick="copyText('${esc(code)}')">Copy</button> · <button class="link-btn" onclick="copyText(inviteLink())">Copy invite link</button> · ` : ''}<button class="link-btn" onclick="openCodeForm()">Change</button></p>
+      <p class="hint">Your code: <b>${esc(code) || '-'}</b> ${code ? `<button class="link-btn" onclick="copyText('${esc(code)}')">Copy</button> · <button class="link-btn" onclick="copyText(inviteLink())">Copy invite link</button>` : ''}</p>
       <div class="toggle-row"><div><strong>Show when I’m locked in</strong><span>Friends see a green dot and your subject</span></div><button class="switch ${state.me?.hide_live ? 'off' : ''}" onclick="toggleLive()" role="switch" aria-checked="${!state.me?.hide_live}" aria-label="Show when I am locked in"></button></div>
       <div id="liRows">${boardRowsHTML()}</div></div>
     ${rewardsHTML()}
@@ -3094,9 +3099,11 @@ async function stopFocus(){
 async function addFriend(){
   const code = ($('fCode').value || '').trim().toLowerCase();
   if (code.length < 4) return showToast('Enter your friend’s code.', true);
-  const { error } = await sb.rpc('add_friend', { code });
-  if (error) return showToast(friendlyError(error), true);
-  $('fCode').value = ''; await loadBoard(); renderBoardInto(); showToast('Friend request sent');
+  const btn = document.querySelector('.friend-add .btn'); if (btn) btn.disabled = true;
+  const { data, error } = await sb.rpc('add_friend', { code });
+  if (btn) btn.disabled = false;
+  if (error) return showToast(/schema cache|could not find the function/i.test(error.message || '') ? 'Friends need the latest features.sql in Supabase.' : friendlyError(error), true);
+  $('fCode').value = ''; await loadBoard(); renderBoardInto(); showToast(data || 'Friend request sent');
 }
 async function respondFriend(other, accept){
   const { error } = await sb.rpc('respond_friend', { other, accept });
@@ -3111,7 +3118,7 @@ setInterval(() => {
   if (c && r && state.tab === 'lockin') c.textContent = fmtHMS(sDur(r));
   if (tickN % 30 || document.visibilityState !== 'visible' || !state.loaded) return;
   if (state.tab === 'lockin') loadBoard().then(renderBoardInto).catch(() => {});
-  else if (['bookings','a-pay'].includes(state.tab) && !document.activeElement?.matches('input,textarea,select')) renderBody();
+  else { loadBoard().catch(() => {}); if (['bookings','a-pay'].includes(state.tab) && !document.activeElement?.matches('input,textarea,select')) renderBody(); }
   if (state.payOpen && $('payOverlay').classList.contains('open')) renderPayment();
 }, 1000);
 
@@ -3191,25 +3198,6 @@ function consumePendingAdd(){
   setTab('lockin');
   const i = $('fCode'); if (i) { i.value = code; i.focus(); }
   showToast('Invite code filled in. Tap Add to send the request.');
-}
-function openCodeForm(){
-  const cur = state.me?.friend_code || '';
-  $('formOverlay').innerHTML = `
-    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay('formOverlay')" aria-label="Back">${ic.back}</button><div class="overlay-title">Your friend code</div></div>
-    <form class="overlay-body" id="codeForm" novalidate><div class="pad">
-      <div class="field"><label for="cdInput">Friend code</label><input class="input" id="cdInput" maxlength="12" value="${esc(cur)}" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="sub">4 to 12 characters: letters, numbers or underscore. Friends type this to add you, and it doubles as your referral code.</span></div>
-      <div class="form-error" id="codeError" role="alert"></div>
-      <button class="btn btn-brand" type="submit" style="width:100%">Save code</button>
-      <button class="btn btn-ghost" type="button" id="cdRandom" style="width:100%;margin-top:10px">Randomize instead</button>
-    </div></form>`;
-  const done = async (p) => { const { data, error } = await p; if (error) return void ($('codeError').textContent = friendlyError(error));
-    state.me.friend_code = data; closeOverlay('formOverlay'); renderBody(); showToast('Friend code updated'); };
-  $('codeForm').addEventListener('submit', e => { e.preventDefault();
-    const v = $('cdInput').value.trim().toLowerCase();
-    if (!/^[a-z0-9_]{4,12}$/.test(v)) return void ($('codeError').textContent = 'Use 4 to 12 letters, numbers or underscores.');
-    done(sb.rpc('set_friend_code', { newcode: v })); });
-  $('cdRandom').addEventListener('click', () => done(sb.rpc('regenerate_friend_code')));
-  openOverlay('formOverlay');
 }
 function showBoot(html){ screenEl.innerHTML = `<div class="boot"><img src="${LOGO}" alt=""><span>${html}</span></div>`; }
 function configured(){ return !SUPABASE_URL.includes('YOUR-PROJECT') && !SUPABASE_ANON_KEY.startsWith('YOUR-'); }
