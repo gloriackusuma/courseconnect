@@ -1345,10 +1345,22 @@
     .app-body[data-tab="discover"]{ row-gap:16px; column-gap:18px; }
   }
 
-  /* ===== Unfriend ===== */
-  .lb-row .row-actions{ display:flex; gap:6px; flex:none; margin-left:4px; }
-  .lb-row .mini-btn.danger{ border-color:color-mix(in srgb,var(--danger) 45%,var(--border)); }
-  .lb-row .mini-btn.danger.confirm{ background:var(--danger); color:#fff; border-color:var(--danger); }
+  /* ===== Friend profile popup (unfriend lives here) ===== */
+  .lb-row.tap{ cursor:pointer; border-radius:12px; transition:background .15s ease; }
+  .lb-row.tap:hover{ background:var(--surface-alt); }
+  .pp-back{ position:fixed; inset:0; z-index:99999; background:rgba(10,11,24,.55); display:flex; align-items:center; justify-content:center; padding:20px; animation:ppIn .15s ease; }
+  @keyframes ppIn{ from{opacity:0} to{opacity:1} }
+  .pp-card{ width:min(340px,100%); background:var(--surface); color:var(--ink); border:1px solid var(--border); border-radius:var(--radius-lg); padding:26px 22px 14px; text-align:center; box-shadow:0 24px 60px -20px rgba(0,0,0,.5); }
+  .pp-card .avatar{ margin:0 auto 12px; width:64px; height:64px; font-size:22px; }
+  .pp-card h3{ margin:0; font-size:18px; font-weight:800; }
+  .pp-card .pp-sub{ margin:4px 0 0; font-size:12.5px; font-weight:600; color:var(--ink-soft); }
+  .pp-card .pp-stat{ margin:16px 0 0; padding:12px; border-radius:14px; background:var(--surface-alt); font-size:12px; font-weight:700; color:var(--ink-faint); }
+  .pp-card .pp-stat strong{ display:block; font-size:19px; color:var(--ink); margin-top:2px; }
+  .pp-actions{ margin-top:14px; border-top:1px solid var(--border); padding-top:6px; display:grid; }
+  .pp-actions button{ background:none; border:0; font:inherit; font-size:13px; font-weight:700; padding:11px; cursor:pointer; color:var(--ink-soft); border-radius:10px; }
+  .pp-actions button:hover{ background:var(--surface-alt); }
+  .pp-actions .pp-danger{ color:var(--danger); font-weight:600; }
+  .pp-confirm{ font-size:12.5px; font-weight:600; color:var(--ink-soft); margin:2px 0 4px; }
 </style>
 </head>
 <body>
@@ -3061,21 +3073,17 @@ function badgesOf(){
   return [[state.focus.length >= 1, 'First lock-in'], [tot >= 36e6, '10 hours focused'], [st >= 3, '3-day streak'], [st >= 7, '7-day streak'],
     [joinedClasses().some(hasEnded), 'Verified learner'], [hostedClasses().some(hasEnded), 'Verified mentor'], [r.n >= 3 && r.avg >= 4.5, 'Top-rated mentor']];
 }
-let unfriendAsk = null;
 function boardRowsHTML(){
   const rows = state.board, rk = r => rows.filter(x => x.relation === r);
   const board = [...rk('me'), ...rk('friend')].sort((a, z) => z.week_secs - a.week_secs);
   const inc = rk('incoming'), out = rk('outgoing');
-  const unfriendBtn = p => unfriendAsk === p.id
-    ? `<span class="row-actions"><button class="mini-btn" onclick="askUnfriend(null)">Cancel</button><button class="mini-btn danger confirm" onclick="removeFriend('${p.id}')">Unfriend</button></span>`
-    : `<span class="row-actions"><button class="mini-btn danger" aria-label="Unfriend ${esc(p.full_name)}" onclick="askUnfriend('${p.id}')">Unfriend</button></span>`;
+  const tap = p => p.relation === 'me' ? '' : ` tap" onclick="openPerson('${p.id}')" role="button" tabindex="0`;
   return inc.map(p => `<div class="lb-row">${avatar(p.id, p.full_name)}<div class="cm-t"><strong>${esc(p.full_name)}</strong><span>wants to be friends</span></div>
       <button class="mini-btn" onclick="respondFriend('${p.id}',false)">Decline</button><button class="mini-btn primary" onclick="respondFriend('${p.id}',true)">Accept</button></div>`).join('')
-    + board.map((p, i) => `<div class="lb-row"><span class="lb-rank">${i + 1}</span>${avatar(p.id, p.full_name)}
+    + board.map((p, i) => `<div class="lb-row${tap(p)}"><span class="lb-rank">${i + 1}</span>${avatar(p.id, p.full_name)}
       <div class="cm-t"><strong>${esc(p.full_name)}${p.relation === 'me' ? ' (you)' : ''}</strong><span>${p.live ? `<i class="live-dot"></i>Locked in${p.subject ? ': ' + esc(p.subject) : ''}` : 'Not focusing now'}</span></div>
-      <em>${fmtHM(p.week_secs * 1000)}</em>${p.relation === 'friend' ? unfriendBtn(p) : ''}</div>`).join('')
-    + out.map(p => `<div class="lb-row">${avatar(p.id, p.full_name)}<div class="cm-t"><strong>${esc(p.full_name)}</strong><span>Request sent</span></div>
-      <span class="row-actions"><button class="mini-btn" onclick="removeFriend('${p.id}', true)">Cancel request</button></span></div>`).join('')
+      <em>${fmtHM(p.week_secs * 1000)}</em></div>`).join('')
+    + out.map(p => `<div class="lb-row${tap(p)}">${avatar(p.id, p.full_name)}<div class="cm-t"><strong>${esc(p.full_name)}</strong><span>Request sent</span></div></div>`).join('')
     + (board.length < 2 && !inc.length ? `<div class="empty-note" style="padding:14px 0">Add a friend with their code to compete on weekly focus time.</div>` : '');
 }
 function renderBoardInto(){ const e = $('liRows'); if (e) e.innerHTML = boardRowsHTML(); }
@@ -3140,9 +3148,25 @@ async function respondFriend(other, accept){
   if (error) return showToast(friendlyError(error), true);
   await loadBoard(); renderBoardInto(); showToast(accept ? 'Friend added' : 'Request declined');
 }
-function askUnfriend(id){ unfriendAsk = id; renderBoardInto(); }
+function closePerson(){ const e = document.getElementById('ppBack'); if (e) e.remove(); document.removeEventListener('keydown', ppKey); }
+function ppKey(e){ if (e.key === 'Escape') closePerson(); }
+function openPerson(id, confirming){
+  const p = state.board.find(x => x.id === id); if (!p) return;
+  closePerson();
+  const isReq = p.relation === 'outgoing', label = isReq ? 'Cancel friend request' : 'Unfriend';
+  const sub = isReq ? 'Friend request sent' : p.live ? `<i class="live-dot"></i>Locked in${p.subject ? ': ' + esc(p.subject) : ''}` : 'Not focusing now';
+  const el = document.createElement('div'); el.id = 'ppBack'; el.className = 'pp-back';
+  el.onclick = ev => { if (ev.target === el) closePerson(); };
+  el.innerHTML = `<div class="pp-card" role="dialog" aria-label="${esc(p.full_name)}">
+    ${avatar(p.id, p.full_name, 'lg')}<h3>${esc(p.full_name)}</h3><p class="pp-sub">${sub}</p>
+    ${isReq ? '' : `<div class="pp-stat">This week<strong>${fmtHM(p.week_secs * 1000)}</strong></div>`}
+    <div class="pp-actions">${confirming
+      ? `<p class="pp-confirm">${isReq ? 'Cancel this request?' : `Remove ${esc(first(p.full_name))} from your friends?`}</p><button class="pp-danger" onclick="removeFriend('${p.id}', ${isReq})">Yes, ${isReq ? 'cancel it' : 'unfriend'}</button><button onclick="openPerson('${p.id}')">Keep</button>`
+      : `<button class="pp-danger" onclick="openPerson('${p.id}', true)">${label}</button><button onclick="closePerson()">Close</button>`}</div></div>`;
+  document.body.appendChild(el); document.addEventListener('keydown', ppKey);
+}
 async function removeFriend(other, isRequest){
-  unfriendAsk = null;
+  closePerson();
   const { error } = await sb.rpc('remove_friend', { other });
   if (error) return showToast(/schema cache|could not find the function/i.test(error.message || '') ? 'Unfriend needs the remove_friend function. Run unfriend.sql in Supabase.' : friendlyError(error), true);
   await loadBoard(); renderBoardInto(); showToast(isRequest ? 'Request cancelled' : 'Friend removed');
