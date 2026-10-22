@@ -9,10 +9,6 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="CourseConnect">
 <meta property="og:description" content="Join a class, land in its group chat, learn together.">
-<meta property="og:image" content="assets/logo.png">
-<link rel="icon" type="image/png" href="assets/favicon.png">
-<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-<link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
@@ -1276,6 +1272,44 @@
     .pf{ grid-template-columns:1fr; }
     .pf-side{ position:static; }
   }
+
+  /* ===== ROUND 7: Lock In, friends, reviews ===== */
+  .li{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
+  .li-hero{position:relative;overflow:hidden;background:var(--hero);color:#fff;border-radius:var(--radius-lg);padding:24px 20px;text-align:center}
+  .li-hero .hp-art{right:16px;top:14px}
+  .li-hero p{margin:0;font-size:12.5px;font-weight:700;opacity:.92}
+  .li-clock{font-size:46px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin:6px 0 2px}
+  .li-hero .input{display:block;margin:14px auto 0;max-width:340px;background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.38);color:#fff}
+  .li-hero .input::placeholder{color:rgba(255,255,255,.78)}
+  .li-go{display:flex;margin:14px auto 0;max-width:340px;background:#fff;color:#161829}
+  .li-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow);min-width:0}
+  .li-card h4{margin:0 0 10px;font-size:14px;font-weight:800}
+  .li-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .li-stats div{background:var(--surface-alt);border-radius:14px;padding:12px 14px}
+  .li-stats strong{display:block;font-size:21px;font-weight:800;letter-spacing:-.01em}
+  .li-stats span{font-size:11.5px;color:var(--ink-faint);font-weight:700}
+  .lb-row{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--border)}
+  .lb-row:last-child{border-bottom:none}
+  .lb-rank{width:20px;flex:none;font-weight:800;color:var(--ink-faint);text-align:center;font-size:13px}
+  .lb-row .cm-t{flex:1;min-width:0}
+  .lb-row em{font-style:normal;font-weight:800;font-size:13px;white-space:nowrap}
+  .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--good);margin-right:6px;box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 25%,transparent)}
+  .friend-add{display:flex;gap:8px}
+  .friend-add .input{flex:1;min-width:0;text-transform:lowercase}
+  .friend-add .btn{flex:none;width:auto;padding:12px 20px}
+  .rstar{color:var(--gold);letter-spacing:1px}
+  .star-pick{display:flex;gap:2px}
+  .star-pick button{background:none;border:none;font-size:30px;line-height:1;color:var(--border);padding:2px 3px}
+  .star-pick button.on{color:var(--gold)}
+  .rv{padding:9px 0;border-bottom:1px solid var(--border);font-size:12.5px;line-height:1.55}
+  .badge-off{opacity:.42}
+  @media (max-width:560px){ .tab-btn{font-size:10px;min-width:0} .tab-btn svg{width:20px;height:20px} }
+  @media (min-width:900px){
+    .li{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;gap:18px}
+    .li > .li-hero, .li > .li-wide{grid-column:1 / -1}
+    .li-hero{padding:40px 24px}.li-clock{font-size:72px}
+    .li-stats{grid-template-columns:repeat(4,1fr)}
+  }
 </style>
 </head>
 <body>
@@ -1325,6 +1359,7 @@ let sb = null;
    ============================================================ */
 const sv = p => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>';
 const ic = {
+  timer: sv('<circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 1.5M9.5 3h5"/>'),
   search: sv('<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>'),
   x: sv('<path d="M6 6l12 12M18 6L6 18"/>'),
   bell: sv('<path d="M6 9a6 6 0 1112 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 19.5a2 2 0 004 0"/>'),
@@ -1556,14 +1591,12 @@ async function submitAuth(e){
 function renderNewPassword(){
   screenEl.innerHTML = `
     <div class="auth">
-      <img class="auth-logo" src="${LOGO}" alt="CourseConnect">
-      <h1>Set a new password</h1>
-      <p class="lead">Choose a new password for your account.</p>
-      <form id="pwForm" novalidate>
+      <div class="auth-hero">${ic.cap.replace('<svg','<svg class="hp-art"')}<span class="auth-mark"><img class="auth-logo" src="${LOGO}" alt=""></span><h1>Set a new password</h1><p class="lead">Choose a new password for your account.</p></div>
+      <div class="auth-body"><form id="pwForm" novalidate>
         <div class="field"><label for="newPass">New password</label><input class="input" id="newPass" type="password" autocomplete="new-password"></div>
         <div class="form-error" id="pwError" role="alert"></div>
         <button class="btn btn-brand" type="submit">Save password</button>
-      </form>
+      </form></div>
     </div>
     <div class="toast" id="toast"></div>`;
   $('pwForm').addEventListener('submit', async (e) => {
@@ -1655,7 +1688,7 @@ async function loadAccounts(){
 }
 async function reloadAll(){
   await loadClasses();
-  await Promise.all([loadSeats(), loadBookings(), loadAccounts(), loadLastMessages()]);
+  await Promise.all([loadSeats(), loadBookings(), loadAccounts(), loadLastMessages(), loadFocus().catch(() => {}), loadBoard().catch(() => {}), loadReviews().catch(() => {})]);
 }
 
 function classById(id){ return state.classes.find(c => c.id === id); }
@@ -1688,7 +1721,7 @@ function refreshVisible(){
    Student and Mentor are separate spaces with their own tabs.
    ============================================================ */
 const TABS = {
-  student: [['discover','Discover',ic.compass], ['dashboard','Dashboard',ic.chart], ['chats','Chats',ic.msg,'chatDot'], ['bookings','Bookings',ic.calendar,'bookDot'], ['profile','Profile',ic.user]],
+  student: [['discover','Discover',ic.compass], ['dashboard','Dashboard',ic.chart], ['lockin','Lock In',ic.timer], ['chats','Chats',ic.msg,'chatDot'], ['bookings','Bookings',ic.calendar,'bookDot'], ['profile','Profile',ic.user]],
   mentor:  [['m-home','My classes',ic.board,'mHomeDot'], ['m-dash','Dashboard',ic.chart], ['m-chats','Groups',ic.msg,'mChatDot'], ['m-sched','Schedule',ic.calendar], ['profile','Profile',ic.user]],
   admin:   [['a-pay','Payments',ic.card,'aPayDot'], ['a-payout','Payouts',ic.wallet,'aOutDot'], ['a-history','History',ic.history], ['profile','Profile',ic.user]],
 };
@@ -1794,6 +1827,7 @@ function renderHeader(){
         <div class="chip-row" id="chipRow"></div>`;
       break;
     case 'dashboard': html = simple('Dashboard', 'What you have learned so far.'); break;
+    case 'lockin': html = simple('Lock In', 'Focus time, streaks and friends. Class hours count as verified.'); break;
     case 'm-dash': html = simple('Dashboard', 'Your teaching and earnings.'); break;
     case 'chats': {
       const n = joinedClasses().filter(c => isUnread(c.id)).length;
@@ -1820,7 +1854,7 @@ function renderBody(){
   const b = $('appBody'); if (!b) return;
   b.dataset.tab = state.tab;
   if (!state.loaded) { b.innerHTML = '<div class="loading">Loading…</div>'; return; }
-  ({ discover: renderDiscover, dashboard: renderStudentDash, 'm-dash': renderMentorDash, chats: renderStudentChats, bookings: renderBookings,
+  ({ discover: renderDiscover, dashboard: renderStudentDash, lockin: renderLockIn, 'm-dash': renderMentorDash, chats: renderStudentChats, bookings: renderBookings,
      'm-home': renderMentorHome, 'm-chats': renderMentorChats, 'm-sched': renderMentorSched,
      'a-pay': renderAdminPayments, 'a-payout': renderAdminPayouts, 'a-history': renderAdminHistory,
      profile: renderProfile })[state.tab](b);
@@ -1855,13 +1889,14 @@ function renderDiscover(b){
     return;
   }
   const picks = home ? majorPicks(list) : [];
+  const rest = list.filter(c => !picks.includes(c));
   const picksHTML = picks.length ? `<div class="section-label"><b>Picked for ${esc(state.me.major)}</b></div>${picks.map(classCardHTML).join('')}` : '';
   b.innerHTML = home + picksHTML + `
     <div class="section-row">
       <div class="section-label"><b>${list.length}</b> upcoming class${list.length === 1 ? '' : 'es'}</div>
       <select class="sort-select" aria-label="Sort classes" onchange="setSort(this.value)">${SORTS.map(([v, l]) => `<option value="${v}" ${state.sort === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
     </div>
-    ${list.map(classCardHTML).join('')}`;
+    ${rest.map(classCardHTML).join('')}`;
 }
 
 /* ---------- Personal home panel + picks for your major ---------- */
@@ -2062,7 +2097,7 @@ function classCardHTML(c){
         <p class="class-title">${esc(c.title)}</p>
         <span class="kind-badge ${c.category}">${esc(badgeText(c))}</span>
         <div class="class-meta">
-          <span>${ic.user}<b>${esc(c.host?.full_name || 'Mentor')}</b></span>
+          <span>${ic.user}<b>${esc(c.host?.full_name || 'Mentor')}${ratingChip(c.host_id)}</b></span>
           <span>${ic.pin}<b>${esc(c.location)}</b></span>
         </div>
         <div class="class-foot">
@@ -2132,7 +2167,7 @@ function renderDetail(){
         <div class="fact"><span>Seats taken</span><strong>${taken} of ${c.capacity}</strong></div>
         <div class="fact"><span>Seats left</span><strong>${Math.max(0, c.capacity - taken)}</strong></div>
       </div>
-      ${payBlock}${hostBlock}
+      ${payBlock}${hostBlock}${reviewBlock(c)}
       ${c.description ? `<div class="block"><h4>About this class</h4><p class="pre">${esc(c.description)}</p></div>` : ''}
       <div class="block">
         <h4>Mentor</h4>
@@ -2921,6 +2956,149 @@ window.addEventListener('offline', () => { hadDrop = true; setLive('offline'); }
 /* ============================================================
    BOOT
    ============================================================ */
+
+/* ============================================================
+   LOCK IN · STREAKS · FRIENDS · VERIFIED REVIEWS
+   Needs supabase/features.sql. Timer lives on the server
+   (started_at), so closing the tab never loses a session.
+   ============================================================ */
+Object.assign(state, { focus: [], board: [], reviews: [], featOn: true });
+const CAP = 6 * 3600e3, FSEL = 'id, subject, started_at, ended_at';
+async function loadFocus(){
+  const { data, error } = await sb.from('focus_sessions').select(FSEL).order('started_at', { ascending: false }).limit(500);
+  if (error) { state.featOn = false; return; }
+  state.featOn = true; state.focus = data || [];
+}
+async function loadBoard(){ const { data, error } = await sb.rpc('friend_board'); if (!error) state.board = data || []; }
+async function loadReviews(){
+  const { data } = await sb.from('class_reviews').select('class_id, user_id, rating, comment, created_at').order('created_at').limit(2000);
+  state.reviews = data || []; await ensureNames(state.reviews.map(r => r.user_id));
+}
+const sDur = s => Math.max(0, Math.min((s.ended_at ? new Date(s.ended_at) : new Date()) - new Date(s.started_at), CAP));
+const runSess = () => state.focus.find(s => !s.ended_at);
+const p2 = n => String(n).padStart(2, '0');
+const fmtHMS = ms => { const t = Math.floor(ms / 1000); return `${p2(Math.floor(t / 3600))}:${p2(Math.floor(t % 3600 / 60))}:${p2(t % 60)}`; };
+const fmtHM = ms => { const m = Math.round(ms / 60000); return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`; };
+function dayTotals(){ const t = {}; state.focus.forEach(s => { const k = ymd(s.started_at); t[k] = (t[k] || 0) + sDur(s); }); return t; }
+const doneClasses = () => [...joinedClasses(), ...hostedClasses()].filter(hasEnded);
+function activeDays(){ const t = dayTotals(), a = new Set(Object.keys(t).filter(k => t[k] >= 6e5)); doneClasses().forEach(c => a.add(ymd(c.starts_at))); return a; }
+function streakOf(a){ const d = new Date(); let n = 0; if (!a.has(ymd(d))) d.setDate(d.getDate() - 1); while (a.has(ymd(d))) { n++; d.setDate(d.getDate() - 1); } return n; }
+function lastDays(n){ const o = []; for (let i = n - 1; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); o.push({ key: ymd(d), label: d.toLocaleDateString('en-GB', { weekday:'short' }).slice(0, 2), v: 0 }); } return o; }
+
+function ratingOf(hostId){
+  const ids = new Set(state.classes.filter(c => c.host_id === hostId).map(c => c.id)), r = state.reviews.filter(x => ids.has(x.class_id));
+  return { n: r.length, avg: r.length ? r.reduce((s, x) => s + x.rating, 0) / r.length : 0 };
+}
+const rstars = n => `<span class="rstar">${'★'.repeat(Math.round(n))}${'☆'.repeat(5 - Math.round(n))}</span>`;
+function ratingChip(hostId){ const r = ratingOf(hostId); return r.n ? ` <span class="rstar">★</span>${r.avg.toFixed(1)} (${r.n})` : ''; }
+let pickedStar = 0;
+function reviewBlock(c){
+  const rs = state.reviews.filter(x => x.class_id === c.id), mine = rs.some(x => x.user_id === uid());
+  const can = isMember(c) && !isHost(c) && classEnded(c) && !mine, r = ratingOf(c.host_id);
+  if (!rs.length && !can) return '';
+  pickedStar = 0;
+  return `<div class="block"><h4>Verified reviews${r.n ? ` · ★ ${r.avg.toFixed(1)} mentor rating (${r.n})` : ''}</h4>
+    ${rs.slice(-3).reverse().map(x => `<div class="rv">${rstars(x.rating)} <b>${esc(first(names.get(x.user_id) || 'Student'))}</b> <span class="pill good">Attended</span>${x.comment ? `<br>${esc(x.comment)}` : ''}</div>`).join('')}
+    ${can ? `<p style="margin:12px 0 4px;font-weight:700;font-size:13px">Rate this class</p>
+      <div class="star-pick" id="starPick">${[1,2,3,4,5].map(n => `<button type="button" data-n="${n}" aria-label="${n} stars" onclick="pickStar(${n})">★</button>`).join('')}</div>
+      <textarea class="input" id="rvText" maxlength="400" placeholder="What was it like? (optional)" style="margin-top:8px"></textarea>
+      <button class="btn btn-brand" style="width:100%;margin-top:10px" onclick="sendReview('${c.id}')">Post review</button>` : ''}</div>`;
+}
+function pickStar(n){ pickedStar = n; document.querySelectorAll('#starPick button').forEach(b => b.classList.toggle('on', +b.dataset.n <= n)); }
+async function sendReview(cid){
+  if (!pickedStar) return showToast('Pick a star rating first.', true);
+  const { error } = await sb.rpc('review_class', { cid, stars: pickedStar, note: ($('rvText').value || '').trim() || null });
+  if (error) return showToast(friendlyError(error), true);
+  await loadReviews(); renderDetail(); renderBody(); showToast('Thanks! Review posted');
+}
+
+function badgesOf(){
+  const tot = state.focus.reduce((s, x) => s + sDur(x), 0), st = streakOf(activeDays()), r = ratingOf(uid());
+  return [[state.focus.length >= 1, 'First lock-in'], [tot >= 36e6, '10 hours focused'], [st >= 3, '3-day streak'], [st >= 7, '7-day streak'],
+    [joinedClasses().some(hasEnded), 'Verified learner'], [hostedClasses().some(hasEnded), 'Verified mentor'], [r.n >= 3 && r.avg >= 4.5, 'Top-rated mentor']];
+}
+function boardRowsHTML(){
+  const rows = state.board, rk = r => rows.filter(x => x.relation === r);
+  const board = [...rk('me'), ...rk('friend')].sort((a, z) => z.week_secs - a.week_secs);
+  const inc = rk('incoming'), out = rk('outgoing');
+  return inc.map(p => `<div class="lb-row">${avatar(p.id, p.full_name)}<div class="cm-t"><strong>${esc(p.full_name)}</strong><span>wants to be friends</span></div>
+      <button class="mini-btn" onclick="respondFriend('${p.id}',false)">Decline</button><button class="mini-btn primary" onclick="respondFriend('${p.id}',true)">Accept</button></div>`).join('')
+    + board.map((p, i) => `<div class="lb-row"><span class="lb-rank">${i + 1}</span>${avatar(p.id, p.full_name)}
+      <div class="cm-t"><strong>${esc(p.full_name)}${p.relation === 'me' ? ' (you)' : ''}</strong><span>${p.live ? `<i class="live-dot"></i>Locked in${p.subject ? ': ' + esc(p.subject) : ''}` : 'Not focusing now'}</span></div>
+      <em>${fmtHM(p.week_secs * 1000)}</em></div>`).join('')
+    + out.map(p => `<div class="lb-row">${avatar(p.id, p.full_name)}<div class="cm-t"><strong>${esc(p.full_name)}</strong><span>Request sent</span></div></div>`).join('')
+    + (board.length < 2 && !inc.length ? `<div class="empty-note" style="padding:14px 0">Add a friend with their code to compete on weekly focus time.</div>` : '');
+}
+function renderBoardInto(){ const e = $('liRows'); if (e) e.innerHTML = boardRowsHTML(); }
+
+function renderLockIn(b){
+  if (!state.featOn) { b.innerHTML = `<div class="empty-note">Lock In needs the new database tables.<br>Run <b>supabase/features.sql</b> in the Supabase SQL editor, then reload.</div>`; return; }
+  const run = runSess(), t = dayTotals(), days = lastDays(7), a = activeDays(), code = state.me?.friend_code || '';
+  days.forEach(d => { d.v = Math.round((t[d.key] || 0) / 6e4); });
+  const week = days.reduce((s, d) => s + d.v, 0) * 6e4, bySub = new Map();
+  state.focus.filter(s => ymd(s.started_at) >= days[0].key).forEach(s => { const k = s.subject || 'Free focus'; bySub.set(k, (bySub.get(k) || 0) + sDur(s)); });
+  const subs = [...bySub.entries()].sort((x, y) => y[1] - x[1]);
+  const recent = [...new Set(state.focus.map(s => s.subject).filter(Boolean))].slice(0, 8);
+  const cls = doneClasses().reduce((s, c) => s + c.duration_min * 6e4, 0);
+  b.innerHTML = `<div class="li">
+    <div class="li-hero">${ic.timer.replace('<svg', '<svg class="hp-art"')}
+      <p>${run ? 'You are locked in' : 'Ready to focus?'}</p><div class="li-clock" id="liClock">${fmtHMS(run ? sDur(run) : 0)}</div>
+      ${run ? `<p>${esc(run.subject || 'Free focus')}</p><button class="btn li-go" onclick="stopFocus()">Stop &amp; save</button>`
+        : `<input class="input" id="liSubject" maxlength="40" list="liSubs" placeholder="What are you studying? (optional)" aria-label="Subject"><datalist id="liSubs">${recent.map(s => `<option value="${esc(s)}">`).join('')}</datalist><button class="btn li-go" onclick="startFocus()">Lock in</button>`}
+    </div>
+    <div class="li-card li-wide"><div class="li-stats">
+      <div><strong>${fmtHM(t[ymd(new Date())] || 0)}</strong><span>Focus today</span></div>
+      <div><strong>${fmtHM(week)}</strong><span>Last 7 days</span></div>
+      <div><strong>${streakOf(a)} day${streakOf(a) === 1 ? '' : 's'}</strong><span>Study streak</span></div>
+      <div><strong>${fmtHM(cls)}</strong><span>Class hours (verified)</span></div></div></div>
+    <div class="li-card"><h4>Last 7 days (self-reported)</h4>${barsHTML(days, v => v >= 60 ? Math.round(v / 6) / 10 + 'h' : v + 'm')}
+      ${subs.length ? `<div class="tag-row" style="margin-top:12px">${subs.map(([k, ms]) => `<span class="tag skill-tag">${esc(k)} <b class="mini-count">${fmtHM(ms)}</b></span>`).join('')}</div>` : ''}</div>
+    <div class="li-card"><h4>Friends this week</h4>
+      <div class="friend-add"><input class="input" id="fCode" maxlength="8" placeholder="Friend code" aria-label="Friend code" autocomplete="off"><button class="btn btn-brand" onclick="addFriend()">Add</button></div>
+      <p class="hint">Your code: <b>${esc(code) || '-'}</b> ${code ? `<button class="link-btn" onclick="copyText('${esc(code)}')">Copy</button>` : ''}</p>
+      <div id="liRows">${boardRowsHTML()}</div></div>
+    <div class="li-card li-wide"><h4>Badges</h4><div class="tag-row">${badgesOf().map(([ok, l]) => `<span class="tag ${ok ? 'skill-tag' : 'badge-off'}">${ok ? ic.award.replace('<svg', '<svg style="width:13px;height:13px"') : ''}${l}</span>`).join('')}</div>
+      <p class="hint">Class hours and reviews come from classes you actually joined, so they can’t be faked. Timer hours are self-reported.</p></div>
+  </div>`;
+}
+async function startFocus(){
+  if (runSess()) return;
+  const subject = (($('liSubject') || {}).value || '').trim().slice(0, 40) || null;
+  const { data, error } = await sb.from('focus_sessions').insert({ subject }).select(FSEL).single();
+  if (error) return showToast(friendlyError(error), true);
+  state.focus.unshift(data); renderBody(); loadBoard().then(renderBoardInto).catch(() => {}); showToast('Locked in. Go get it!');
+}
+async function stopFocus(){
+  const s = runSess(); if (!s) return;
+  const end = new Date(Math.min(Date.now(), new Date(s.started_at).getTime() + CAP)).toISOString();
+  const { data, error } = await sb.from('focus_sessions').update({ ended_at: end }).eq('id', s.id).select(FSEL).single();
+  if (error) return showToast(friendlyError(error), true);
+  Object.assign(s, data); renderBody(); loadBoard().then(renderBoardInto).catch(() => {}); showToast(`Saved ${fmtHM(sDur(s))} of focus`);
+}
+async function addFriend(){
+  const code = ($('fCode').value || '').trim().toLowerCase();
+  if (code.length < 4) return showToast('Enter your friend’s code.', true);
+  const { error } = await sb.rpc('add_friend', { code });
+  if (error) return showToast(friendlyError(error), true);
+  $('fCode').value = ''; await loadBoard(); renderBoardInto(); showToast('Friend request sent');
+}
+async function respondFriend(other, accept){
+  const { error } = await sb.rpc('respond_friend', { other, accept });
+  if (error) return showToast(friendlyError(error), true);
+  await loadBoard(); renderBoardInto(); showToast(accept ? 'Friend added' : 'Request declined');
+}
+/* 1s ticker: live clock; every 30s refresh the board and any countdowns (payment time left) */
+let tickN = 0;
+setInterval(() => {
+  tickN++;
+  const r = runSess(), c = $('liClock');
+  if (c && r && state.tab === 'lockin') c.textContent = fmtHMS(sDur(r));
+  if (tickN % 30 || document.visibilityState !== 'visible' || !state.loaded) return;
+  if (state.tab === 'lockin') loadBoard().then(renderBoardInto).catch(() => {});
+  else if (['bookings','a-pay'].includes(state.tab) && !document.activeElement?.matches('input,textarea,select')) renderBody();
+  if (state.payOpen && $('payOverlay').classList.contains('open')) renderPayment();
+}, 1000);
+
 function showBoot(html){ screenEl.innerHTML = `<div class="boot"><img src="${LOGO}" alt=""><span>${html}</span></div>`; }
 function configured(){ return !SUPABASE_URL.includes('YOUR-PROJECT') && !SUPABASE_ANON_KEY.startsWith('YOUR-'); }
 
@@ -2949,6 +3127,7 @@ async function start(session){
 
 function boot(){
   applyTheme();
+  if (LOGO) { const l = document.createElement('link'); l.rel = 'icon'; l.href = LOGO; document.head.appendChild(l); }
   if (!window.supabase) return showBoot('Couldn’t load the Supabase library. Check your connection and reload.');
   if (!configured()) return showBoot('Paste your Supabase URL and key into the <code>CONFIG</code> section at the top of the script in <code>index.html</code>. Setup steps are in README.md.');
   sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
