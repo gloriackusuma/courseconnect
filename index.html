@@ -1310,6 +1310,20 @@
     .li-hero{padding:40px 24px}.li-clock{font-size:72px}
     .li-stats{grid-template-columns:repeat(4,1fr)}
   }
+
+  /* ===== ROUND 8: profile preview fix, matching, ranking, rewards ===== */
+  .profile-hero .avatar{margin:0 auto}
+  .profile-hero .rate-tag{align-items:center;gap:6px;padding:7px 14px}
+  .profile-hero .rate-tag svg{width:14px;height:14px;flex:none}
+  .profile-hero .rate-tag span{font-size:11.5px;opacity:1}
+  .match-wrap{margin-bottom:10px;min-width:0}
+  .match-wrap .class-card{margin-bottom:0}
+  .match-line{font-size:12px;font-weight:700;color:var(--brand-deep);background:var(--brand-soft);border-radius:12px 12px 0 0;padding:7px 13px;margin-bottom:-6px;position:relative;z-index:0}
+  .match-line b{color:var(--accent)}
+  .rank-card{margin:10px 0 4px}
+  .li-card .profile-progress-bar{background:var(--surface-alt);margin:10px 0 4px}
+  .li-card .toggle-row{margin:12px 0 4px}
+  @media (min-width:900px){ .app-body > .match-wrap{grid-column:auto} .match-wrap .class-card{height:calc(100% - 28px)} }
 </style>
 </head>
 <body>
@@ -1688,7 +1702,7 @@ async function loadAccounts(){
 }
 async function reloadAll(){
   await loadClasses();
-  await Promise.all([loadSeats(), loadBookings(), loadAccounts(), loadLastMessages(), loadFocus().catch(() => {}), loadBoard().catch(() => {}), loadReviews().catch(() => {})]);
+  await Promise.all([loadSeats(), loadBookings(), loadAccounts(), loadLastMessages(), loadFocus().catch(() => {}), loadBoard().catch(() => {}), loadReviews().catch(() => {}), loadRef().catch(() => {})]);
 }
 
 function classById(id){ return state.classes.find(c => c.id === id); }
@@ -1883,14 +1897,14 @@ function renderDiscover(b){
   const left = c => c.capacity - seatsTaken(c);
   if (state.sort === 'cheapest') list.sort((a, z) => a.price - z.price || a.starts_at.localeCompare(z.starts_at));
   else if (state.sort === 'seats') list.sort((a, z) => left(z) - left(a) || a.starts_at.localeCompare(z.starts_at));
-  const home = (!q && state.filter === 'all') ? studentHomeHTML() : '';
+  const home = (!q && state.filter === 'all') ? studentHomeHTML() + topMentorsHTML() : '';
   if (!list.length) {
     b.innerHTML = home + `<div class="empty-note">${q || state.filter !== 'all' ? 'No upcoming classes match this search.' : 'No upcoming classes from other mentors yet.'}<br>Want to teach something? Switch to <b>Mentor</b> and create a class.</div>`;
     return;
   }
-  const picks = home ? majorPicks(list) : [];
-  const rest = list.filter(c => !picks.includes(c));
-  const picksHTML = picks.length ? `<div class="section-label"><b>Picked for ${esc(state.me.major)}</b></div>${picks.map(classCardHTML).join('')}` : '';
+  const picks = home ? matchPicks(list) : [];
+  const rest = list.filter(c => !picks.some(p => p.c === c));
+  const picksHTML = picks.length ? `<div class="section-label"><b>Matched for you</b></div>${picks.map(p => `<div class="match-wrap"><div class="match-line"><b>${p.m.pct}% match</b> · ${esc(p.m.why.join(', '))}</div>${classCardHTML(p.c)}</div>`).join('')}` : '';
   b.innerHTML = home + picksHTML + `
     <div class="section-row">
       <div class="section-label"><b>${list.length}</b> upcoming class${list.length === 1 ? '' : 'es'}</div>
@@ -3054,9 +3068,11 @@ function renderLockIn(b){
     <div class="li-card"><h4>Last 7 days (self-reported)</h4>${barsHTML(days, v => v >= 60 ? Math.round(v / 6) / 10 + 'h' : v + 'm')}
       ${subs.length ? `<div class="tag-row" style="margin-top:12px">${subs.map(([k, ms]) => `<span class="tag skill-tag">${esc(k)} <b class="mini-count">${fmtHM(ms)}</b></span>`).join('')}</div>` : ''}</div>
     <div class="li-card"><h4>Friends this week</h4>
-      <div class="friend-add"><input class="input" id="fCode" maxlength="8" placeholder="Friend code" aria-label="Friend code" autocomplete="off"><button class="btn btn-brand" onclick="addFriend()">Add</button></div>
-      <p class="hint">Your code: <b>${esc(code) || '-'}</b> ${code ? `<button class="link-btn" onclick="copyText('${esc(code)}')">Copy</button>` : ''}</p>
+      <div class="friend-add"><input class="input" id="fCode" maxlength="12" placeholder="Friend code" aria-label="Friend code" autocomplete="off"><button class="btn btn-brand" onclick="addFriend()">Add</button></div>
+      <p class="hint">Your code: <b>${esc(code) || '-'}</b> ${code ? `<button class="link-btn" onclick="copyText('${esc(code)}')">Copy</button> · <button class="link-btn" onclick="copyText(inviteLink())">Copy invite link</button> · ` : ''}<button class="link-btn" onclick="openCodeForm()">Change</button></p>
+      <div class="toggle-row"><div><strong>Show when I’m locked in</strong><span>Friends see a green dot and your subject</span></div><button class="switch ${state.me?.hide_live ? 'off' : ''}" onclick="toggleLive()" role="switch" aria-checked="${!state.me?.hide_live}" aria-label="Show when I am locked in"></button></div>
       <div id="liRows">${boardRowsHTML()}</div></div>
+    ${rewardsHTML()}
     <div class="li-card li-wide"><h4>Badges</h4><div class="tag-row">${badgesOf().map(([ok, l]) => `<span class="tag ${ok ? 'skill-tag' : 'badge-off'}">${ok ? ic.award.replace('<svg', '<svg style="width:13px;height:13px"') : ''}${l}</span>`).join('')}</div>
       <p class="hint">Class hours and reviews come from classes you actually joined, so they can’t be faked. Timer hours are self-reported.</p></div>
   </div>`;
@@ -3099,6 +3115,102 @@ setInterval(() => {
   if (state.payOpen && $('payOverlay').classList.contains('open')) renderPayment();
 }, 1000);
 
+
+/* ===== Matching · mentor ranking · rewards · privacy ===== */
+state.refCount = 0;
+async function loadRef(){ const { data, error } = await sb.rpc('referral_count'); if (!error) state.refCount = data || 0; }
+function matchScore(c){
+  let s = 0; const why = [], me = state.me || {};
+  const words = String(me.major || '').toLowerCase().split(/[^a-z]+/).filter(w => w.length >= 4);
+  const txt = [c.title, c.subject, c.description].map(v => (v || '').toLowerCase()).join(' ');
+  if (words.some(w => txt.includes(w))) { s += 35; why.push('fits your major'); }
+  const mine = new Set([...state.focus.map(x => x.subject), ...joinedClasses().map(x => x.subject)].filter(Boolean).map(x => x.toLowerCase()));
+  if (c.subject && mine.has(c.subject.toLowerCase())) { s += 25; why.push('a subject you study'); }
+  if (c.host?.campus && me.campus && c.host.campus.toLowerCase() === me.campus.toLowerCase()) { s += 10; why.push('same campus'); }
+  const r = ratingOf(c.host_id); if (r.n) { s += Math.round(r.avg * 4); if (r.avg >= 4.5) why.push(`rated ${r.avg.toFixed(1)}`); }
+  const fr = new Set(state.board.filter(x => x.relation === 'friend').map(x => x.id));
+  if (c.members.some(m => fr.has(m.user_id))) { s += 15; why.push('a friend joined'); }
+  if (c.price === 0) s += 5;
+  return { pct: Math.min(99, s), why };
+}
+function matchPicks(list){
+  return list.filter(c => !isMember(c) && seatsTaken(c) < c.capacity).map(c => ({ c, m: matchScore(c) }))
+    .filter(x => x.m.why.length).sort((a, z) => z.m.pct - a.m.pct).slice(0, 3);
+}
+function mentorRank(){
+  const by = new Map();
+  state.classes.forEach(c => { const e = by.get(c.host_id) || { id: c.host_id, name: c.host?.full_name || 'Mentor', done: 0, stu: 0 };
+    if (hasEnded(c)) { e.done++; e.stu += c.members.length; } by.set(c.host_id, e); });
+  return [...by.values()].map(e => { const r = ratingOf(e.id); return { ...e, r, score: (r.avg * r.n + 12) / (r.n + 3) * 20 + Math.min(e.done, 10) * 2 + Math.min(e.stu, 30) * .5 }; })
+    .filter(e => e.done || e.r.n).sort((a, z) => z.score - a.score).slice(0, 5);
+}
+function topMentorsHTML(){
+  const list = mentorRank(); if (!list.length) return '';
+  return `<div class="li-card rank-card"><h4>Top mentors</h4>${list.map((m, i) => `<div class="lb-row"><span class="lb-rank">${i + 1}</span>${avatar(m.id, m.name)}
+    <div class="cm-t"><strong>${esc(m.name)}</strong><span>${m.done} class${m.done === 1 ? '' : 'es'} taught, ${m.stu} student${m.stu === 1 ? '' : 's'}</span></div>
+    <em>${m.r.n ? `<span class="rstar">★</span>${m.r.avg.toFixed(1)}` : 'New'}</em></div>`).join('')}</div>`;
+}
+const TIERS = [['Bronze', 0], ['Silver', 200], ['Gold', 500], ['Platinum', 1000]];
+function pointsOf(){
+  const att = joinedClasses().filter(hasEnded).length, rv = state.reviews.filter(r => r.user_id === uid()).length, ref = state.refCount || 0;
+  return { pts: att * 50 + rv * 20 + ref * 100, att, rv, ref };
+}
+function rewardsHTML(){
+  const p = pointsOf(); let ti = 0; TIERS.forEach((t, i) => { if (p.pts >= t[1]) ti = i; });
+  const next = TIERS[ti + 1], pct = next ? Math.round((p.pts - TIERS[ti][1]) / (next[1] - TIERS[ti][1]) * 100) : 100, code = state.me?.friend_code || '';
+  return `<div class="li-card li-wide"><h4>Loyalty rewards · ${TIERS[ti][0]}</h4>
+    <div class="profile-progress-top"><strong>${p.pts} points</strong><span>${next ? `${next[1] - p.pts} to ${next[0]}` : 'Top tier'}</span></div>
+    <div class="profile-progress-bar"><i style="width:${pct}%"></i></div>
+    <p class="hint">50 points per attended class, 20 per review, 100 per friend you refer who joins a class. Only verified activity earns points.</p>
+    <div class="friend-add" style="margin-top:12px"><input class="input" id="refCode" maxlength="12" placeholder="Got a referral code?" aria-label="Referral code" autocomplete="off"><button class="btn btn-ghost" onclick="useReferral()">Apply</button></div>
+    <p class="hint">Your referral code is <b>${esc(code) || '-'}</b>. ${p.ref} friend${p.ref === 1 ? '' : 's'} joined a class with it.</p></div>`;
+}
+async function useReferral(){
+  const code = ($('refCode').value || '').trim().toLowerCase();
+  if (code.length < 4) return showToast('Enter a referral code.', true);
+  const { error } = await sb.rpc('use_referral', { code });
+  if (error) return showToast(friendlyError(error), true);
+  $('refCode').value = ''; showToast('Referral applied. Your friend earns points when you join a class.');
+}
+async function toggleLive(){
+  const hide = !state.me.hide_live;
+  const { data, error } = await sb.from('profiles').update({ hide_live: hide }).eq('id', uid()).select('*').single();
+  if (error) return showToast(/hide_live/i.test(error.message || '') ? 'Run the updated features.sql first.' : friendlyError(error), true);
+  state.me = data; await loadBoard(); renderBody(); showToast(hide ? 'Your lock-in status is hidden' : 'Friends can see when you lock in');
+}
+
+
+/* ===== Friend code: choose your own or randomize; invite link ?add=code ===== */
+try { const a = new URLSearchParams(location.search).get('add'); if (a && /^[a-z0-9_]{4,12}$/i.test(a)) { lsSet('cc_pending_add', a.toLowerCase()); history.replaceState(null, '', location.pathname + location.hash); } } catch (e) {}
+const inviteLink = () => location.origin + location.pathname + '?add=' + (state.me?.friend_code || '');
+function consumePendingAdd(){
+  const code = lsGet('cc_pending_add', null); if (!code) return;
+  lsSet('cc_pending_add', null);
+  if (code === state.me?.friend_code) return;
+  if (state.role !== 'student') setRole('student');
+  setTab('lockin');
+  const i = $('fCode'); if (i) { i.value = code; i.focus(); }
+  showToast('Invite code filled in. Tap Add to send the request.');
+}
+function openCodeForm(){
+  const cur = state.me?.friend_code || '';
+  $('formOverlay').innerHTML = `
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay('formOverlay')" aria-label="Back">${ic.back}</button><div class="overlay-title">Your friend code</div></div>
+    <form class="overlay-body" id="codeForm" novalidate><div class="pad">
+      <div class="field"><label for="cdInput">Friend code</label><input class="input" id="cdInput" maxlength="12" value="${esc(cur)}" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="sub">4 to 12 characters: letters, numbers or underscore. Friends type this to add you, and it doubles as your referral code.</span></div>
+      <div class="form-error" id="codeError" role="alert"></div>
+      <button class="btn btn-brand" type="submit" style="width:100%">Save code</button>
+      <button class="btn btn-ghost" type="button" id="cdRandom" style="width:100%;margin-top:10px">Randomize instead</button>
+    </div></form>`;
+  const done = async (p) => { const { data, error } = await p; if (error) return void ($('codeError').textContent = friendlyError(error));
+    state.me.friend_code = data; closeOverlay('formOverlay'); renderBody(); showToast('Friend code updated'); };
+  $('codeForm').addEventListener('submit', e => { e.preventDefault();
+    const v = $('cdInput').value.trim().toLowerCase();
+    if (!/^[a-z0-9_]{4,12}$/.test(v)) return void ($('codeError').textContent = 'Use 4 to 12 letters, numbers or underscores.');
+    done(sb.rpc('set_friend_code', { newcode: v })); });
+  $('cdRandom').addEventListener('click', () => done(sb.rpc('regenerate_friend_code')));
+  openOverlay('formOverlay');
+}
 function showBoot(html){ screenEl.innerHTML = `<div class="boot"><img src="${LOGO}" alt=""><span>${html}</span></div>`; }
 function configured(){ return !SUPABASE_URL.includes('YOUR-PROJECT') && !SUPABASE_ANON_KEY.startsWith('YOUR-'); }
 
@@ -3122,6 +3234,7 @@ async function start(session){
   state.loaded = true;
   setTab(state.tab);
   subscribeRealtime();
+  setTimeout(consumePendingAdd, 300);
   if (!(lsGet('cc_onboarded_' + uid(), false) || state.session.user.user_metadata?.onboarded)) openOnboarding();
 }
 
