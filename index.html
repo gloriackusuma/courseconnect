@@ -1324,6 +1324,31 @@
   .li-card .profile-progress-bar{background:var(--surface-alt);margin:10px 0 4px}
   .li-card .toggle-row{margin:12px 0 4px}
   @media (min-width:900px){ .app-body > .match-wrap{grid-column:auto} .match-wrap .class-card{height:calc(100% - 28px)} }
+
+  /* ===== FIX: class card spacing + clipping ===== */
+  .class-card{ gap:16px; padding:18px 18px 18px 22px; align-items:flex-start; }
+  .class-main{ display:flex; flex-direction:column; min-width:0; }
+  .class-title{ line-height:1.35; }
+  .kind-badge{ align-self:flex-start; margin-top:8px; padding:4px 10px; }
+  .class-meta{ margin:12px 0 0; display:grid; gap:6px; line-height:1.4; }
+  .class-foot{ margin-top:16px; padding-top:14px; border-top:1px solid var(--border); gap:14px; }
+  .seats-bar{ height:6px; }
+  .seats small{ margin-top:6px; }
+  .date-block{ padding:10px 0; }
+  @media (min-width:900px){
+    .screen > .app-body{ grid-auto-rows:max-content; }
+    .split-list{ grid-auto-rows:max-content; }
+    .class-card{ gap:18px; padding:22px 24px 22px 28px; }
+    .date-block{ width:64px; padding:12px 0; }
+    .class-title{ font-size:15.5px; }
+    .class-meta{ font-size:12.5px; }
+    .app-body[data-tab="discover"]{ row-gap:16px; column-gap:18px; }
+  }
+
+  /* ===== Unfriend ===== */
+  .lb-row .row-actions{ display:flex; gap:6px; flex:none; margin-left:4px; }
+  .lb-row .mini-btn.danger{ border-color:color-mix(in srgb,var(--danger) 45%,var(--border)); }
+  .lb-row .mini-btn.danger.confirm{ background:var(--danger); color:#fff; border-color:var(--danger); }
 </style>
 </head>
 <body>
@@ -3036,16 +3061,21 @@ function badgesOf(){
   return [[state.focus.length >= 1, 'First lock-in'], [tot >= 36e6, '10 hours focused'], [st >= 3, '3-day streak'], [st >= 7, '7-day streak'],
     [joinedClasses().some(hasEnded), 'Verified learner'], [hostedClasses().some(hasEnded), 'Verified mentor'], [r.n >= 3 && r.avg >= 4.5, 'Top-rated mentor']];
 }
+let unfriendAsk = null;
 function boardRowsHTML(){
   const rows = state.board, rk = r => rows.filter(x => x.relation === r);
   const board = [...rk('me'), ...rk('friend')].sort((a, z) => z.week_secs - a.week_secs);
   const inc = rk('incoming'), out = rk('outgoing');
+  const unfriendBtn = p => unfriendAsk === p.id
+    ? `<span class="row-actions"><button class="mini-btn" onclick="askUnfriend(null)">Cancel</button><button class="mini-btn danger confirm" onclick="removeFriend('${p.id}')">Unfriend</button></span>`
+    : `<span class="row-actions"><button class="mini-btn danger" aria-label="Unfriend ${esc(p.full_name)}" onclick="askUnfriend('${p.id}')">Unfriend</button></span>`;
   return inc.map(p => `<div class="lb-row">${avatar(p.id, p.full_name)}<div class="cm-t"><strong>${esc(p.full_name)}</strong><span>wants to be friends</span></div>
       <button class="mini-btn" onclick="respondFriend('${p.id}',false)">Decline</button><button class="mini-btn primary" onclick="respondFriend('${p.id}',true)">Accept</button></div>`).join('')
     + board.map((p, i) => `<div class="lb-row"><span class="lb-rank">${i + 1}</span>${avatar(p.id, p.full_name)}
       <div class="cm-t"><strong>${esc(p.full_name)}${p.relation === 'me' ? ' (you)' : ''}</strong><span>${p.live ? `<i class="live-dot"></i>Locked in${p.subject ? ': ' + esc(p.subject) : ''}` : 'Not focusing now'}</span></div>
-      <em>${fmtHM(p.week_secs * 1000)}</em></div>`).join('')
-    + out.map(p => `<div class="lb-row">${avatar(p.id, p.full_name)}<div class="cm-t"><strong>${esc(p.full_name)}</strong><span>Request sent</span></div></div>`).join('')
+      <em>${fmtHM(p.week_secs * 1000)}</em>${p.relation === 'friend' ? unfriendBtn(p) : ''}</div>`).join('')
+    + out.map(p => `<div class="lb-row">${avatar(p.id, p.full_name)}<div class="cm-t"><strong>${esc(p.full_name)}</strong><span>Request sent</span></div>
+      <span class="row-actions"><button class="mini-btn" onclick="removeFriend('${p.id}', true)">Cancel request</button></span></div>`).join('')
     + (board.length < 2 && !inc.length ? `<div class="empty-note" style="padding:14px 0">Add a friend with their code to compete on weekly focus time.</div>` : '');
 }
 function renderBoardInto(){ const e = $('liRows'); if (e) e.innerHTML = boardRowsHTML(); }
@@ -3109,6 +3139,13 @@ async function respondFriend(other, accept){
   const { error } = await sb.rpc('respond_friend', { other, accept });
   if (error) return showToast(friendlyError(error), true);
   await loadBoard(); renderBoardInto(); showToast(accept ? 'Friend added' : 'Request declined');
+}
+function askUnfriend(id){ unfriendAsk = id; renderBoardInto(); }
+async function removeFriend(other, isRequest){
+  unfriendAsk = null;
+  const { error } = await sb.rpc('remove_friend', { other });
+  if (error) return showToast(/schema cache|could not find the function/i.test(error.message || '') ? 'Unfriend needs the remove_friend function. Run unfriend.sql in Supabase.' : friendlyError(error), true);
+  await loadBoard(); renderBoardInto(); showToast(isRequest ? 'Request cancelled' : 'Friend removed');
 }
 /* 1s ticker: live clock; every 30s refresh the board and any countdowns (payment time left) */
 let tickN = 0;
